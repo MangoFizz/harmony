@@ -15,11 +15,6 @@ namespace Harmony::Optic {
     class Handler {
     public:
         /**
-         * Get DirectX 9 device
-         */
-        //LPDIRECT3DDEVICE9 get_d3d9_device() noexcept;
-
-        /**
          * Get optic groups
          * @return  A read-only reference to the groups array
          */
@@ -81,10 +76,6 @@ namespace Harmony::Optic {
         /** Render group */
         std::map<std::string, RenderGroup> groups;
     };
-
-    #ifdef DEBUG
-    void set_up_optic_test() noexcept;
-    #endif
 }
 
 #endif

@@ -88,8 +88,6 @@ namespace Harmony {
       // Enable console output
       enable_output(true);
 
-      //Optic::set_up_optic_test();
-
       // Set up d3d9 events
       enable_d3d9_end_scene_hook();
       enable_d3d9_reset_hook();
