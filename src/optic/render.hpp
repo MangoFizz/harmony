@@ -149,17 +149,6 @@ namespace Harmony::Optic {
         void set_slide_anim(Animation anim) noexcept;
 
         /**
-         * Get if wait for slide animation ends
-         */
-        bool wait_for_slide() noexcept;
-
-        /**
-         * Set if wait for slide animation
-         * @param value     New value
-         */
-        void wait_for_slide(bool value) noexcept;
-
-        /**
          * Get maximum number of renders
          */
         std::size_t get_maximum_renders() const noexcept;
@@ -233,9 +222,6 @@ namespace Harmony::Optic {
 
         /** Slide animation */
         Animation slide_anim;
-
-        /** Wait for slide animation flag */
-        bool wait_for_stack_slide_anim = false;
 
         /** Maximum active renders */
         std::size_t max_renders = 0;

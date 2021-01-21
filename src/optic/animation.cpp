@@ -5,8 +5,6 @@
 #include "animation.hpp"
 
 namespace Harmony::Optic {
-    #define FRAMES_PER_SECOND 60
-
     long Animation::get_duration() const noexcept {
         return this->duration;
     }
@@ -133,25 +131,6 @@ namespace Harmony::Optic {
 
     Math::QuadraticBezier Animation::ease_in_out() noexcept {
         return Math::QuadraticBezier({0.4f, 0.0f}, {0.6f, 1.0f});
-    }
-
-    Animation::Trigger Animation::get_trigger_from_string(const char *trigger_name) noexcept {
-        std::string trigger_str = trigger_name;
-        if(trigger_str == "fade_in") {
-            return TRIGGER_FADE_IN;
-        }
-        else if(trigger_str == "fade_out") {
-            return TRIGGER_FADE_OUT;
-        }
-        else if(trigger_str == "slide") {
-            return TRIGGER_SLIDE;
-        }
-        else if(trigger_str == "none") {
-            return TRIGGER_NONE;
-        }
-        else {
-            return TRIGGER_INVALID;
-        }
     }
 
     Animation::Target Animation::get_target_from_string(const char *target_name) noexcept {

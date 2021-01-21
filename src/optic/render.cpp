@@ -95,14 +95,6 @@ namespace Harmony::Optic {
         this->slide_anim = anim;
     }
 
-    bool RenderGroup::wait_for_slide() noexcept {
-        return this->wait_for_stack_slide_anim;
-    }
-
-    void RenderGroup::wait_for_slide(bool value) noexcept {
-        this->wait_for_stack_slide_anim = value;
-    }
-
     std::size_t RenderGroup::get_maximum_renders() const noexcept {
         return this->max_renders;
     }

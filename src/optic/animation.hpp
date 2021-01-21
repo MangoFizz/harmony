@@ -4,9 +4,7 @@
 #define HARMONY_OPTIC_ANIMATION_HPP
 
 #include <string>
-#include <vector>
 #include <map>
-#include <utility>
 #include <chrono>
 #include "../math/geometry.hpp"
 #include "sprite.hpp"
@@ -14,9 +12,6 @@
 namespace Harmony::Optic {
     class Animation {
     public:
-        /** Animation frame type */
-        using Frame = float;
-
         struct StateTransform {
             Math::Point2D position;
             int opacity;
@@ -27,14 +22,6 @@ namespace Harmony::Optic {
                 opacity = 0;
                 rotation = 0;
             }
-        };
-
-        enum Trigger {
-            TRIGGER_FADE_IN,
-            TRIGGER_FADE_OUT,
-            TRIGGER_SLIDE,
-            TRIGGER_NONE,
-            TRIGGER_INVALID
         };
 
         /**
@@ -138,13 +125,6 @@ namespace Harmony::Optic {
         inline bool operator==(const Animation& anim) {
             return this->tag == anim.get_tag();
         }
-
-        /**
-         * Get a trigger from a given string
-         * @param trigger_name  Name of the desired trigger
-         * @return              The trigger itself
-         */
-        static Trigger get_trigger_from_string(const char *trigger_name) noexcept;
 
         /**
          * Get a target from a given string
