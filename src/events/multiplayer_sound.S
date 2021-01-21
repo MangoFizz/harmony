@@ -10,8 +10,8 @@ _on_multiplayer_sound_asm:
     pushad
 
     push esi
-	call _do_on_multiplayer_sound
-	pop esi
+    call _do_on_multiplayer_sound
+    pop esi
 
     popad
     popfd

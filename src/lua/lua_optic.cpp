@@ -336,6 +336,6 @@ namespace Harmony::Lua {
 
         lua_pushstring(state, "optic");
         luaL_newlibtable(state, optic);
-		luaL_setfuncs(state, optic, 0);
+        luaL_setfuncs(state, optic, 0);
     }
 }
