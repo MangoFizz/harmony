@@ -35,10 +35,6 @@ namespace Harmony::Optic {
         std::terminate();
     }
 
-    void Handler::remove_render_group(const char *name) noexcept {
-        this->groups.erase(name);
-    }
-
     void Handler::render_sprite(Sprite *sprite, const char *group_name) noexcept {
         if(this->groups.find(group_name) != this->groups.end()) {
             this->groups[group_name].enqueue_sprite(sprite);
@@ -78,16 +74,18 @@ namespace Harmony::Optic {
     }
 
     static void on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {
-        for(auto &elem : handler->get_render_groups()) {
-            auto group_name = elem.first;
-            auto &group = elem.second;
+        auto &groups = handler->get_render_groups();
+        auto it = groups.begin();
+        while(it != groups.end()) {
+            auto group_name = it->first;
+            auto &group = it->second;
             auto &renders = group.get_renders();
             auto &queue = group.get_sprites_queue();
-            auto maximum_renders = group.get_maximum_renders();
+            auto max_renders = group.get_maximum_renders();
 
             // Remove if is a temporal group
             if(group.single_render() && queue.empty() && renders.empty()) {
-                handler->remove_render_group(group_name.c_str());
+                it = groups.erase(it);
                 continue;
             }
 
@@ -96,20 +94,24 @@ namespace Harmony::Optic {
             auto fade_out_anim = group.get_fade_out_anim();
             auto &slide_anim = group.get_slide_anim();
 
+            // Render sprite from queue
             if(!slide_anim.is_playing()) {
-                // Render sprite from queue
-                if(!queue.empty() && (maximum_renders == 0 || renders.size() < maximum_renders)) {
+                if(!queue.empty() && (max_renders == 0 || renders.size() < max_renders)) {
                     auto &render = group.render_sprite_from_queue();
+
+                    // Play fade-in animation in the new render
                     render.play_animation(fade_in_anim);
+
+                    // Play slide animation
                     if(renders.size() > 1) {
                         slide_anim.play();
                     }
                 }
             }
 
+            // Remove expired renders
             if(!renders.empty() && renders.front().get_timelife() > group.get_render_duration()) {
-                //renders.pop_front();
-                renders.erase(renders.begin());
+                renders.pop_front();
             }
 
             for(std::size_t i = 0; i < renders.size(); i++) {
@@ -119,7 +121,7 @@ namespace Harmony::Optic {
                 auto &active_animations = render.get_active_animations();
                 Sprite::State current_render_state = render.get_state();
 
-                // Slide animation
+                // Apply slide animation
                 if(slide_anim.is_playing() && i != renders.size() - 1) {
                     slide_anim.apply_transform(current_render_state);
 
@@ -128,7 +130,7 @@ namespace Harmony::Optic {
                     }
                 }
 
-                // Apply active animations
+                // Apply render active animations
                 for(std::size_t i = 0; i < active_animations.size(); i++) {
                     auto &anim = active_animations[i];
                     anim.apply_transform(current_render_state);
@@ -151,9 +153,13 @@ namespace Harmony::Optic {
                 sprite->draw(current_render_state.position, current_render_state.color);
             }
             
+            // Stop slide animation
             if(slide_anim.get_time_left() == 0) {
                 slide_anim.stop();
             }
+
+            // bump up iterator
+            it++;
         }
     }
 
