@@ -4,7 +4,6 @@
 #define CHIMERA__EVENT__D3D9_RESET_HPP
 
 #include <d3d9.h>
-
 #include "event.hpp"
 
 namespace Harmony {

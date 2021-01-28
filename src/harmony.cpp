@@ -5,6 +5,7 @@
 #include <lua.hpp>
 #include "events/d3d9_end_scene.hpp"
 #include "events/d3d9_reset.hpp"
+#include "events/map_load.hpp"
 #include "events/multiplayer_sound.hpp"
 #include "events/tick.hpp"
 #include "lua/lua_callback.hpp"
@@ -68,6 +69,9 @@ namespace Harmony {
 
       // Set up tick event hook
       enable_tick_event();
+
+      // Set up map load hook
+      enable_map_load_hook();
 
       // Add first tick event
       add_tick_event(first_tick);

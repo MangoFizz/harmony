@@ -13,9 +13,10 @@ namespace Harmony {
             signatures.emplace_back(name, data, sizeof(data) / sizeof(data[0]), offset); \
         }
         
-        /** Events signatures */
+        /** Events */
         FIND_SIGNATURE("on_tick", 0x0, {-1 /*0xE8*/, -1, -1, -1, -1, 0xA1, -1, -1, -1, -1, 0x8B, 0x50, 0x14, 0x8B, 0x48, 0x0C});
         FIND_SIGNATURE("on_multiplayer_sound", 0x0, {0xC6, 0x44, 0x24, 0x04, 0x00, 0x8A, 0x86});
+        FIND_SIGNATURE("on_map_load", 0x0, {0xE8, -1, -1, -1, -1, 0xE8, -1, -1, -1, -1, 0xA1, -1, -1, -1, -1, 0x33, 0xD2, 0x8B, 0xC8, 0x89, 0x11});
 
         /** Misc */
         FIND_SIGNATURE("window_handle", 0x2, {0x89, 0x35, -1, -1, -1, -1, 0xFF, 0x15, -1, -1, -1, -1, 0x3B, 0xC5});

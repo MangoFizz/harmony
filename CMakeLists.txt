@@ -21,9 +21,10 @@ add_library(harmony MODULE
     src/events/d3d9_end_scene.S
     src/events/d3d9_reset.cpp
     src/events/d3d9_reset.S
-    src/events/tick.cpp
+    src/events/map_load.cpp
     src/events/multiplayer_sound.cpp
     src/events/multiplayer_sound.S
+    src/events/tick.cpp
     src/halo_data/path.cpp
     src/halo_data/resolution.cpp
     src/halo_data/sounds.cpp
