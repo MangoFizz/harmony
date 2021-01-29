@@ -40,6 +40,12 @@ namespace Harmony::Optic {
         RenderGroup &add_render_group(const char *name, Math::Point2D position, std::uint8_t opacity, Math::Angle rotation, RenderGroup::Align align, long render_duration) noexcept;
 
         /**
+         * Remove an existing optic group
+         * @param name  Name of the group
+         */
+        void remove_render_group(std::string name) noexcept;
+
+        /**
          * Render a sprite
          * @param sprite        Sprite to render
          * @param group_name    Render group when the sprite will be rendered

@@ -176,6 +176,9 @@ namespace Harmony::Lua {
 
                 auto &group = optic_handler->add_render_group(name.c_str(), {pos_x, pos_y}, opacity, 0, Optic::RenderGroup::ALIGN_LEFT, duration);
 
+                // Register group
+                optic_store.groups.emplace_back(name);
+
                 if(args >= 6) {
                     const char *fade_in = luaL_checkstring(state, 6);
                     if(animations.find(fade_in) != animations.end()) {

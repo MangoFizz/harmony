@@ -35,6 +35,10 @@ namespace Harmony::Optic {
         std::terminate();
     }
 
+    void Handler::remove_render_group(std::string name) noexcept {
+        this->groups.erase(name);
+    }
+
     void Handler::render_sprite(Sprite *sprite, const char *group_name) noexcept {
         if(this->groups.find(group_name) != this->groups.end()) {
             this->groups[group_name].enqueue_sprite(sprite);

@@ -2,9 +2,18 @@
 
 #include <filesystem>
 #include "../halo_data/path.hpp"
+#include "../optic/handler.hpp"
+#include "../harmony.hpp"
 #include "script.hpp"
 
 namespace Harmony::Lua {
+    void Script::OpticStore::remove_optic_groups() noexcept {
+        auto &optic_handler = get_harmony().get_optic_handler();
+        for(std::size_t i = 0; i < this->groups.size(); i++) {
+            optic_handler.remove_render_group(this->groups[i]);
+        }
+    }
+
     const char *Script::get_name() const noexcept {
         return this->name.c_str();
     }
@@ -77,5 +86,9 @@ namespace Harmony::Lua {
         this->name = get_global_from_state(state, "script_name");
         this->type = get_global_from_state(state, "script_type");
         this->data_path = this->get_script_data_path();
+    }
+
+    Script::~Script() noexcept {
+        this->optic_store.remove_optic_groups();
     }
 }

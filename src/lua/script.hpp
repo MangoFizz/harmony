@@ -19,6 +19,14 @@ namespace Harmony::Lua {
 
             /** Sprites */
             std::map<std::string, Optic::Sprite> sprites;
+
+            /** Groups */
+            std::vector<std::string> groups;
+
+            /**
+            * Remove script optic groups
+            */
+            void remove_optic_groups() noexcept;
         };
 
         /**
@@ -73,6 +81,11 @@ namespace Harmony::Lua {
          * @param state     Pointer to Lua script state
          */
         Script(lua_State *state) noexcept;
+
+        /**
+         * Destructor for script
+         */
+        ~Script() noexcept;
 
         /**
          * Equals operator for std::find function
