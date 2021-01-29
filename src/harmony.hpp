@@ -11,12 +11,12 @@ struct lua_State;
 namespace Harmony {
     class Signature;
 
-    namespace Optic {
-        class Handler;
+    namespace Lua {
+        class Library;
     }
 
-    namespace Lua {
-        class Script;
+    namespace Optic {
+        class Handler;
     }
 
     /** Harmony class */
@@ -30,28 +30,14 @@ namespace Harmony {
         Signature &get_signature(const char *name) noexcept;
 
         /**
+         * Get Lua library handler
+         */
+        Lua::Library &get_lua_library_handler() noexcept;
+
+        /**
          * Get optic handler
          */
         Optic::Handler &get_optic_handler() noexcept;
-
-        /**
-         * Get Lua scripts
-         */
-        std::vector<Lua::Script> &get_lua_scripts() noexcept;
-
-        /**
-         * Get script by name
-         * @param name  Name of the script
-         * @return      Reference to script
-         */
-        Lua::Script *get_lua_script(const char *name) noexcept;
-
-        /**
-         * Get script from state
-         * @param state     Lua state
-         * @return          Reference to script
-         */
-        Lua::Script *get_lua_script(lua_State *state) noexcept;
 
         /**
          * Constructor for everything
@@ -62,11 +48,11 @@ namespace Harmony {
         /** Harmony signatures */
         std::vector<Signature> signatures;
 
-        /** Optic Handler */
-        std::unique_ptr<Optic::Handler> optic;
+        /** Lua handler */
+        std::unique_ptr<Lua::Library> lua_handler;
 
-        /** Harmony Lua scripts */
-        std::vector<Lua::Script> scripts;
+        /** Optic Handler */
+        std::unique_ptr<Optic::Handler> optic_handler;
     };
 
     /**

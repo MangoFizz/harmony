@@ -2,7 +2,7 @@
 
 #include <filesystem>
 #include "../halo_data/path.hpp"
-#include "lua_script.hpp"
+#include "script.hpp"
 
 namespace Harmony::Lua {
     const char *Script::get_name() const noexcept {
@@ -17,6 +17,15 @@ namespace Harmony::Lua {
         return this->data_path.c_str();
     }
 
+    bool Script::path_is_valid(std::string path) noexcept {
+        std::string data_dir = this->data_path;
+        auto absolute_path = std::filesystem::absolute(std::filesystem::path(data_dir) / path);
+        if(absolute_path.string().find(data_dir) == 0) {
+            return true;
+        }
+        return false;
+    }
+
     std::vector<std::string> &Script::get_callbacks(const char *callback) noexcept {
         if(this->callbacks.find(callback) != this->callbacks.end()) {
             return this->callbacks[callback];
@@ -27,7 +36,7 @@ namespace Harmony::Lua {
         return this->callbacks["invalid"];
     }
 
-    OpticStore &Script::get_optic_store() noexcept {
+    Script::OpticStore &Script::get_optic_store() noexcept {
         return this->optic_store;
     }
 
@@ -35,19 +44,22 @@ namespace Harmony::Lua {
         return this->script;
     }
 
-    void Script::register_callback_function(const char *callback, const char *function) noexcept {
+    void Script::add_callback(const char *callback, const char *function) noexcept {
         this->callbacks[callback].emplace_back(function);
     }
 
-    std::string Script::get_global(lua_State *state, const char *global) noexcept {
+    std::string Script::get_global_from_state(lua_State *state, const char *global) noexcept {
         lua_getglobal(state, global);
         std::string value = lua_tostring(state, -1);
         lua_pop(state, 1);
         return value;
     }
 
+    std::string Script::get_script_name_from_state(lua_State *state) noexcept {
+        return get_global_from_state(state, "script_name");
+    }
+
     std::string Script::get_script_data_path() noexcept {
-        auto state = this->script;
         static auto chimera_folder = HaloData::get_path() / "chimera";
         static auto scripts_data_directory = chimera_folder / "lua" / "data";
 
@@ -62,8 +74,8 @@ namespace Harmony::Lua {
 
     Script::Script(lua_State *state) noexcept {
         this->script = state;
-        this->name = get_global(state, "script_name");
-        this->type = get_global(state, "script_type");
+        this->name = get_global_from_state(state, "script_name");
+        this->type = get_global_from_state(state, "script_type");
         this->data_path = this->get_script_data_path();
     }
 }

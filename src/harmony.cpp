@@ -5,11 +5,10 @@
 #include <lua.hpp>
 #include "events/d3d9_end_scene.hpp"
 #include "events/d3d9_reset.hpp"
+#include "lua/library.hpp"
 #include "events/map_load.hpp"
 #include "events/multiplayer_sound.hpp"
 #include "events/tick.hpp"
-#include "lua/lua_callback.hpp"
-#include "lua/lua_script.hpp"
 #include "memory/signature.hpp"
 #include "messaging/console_output.hpp"
 #include "messaging/message_box.hpp"
@@ -34,38 +33,23 @@ namespace Harmony {
       std::terminate();
    }
 
+   Lua::Library &Harmony::get_lua_library_handler() noexcept{
+      return *(this->lua_handler.get());
+   }
+
    Optic::Handler &Harmony::get_optic_handler() noexcept {
-      return *(this->optic.get());
-   }
-
-   std::vector<Lua::Script> &Harmony::get_lua_scripts() noexcept {
-      return this->scripts;
-   }
-
-   Lua::Script *Harmony::get_lua_script(const char *name) noexcept {
-      for(auto &script : this->scripts) {
-         if(strcmp(script.get_name(), name) == 0) {
-            return &script;
-         }
-      }
-      return nullptr;
-   }
-
-   Lua::Script *Harmony::get_lua_script(lua_State *state) noexcept {
-      for(auto &script : this->scripts) {
-         if(script.get_state() == state) {
-            return &script;
-         }
-      }
-      return nullptr;
+      return *(this->optic_handler.get());
    }
 
    Harmony::Harmony() : signatures(Signature::find_signatures()) {
       // Set instance pointer
       instance = this;
 
+      // Set up library handler
+      this->lua_handler = std::make_unique<Lua::Library>();
+
       // Set up optic
-      this->optic = std::make_unique<Optic::Handler>();
+      this->optic_handler = std::make_unique<Optic::Handler>();
 
       // Set up tick event hook
       enable_tick_event();
@@ -98,9 +82,6 @@ namespace Harmony {
 
       // Set up multiplayer sounds event
       enable_multiplayer_sounds_hook();
-
-      // Set up Lua callbacks
-      Lua::set_up_c_callbacks();
    }
 }
 

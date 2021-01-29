@@ -1,16 +1,26 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef HARMONY_LUA_API_OPTIC
-#define HARMONY_LUA_API_OPTIC
+#ifndef HARMONY_LUA_SCRIPT_HPP
+#define HARMONY_LUA_SCRIPT_HPP
 
 #include <string>
+#include <vector>
+#include <map>
 #include <lua.hpp>
-#include "lua_callback.hpp"
-#include "lua_optic.hpp"
+#include "../optic/animation.hpp"
+#include "../optic/sprite.hpp"
 
 namespace Harmony::Lua {
     class Script {
     public:
+        struct OpticStore {
+            /** Animations */
+            std::map<std::string, Optic::Animation> animations;
+
+            /** Sprites */
+            std::map<std::string, Optic::Sprite> sprites;
+        };
+
         /**
          * Get script name
          */
@@ -25,6 +35,13 @@ namespace Harmony::Lua {
          * Get data path
          */
         const char *get_data_path() const noexcept;
+
+        /**
+         * Check if the path is inside of the script data directory
+         * @param path  Path to check
+         * @return      True if the path is valid, false if not
+         */
+        bool path_is_valid(std::string path) noexcept;
 
         /**
          * Get callbacks
@@ -42,9 +59,14 @@ namespace Harmony::Lua {
         lua_State *get_state() noexcept;
 
         /**
+         * Get global from script
+         */
+        const char *get_global(std::string name) const noexcept;
+
+        /**
          * Register a callback
          */
-        void register_callback_function(const char *callback, const char *function) noexcept;
+        void add_callback(const char *callback, const char *function) noexcept;
 
         /**
          * Constructor for script
@@ -65,7 +87,13 @@ namespace Harmony::Lua {
          * @param global    Name of the global
          * @return          Global value
          */
-        static std::string get_global(lua_State *state, const char *global) noexcept;
+        static std::string get_global_from_state(lua_State *state, const char *global) noexcept;
+
+        /**
+         * Get script name from state
+         * @param state     Pointer to Lua script state
+         */
+        static std::string get_script_name_from_state(lua_State *state) noexcept;
 
     private:
         /** Name of the script */

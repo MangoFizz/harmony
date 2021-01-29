@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <filesystem>
-#include "../halo_data/resolution.hpp"
-#include "../math/geometry.hpp"
-#include "../optic/animation.hpp"
-#include "../optic/handler.hpp"
-#include "../optic/render.hpp"
-#include "../harmony.hpp"
-#include "lua_script.hpp"
-#include "lua_optic.hpp"
-
-namespace fs = std::filesystem;
+#include "../../halo_data/resolution.hpp"
+#include "../../math/geometry.hpp"
+#include "../../optic/animation.hpp"
+#include "../../optic/handler.hpp"
+#include "../../optic/render.hpp"
+#include "../../harmony.hpp"
+#include "../script.hpp"
+#include "../library.hpp"
+#include "optic.hpp"
 
 namespace Harmony::Lua {
-    static Optic::Handler *handler = nullptr;
+    static Optic::Handler *optic_handler = nullptr;
 
     static Script *get_script(lua_State *state) {
         auto &harmony = get_harmony();
-        return harmony.get_lua_script(state);
+        auto &handler = harmony.get_lua_library_handler();
+        return handler.get_script(state);
     }
 
     /**
@@ -25,27 +25,8 @@ namespace Harmony::Lua {
      * @return  Optic name prefix
      */
     static std::string get_optic_prefix(lua_State *state) noexcept {
-        auto prefix = Script::get_global(state, "script_name") + "_";
+        auto prefix = Script::get_global_from_state(state, "script_name") + "_";
         return prefix;
-    }
-
-    /**
-     * Check if a path is inside of the data folder of a given script
-     * @param state     Lua script state
-     * @param path      Path to validate
-     * @return          true if the path valid, false if not
-     */
-    static bool check_path(lua_State *state, fs::path path) noexcept {
-        auto *script = get_script(state);
-
-        // Get script data directory
-        std::string data_directory = script->get_data_path();
-
-        auto absolute_path = fs::absolute(data_directory / path);
-        if(absolute_path.string().find(data_directory) == 0) {
-            return true;
-        }
-        return false;
     }
 
     static int lua_register_animation(lua_State *state) noexcept {
@@ -157,8 +138,8 @@ namespace Harmony::Lua {
 
             // check if the texture file exists
             if(sprites.find(name) == sprites.end()) {
-                if(check_path(state, texture_path)) {
-                    if(fs::exists(texture_path)) {
+                if(script->path_is_valid(texture_path)) {
+                    if(std::filesystem::exists(texture_path)) {
                         sprites[name] = Optic::Sprite(texture_path.c_str(), width, height);
                     }
                     else {
@@ -183,7 +164,7 @@ namespace Harmony::Lua {
         int args = lua_gettop(state);
         if(args >= 5 && args <= 8) {
             auto name = get_optic_prefix(state) + luaL_checkstring(state, 1);
-            if(!handler->get_render_group(name.c_str())) {
+            if(!optic_handler->get_render_group(name.c_str())) {
                 auto *script = get_script(state);
                 auto &optic_store = script->get_optic_store();
                 auto &animations = optic_store.animations;
@@ -193,7 +174,7 @@ namespace Harmony::Lua {
                 int opacity = luaL_checknumber(state, 4);
                 long duration = luaL_checknumber(state, 5);
 
-                auto &group = handler->add_render_group(name.c_str(), {pos_x, pos_y}, opacity, 0, Optic::RenderGroup::ALIGN_LEFT, duration);
+                auto &group = optic_handler->add_render_group(name.c_str(), {pos_x, pos_y}, opacity, 0, Optic::RenderGroup::ALIGN_LEFT, duration);
 
                 if(args >= 6) {
                     const char *fade_in = luaL_checkstring(state, 6);
@@ -236,14 +217,14 @@ namespace Harmony::Lua {
         int args = lua_gettop(state);
         if(args == 2) {
             auto group_name = get_optic_prefix(state) + luaL_checkstring(state, 1);
-            if(handler->get_render_group(group_name.c_str())) {
+            if(optic_handler->get_render_group(group_name.c_str())) {
                 auto *script = get_script(state);
                 auto &optic_store = script->get_optic_store();
                 auto &sprites = optic_store.sprites;
 
                 const char *sprite_name = luaL_checkstring(state, 2);
                 if(sprites.find(sprite_name) != sprites.end()) {
-                    handler->render_sprite(&sprites[sprite_name], group_name.c_str());
+                    optic_handler->render_sprite(&sprites[sprite_name], group_name.c_str());
                 }
                 else {
                     luaL_error(state, "invalid sprite in harmony render_sprite function");
@@ -289,7 +270,7 @@ namespace Harmony::Lua {
                     }
                 }
 
-                handler->render_sprite(&sprites[sprite_name], {pos_x, pos_y}, opacity, 0, Optic::RenderGroup::ALIGN_LEFT, duration, fade_in, fade_out);
+                optic_handler->render_sprite(&sprites[sprite_name], {pos_x, pos_y}, opacity, 0, Optic::RenderGroup::ALIGN_LEFT, duration, fade_in, fade_out);
             }
             else {
                 luaL_error(state, "invalid sprite in harmony render_sprite function");
@@ -305,7 +286,7 @@ namespace Harmony::Lua {
         int args = lua_gettop(state);
         if(args == 1) {
             auto name = get_optic_prefix(state) + luaL_checkstring(state, 1);
-            auto *group = handler->get_render_group(name.c_str());
+            auto *group = optic_handler->get_render_group(name.c_str());
             if(group) {
                 group->get_renders().clear();
             }
@@ -330,12 +311,14 @@ namespace Harmony::Lua {
     };
 
     void set_optic_functions(lua_State *state) noexcept {
-        if(!handler) {
-            handler = &(get_harmony().get_optic_handler());
+        if(!optic_handler) {
+            optic_handler = &(get_harmony().get_optic_handler());
         }
 
         lua_pushstring(state, "optic");
         luaL_newlibtable(state, optic);
         luaL_setfuncs(state, optic, 0);
+
+        lua_settable(state, -3);
     }
 }

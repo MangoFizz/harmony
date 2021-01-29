@@ -29,9 +29,9 @@ add_library(harmony MODULE
     src/halo_data/resolution.cpp
     src/halo_data/sounds.cpp
     src/halo_data/window.cpp
-    src/lua/lua_callback.cpp
-    src/lua/lua_optic.cpp
-    src/lua/lua_script.cpp
+    src/lua/api/callback.cpp
+    src/lua/api/optic.cpp
+    src/lua/script.cpp
     src/lua/library.cpp
     src/math/geometry.cpp
     src/memory/signatures/client.cpp
