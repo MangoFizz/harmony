@@ -4,6 +4,7 @@
 #include "../messaging/console_output.hpp"
 #include "../messaging/message_box.hpp"
 #include "../events/multiplayer_sound.hpp"
+#include "../events/map_load.hpp"
 #include "api/callback.hpp"
 #include "api/optic.hpp"
 #include "script.hpp"
@@ -92,7 +93,17 @@ namespace Harmony::Lua {
         library = this;
 
         // Set up library events
-        add_multiplayer_sound_event(reinterpret_cast<MultiplayerSoundEventFunction>(Library::multiplayer_sound_event));
+        add_map_load_event(Library::on_map_load, EVENT_PRIORITY_BEFORE);
+        add_multiplayer_sound_event(Library::multiplayer_sound_event);
+    }
+    
+    void Library::on_map_load() noexcept {
+        library->unload_map_script();
+    }
+
+    int Library::lua_unload_script(lua_State *state) noexcept {
+        library->unload_script(state);
+        return 0;
     }
 
     bool Library::multiplayer_sound_event(HaloData::MultiplayerSound sound) noexcept {
@@ -112,11 +123,6 @@ namespace Harmony::Lua {
             }
         }
         return allow;
-    }
-
-    int Library::lua_unload_script(lua_State *state) noexcept {
-        library->unload_script(state);
-        return 0;
     }
 
     int luaopen_mods_harmony(lua_State *state) noexcept {

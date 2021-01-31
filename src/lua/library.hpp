@@ -61,14 +61,22 @@ namespace Harmony::Lua {
          */
         Library() noexcept;
 
-        /** Events dispatchers */
-        static bool multiplayer_sound_event(HaloData::MultiplayerSound sound) noexcept;
+        /**
+         * Map load callback
+         * This will unload the map script
+         */
+        static void on_map_load() noexcept;
 
         /** 
          * Unload script callback
          * This function will be called when Chimera unloads a script, so we need to unload it too
          */
         static int lua_unload_script(lua_State *state) noexcept;
+
+        /** 
+         * Events dispatchers
+         */
+        static bool multiplayer_sound_event(HaloData::MultiplayerSound sound) noexcept;
 
     private:
         /** Loaded scripts */
