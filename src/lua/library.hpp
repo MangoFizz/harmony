@@ -62,21 +62,28 @@ namespace Harmony::Lua {
         Library() noexcept;
 
         /**
-         * Map load callback
+         * Map load event
          * This will unload the map script
          */
         static void on_map_load() noexcept;
 
         /** 
-         * Unload script callback
-         * This function will be called when Chimera unloads a script, so we need to unload it too
+         * Sprite management stuff
+         * These events are in charge of loading/unloading the sprites from all scripts
          */
-        static int lua_unload_script(lua_State *state) noexcept;
+        static void on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept;
+        static void on_d3d9_reset(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS *) noexcept;
 
         /** 
-         * Events dispatchers
+         * Script events dispatchers
          */
         static bool multiplayer_sound_event(HaloData::MultiplayerSound sound) noexcept;
+
+        /** 
+         * Unload script callback
+         * This function is called when Chimera unloads a script, so we need to unload it here too
+         */
+        static int lua_unload_script(lua_State *state) noexcept;
 
     private:
         /** Loaded scripts */

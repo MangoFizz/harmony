@@ -3,6 +3,8 @@
 #include <algorithm>
 #include "../messaging/console_output.hpp"
 #include "../messaging/message_box.hpp"
+#include "../events/d3d9_end_scene.hpp"
+#include "../events/d3d9_reset.hpp"
 #include "../events/multiplayer_sound.hpp"
 #include "../events/map_load.hpp"
 #include "api/callback.hpp"
@@ -94,6 +96,10 @@ namespace Harmony::Lua {
 
         // Set up library events
         add_map_load_event(Library::on_map_load, EVENT_PRIORITY_BEFORE);
+        add_d3d9_end_scene_event(Library::on_d3d9_end_scene);
+        add_d3d9_reset_event(Library::on_d3d9_reset);
+
+        // Set up Lua script events
         add_multiplayer_sound_event(Library::multiplayer_sound_event);
     }
     
@@ -101,9 +107,20 @@ namespace Harmony::Lua {
         library->unload_map_script();
     }
 
-    int Library::lua_unload_script(lua_State *state) noexcept {
-        library->unload_script(state);
-        return 0;
+    void Library::on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {
+        for(auto &script : library->get_scripts()) {
+            for(auto &sprite : script.get_optic_store().sprites) {
+                sprite.second.load(device);
+            }
+        }
+    }
+
+    void Library::on_d3d9_reset(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS *) noexcept {
+        for(auto &script : library->get_scripts()) {
+            for(auto &sprite : script.get_optic_store().sprites) {
+                sprite.second.unload();
+            }
+        }
     }
 
     bool Library::multiplayer_sound_event(HaloData::MultiplayerSound sound) noexcept {
@@ -123,6 +140,11 @@ namespace Harmony::Lua {
             }
         }
         return allow;
+    }
+
+    int Library::lua_unload_script(lua_State *state) noexcept {
+        library->unload_script(state);
+        return 0;
     }
 
     int luaopen_mods_harmony(lua_State *state) noexcept {
