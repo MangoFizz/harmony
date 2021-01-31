@@ -82,11 +82,11 @@ namespace Harmony::Lua {
         while(it != this->scripts.end()) {
             std::string script_type = it->get_type();
             if(script_type == "map") {
+                this->scripts.erase(it);
                 break;
             }
             it++;
         }
-        this->scripts.erase(it);
     }
 
     Library::Library() noexcept {
