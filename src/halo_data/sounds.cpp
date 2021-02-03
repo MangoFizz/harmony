@@ -93,10 +93,40 @@ namespace Harmony::HaloData {
                 return "countdown timer end";
             case HaloData::MultiplayerSound::TING:
                 return "ting";
-            case HaloData::MultiplayerSound::SOUND:
-                return "sound";
+            case HaloData::MultiplayerSound::CUSTOM_1:
+                return "custom 1";
+            case HaloData::MultiplayerSound::CUSTOM_2:
+                return "custom 2";
+            case HaloData::MultiplayerSound::CUSTOM_3:
+                return "custom 3";
+            case HaloData::MultiplayerSound::CUSTOM_4:
+                return "custom 4";
+            case HaloData::MultiplayerSound::CUSTOM_5:
+                return "custom 5";
+            case HaloData::MultiplayerSound::CUSTOM_6:
+                return "custom 6";
+            case HaloData::MultiplayerSound::CUSTOM_7:
+                return "custom 7";
+            case HaloData::MultiplayerSound::CUSTOM_8:
+                return "custom 8";
+            case HaloData::MultiplayerSound::CUSTOM_9:
+                return "custom 9";
+            case HaloData::MultiplayerSound::CUSTOM_10:
+                return "custom 10";
+            case HaloData::MultiplayerSound::CUSTOM_11:
+                return "custom 11";
+            case HaloData::MultiplayerSound::CUSTOM_12:
+                return "custom 12";
+            case HaloData::MultiplayerSound::CUSTOM_13:
+                return "custom 13";
+            case HaloData::MultiplayerSound::CUSTOM_14:
+                return "custom 14";
+            case HaloData::MultiplayerSound::CUSTOM_15:
+                return "custom 15";
+            case HaloData::MultiplayerSound::CUSTOM_16:
+                return "custom 16";
             default:
-                return "custom";
+                return "invalid sound";
         }
     }
 }

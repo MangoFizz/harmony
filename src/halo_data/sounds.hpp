@@ -51,9 +51,8 @@ namespace Harmony::HaloData {
         HILL_OCCUPIED,
         COUNTDOWN_TIMER_END,
         TING,
-        SOUND,
 
-        CUSTOM_1 = SOUND,
+        CUSTOM_1,
         CUSTOM_2,
         CUSTOM_3,
         CUSTOM_4,
@@ -68,9 +67,7 @@ namespace Harmony::HaloData {
         CUSTOM_13,
         CUSTOM_14,
         CUSTOM_15,
-        CUSTOM_16,
-
-        CUSTOM
+        CUSTOM_16
     };
 
     std::string string_from_multiplayer_sound(MultiplayerSound sound) noexcept;
