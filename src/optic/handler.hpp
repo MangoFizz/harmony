@@ -72,6 +72,11 @@ namespace Harmony::Optic {
          */
         ~Handler() noexcept;
 
+        /**
+         * D3D9 end scene callback
+         */
+        static void on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept;
+
     private:
         /** Render group */
         std::map<std::string, RenderGroup> groups;

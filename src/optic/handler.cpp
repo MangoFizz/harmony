@@ -12,7 +12,6 @@
 
 namespace Harmony::Optic {
     static Handler *handler = nullptr;
-    static void on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept;
 
     std::map<std::string, RenderGroup> &Handler::get_render_groups() noexcept {
         return this->groups;
@@ -67,14 +66,14 @@ namespace Harmony::Optic {
 
     Handler::~Handler() noexcept {
         // Remove handler events
-        remove_d3d9_end_scene_event(on_d3d9_end_scene);
+        remove_d3d9_end_scene_event(Handler::on_d3d9_end_scene);
 
         this->groups.clear();
 
         handler = nullptr;
     }
 
-    static void on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {
+    void Handler::on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {
         auto &groups = handler->get_render_groups();
         auto it = groups.begin();
         while(it != groups.end()) {
