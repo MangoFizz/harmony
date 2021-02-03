@@ -59,37 +59,37 @@ namespace Harmony::Lua {
             auto &animations = optic_store.animations;
 
             const char *animation_name = luaL_checkstring(state, 1);
-            auto target = Optic::Animation::get_target_from_string(luaL_checkstring(state, 2));
 
             if(animations.find(animation_name) != animations.end()) {
-                if(target != Optic::Animation::TARGET_INVALID) {
-                    Math::QuadraticBezier curve;
-                    if(args == 4) {
-                        std::string preset = luaL_checkstring(state, 3);
-                        if(preset == "ease in") {
-                            curve = Optic::Animation::ease_in();
-                        }
-                        else if(preset == "ease out") {
-                            curve = Optic::Animation::ease_out();
-                        }
-                        else if(preset == "ease in out") {
-                            curve = Optic::Animation::ease_in_out();
-                        }
-                        else if(preset == "linear") {
-                            curve = Optic::Animation::linear();
-                        }
-                        else {
-                            luaL_error(state, "invalid curve preset name in harmony add_animation_curve function");
-                        }
+                Math::QuadraticBezier curve;
+                if(args == 4) {
+                    std::string preset = luaL_checkstring(state, 2);
+                    if(preset == "ease in") {
+                        curve = Optic::Animation::ease_in();
+                    }
+                    else if(preset == "ease out") {
+                        curve = Optic::Animation::ease_out();
+                    }
+                    else if(preset == "ease in out") {
+                        curve = Optic::Animation::ease_in_out();
+                    }
+                    else if(preset == "linear") {
+                        curve = Optic::Animation::linear();
                     }
                     else {
-                        float x1 = luaL_checknumber(state, 3);
-                        float x2 = luaL_checknumber(state, 4);
-                        float y1 = luaL_checknumber(state, 5);
-                        float y2 = luaL_checknumber(state, 6);
-                        curve = Math::QuadraticBezier({x1, x2}, {y1, y2});
+                        luaL_error(state, "invalid curve preset name in harmony add_animation_curve function");
                     }
+                }
+                else {
+                    float x1 = luaL_checknumber(state, 2);
+                    float x2 = luaL_checknumber(state, 3);
+                    float y1 = luaL_checknumber(state, 4);
+                    float y2 = luaL_checknumber(state, 5);
+                    curve = Math::QuadraticBezier({x1, x2}, {y1, y2});
+                }
 
+                auto target = Optic::Animation::get_target_from_string(luaL_checkstring(state, -2));
+                if(target != Optic::Animation::TARGET_INVALID) {
                     auto transform = animations[animation_name].get_transform();
                     switch(target) {
                         case Optic::Animation::TARGET_POSITION_X:
