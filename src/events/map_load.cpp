@@ -7,7 +7,6 @@
 
 namespace Harmony {
     static std::vector<Event<event_no_args>> events;
-    static void initialize_map_load_hook() noexcept;
 
     void add_map_load_event(const event_no_args function, EventPriority priority) noexcept {
         // Remove if exists
