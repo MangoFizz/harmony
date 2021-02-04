@@ -70,6 +70,18 @@ namespace Harmony::Optic {
                 case TARGET_ROTATION:
                     state.rotation += this->render_state_transform.rotation * curve.get_point(t).y;
                     break;
+                case TARGET_SCALE_X:
+                    state.scale.x += this->render_state_transform.scale.x * curve.get_point(t).y;
+                    if(state.scale.x < 0) {
+                        state.scale.x = 0;
+                    }
+                    break;
+                case TARGET_SCALE_Y:
+                    state.scale.y += this->render_state_transform.scale.y * curve.get_point(t).y;
+                    if(state.scale.y < 0) {
+                        state.scale.y = 0;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -146,6 +158,12 @@ namespace Harmony::Optic {
         }
         else if(target_str == "opacity") {
             return TARGET_OPACITY;
+        }
+        else if(target_str == "scale x") {
+            return TARGET_SCALE_X;
+        }
+        else if(target_str == "scale y") {
+            return TARGET_SCALE_Y;
         }
         else {
             return TARGET_INVALID;

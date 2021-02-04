@@ -92,7 +92,7 @@ namespace Harmony::Optic {
         /**
          * Get rotation angle
          */
-        Math::Angle get_rotation() const noexcept;
+        float get_rotation() const noexcept;
 
         /**
          * Get queue align
@@ -191,7 +191,7 @@ namespace Harmony::Optic {
          * @param rotation
          * @param align
          */
-        RenderGroup(Math::Point2D position, std::uint8_t opacity, Math::Angle rotation, Align align, long render_duration, std::size_t maximum_renders = 0, bool single_render = false) noexcept;
+        RenderGroup(Math::Point2D position, std::uint8_t opacity, float rotation, Align align, long render_duration, std::size_t maximum_renders = 0, bool single_render = false) noexcept;
 
         /**
          * Void constructor
@@ -206,7 +206,7 @@ namespace Harmony::Optic {
         std::uint8_t opacity;
 
         /** Rotation of the queue in degrees */
-        Math::Angle rotation;
+        float rotation;
 
         /** Queue align */
         Align align;

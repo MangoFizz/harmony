@@ -24,7 +24,7 @@ namespace Harmony::Optic {
         return nullptr;
     }
 
-    RenderGroup &Handler::add_render_group(const char *name, Math::Point2D position, std::uint8_t opacity, Math::Angle rotation, RenderGroup::Align align, long render_duration) noexcept {
+    RenderGroup &Handler::add_render_group(const char *name, Math::Point2D position, std::uint8_t opacity, float rotation, RenderGroup::Align align, long render_duration) noexcept {
         if(this->groups.find(name) == this->groups.end()) {
             this->groups[name] = RenderGroup(position, opacity, rotation, align, render_duration);
             return this->groups[name];
@@ -43,7 +43,7 @@ namespace Harmony::Optic {
         }
     }
 
-    void Handler::render_sprite(Sprite *sprite, Math::Point2D position, std::uint8_t opacity, Math::Angle rotation, RenderGroup::Align align, long duration, Animation fade_in, Animation fade_out) noexcept {
+    void Handler::render_sprite(Sprite *sprite, Math::Point2D position, std::uint8_t opacity, float rotation, RenderGroup::Align align, long duration, Animation fade_in, Animation fade_out) noexcept {
         auto tmp_name = "tmp" + std::to_string(rand());
         this->groups[tmp_name] = RenderGroup(position, opacity, rotation, align, duration, 0, true);
         auto &tmp_group = this->groups[tmp_name];
@@ -150,7 +150,7 @@ namespace Harmony::Optic {
 
                 // Draw it!
                 sprite->load(device);
-                sprite->draw(current_render_state.position, current_render_state.color);
+                sprite->draw(current_render_state);
             }
             
             // Stop slide animation

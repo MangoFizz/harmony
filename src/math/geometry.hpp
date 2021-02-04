@@ -7,6 +7,9 @@
 #include <cstdint>
 
 namespace Harmony::Math {
+    #define PI 3.14159265359
+    #define RADIAN(degree) degree * PI / 180.0f
+
     typedef float Point;
 
     struct Point2D {
@@ -30,8 +33,6 @@ namespace Harmony::Math {
     };
 
     typedef std::vector<Point2D> Curve;
-
-    typedef int Angle;
 
     struct Rectangle2D {
         int left;

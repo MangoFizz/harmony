@@ -12,13 +12,20 @@
 namespace Harmony::Optic {
     class Sprite {
     public:
+        struct Scale {
+            float x;
+            float y;
+        };
+
         struct State {
             Math::Point2D position;
+            Scale scale;
             Math::ColorARGB color;
-            Math::Angle rotation;
+            float rotation;
 
             State() {
                 position = {0.0f, 0.0f};
+                scale = {1.0f, 1.0f};
                 color = {255, 255, 255, 255};
                 rotation = 0;
             }
@@ -47,10 +54,9 @@ namespace Harmony::Optic {
 
         /**
          * Draw sprite
-         * @param position          Posion of the render
-         * @param color_modifier    Color modifier
+         * @param sprite_state  State of sprite
          */
-        void draw(Math::Point2D position, Math::ColorARGB color_modifier) const noexcept;
+        void draw(State const &sprite_state) const noexcept;
 
         /**
          * Default constructor for sprite

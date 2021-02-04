@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "../messaging/console_output.hpp"
+#include <d3dx9math.h>
 #include "../messaging/message_box.hpp"
 #include "sprite.hpp"
 
@@ -50,14 +50,36 @@ namespace Harmony::Optic {
         this->loaded = false;
     }
 
-    void Sprite::draw(Math::Point2D offset, Math::ColorARGB color) const noexcept {
+    void Sprite::draw(Sprite::State const &state) const noexcept {
         if(this->loaded) {
             D3DXVECTOR3 position;
-            position.x = offset.x;
-            position.y = offset.y;
+            position.x = state.position.x;
+            position.y = state.position.y;
             position.z = 0;
 
-            this->sprite->Begin(D3DXSPRITE_ALPHABLEND); 
+            D3DXVECTOR2 scale_center;
+            scale_center.x = state.position.x;
+            scale_center.y = state.position.y;
+
+            D3DXVECTOR2 scale;
+            scale.x = state.scale.x;
+            scale.y = state.scale.y;
+
+            D3DXVECTOR2 rotation_center;
+            rotation_center.x = state.position.x + this->width / 2;
+            rotation_center.y = state.position.y + this->height / 2;
+
+            auto &rotation = state.rotation;
+
+            auto &color = state.color;
+
+            D3DXMATRIX new_transform;
+            D3DXMatrixTransformation2D(&new_transform, &scale_center, 0.0f, &scale, &rotation_center, rotation, NULL);
+
+            // Update transform
+            this->sprite->SetTransform(&new_transform);
+            
+            this->sprite->Begin(D3DXSPRITE_ALPHABLEND);
             this->sprite->Draw(this->texture, NULL, NULL, &position, D3DCOLOR_RGBA(color.r, color.g, color.b, color.a));
             this->sprite->End();
         }

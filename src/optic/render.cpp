@@ -48,7 +48,7 @@ namespace Harmony::Optic {
         return this->opacity;
     }
 
-    Math::Angle RenderGroup::get_rotation() const noexcept {
+    float RenderGroup::get_rotation() const noexcept {
         return this->rotation;
     }
 
@@ -133,7 +133,7 @@ namespace Harmony::Optic {
         return this->single_render_group;
     }
 
-    RenderGroup::RenderGroup(Math::Point2D position, std::uint8_t opacity, Math::Angle rotation, Align align, long render_duration, std::size_t maximum_renders, bool single_render) noexcept {
+    RenderGroup::RenderGroup(Math::Point2D position, std::uint8_t opacity, float rotation, Align align, long render_duration, std::size_t maximum_renders, bool single_render) noexcept {
         this->position = position;
         this->opacity = opacity;
         this->rotation = rotation;

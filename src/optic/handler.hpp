@@ -37,7 +37,7 @@ namespace Harmony::Optic {
          * @param render_duration   Duration of the medals in milliseconds
          * @return                  True on success, false if the group already exists
          */
-        RenderGroup &add_render_group(const char *name, Math::Point2D position, std::uint8_t opacity, Math::Angle rotation, RenderGroup::Align align, long render_duration) noexcept;
+        RenderGroup &add_render_group(const char *name, Math::Point2D position, std::uint8_t opacity, float rotation, RenderGroup::Align align, long render_duration) noexcept;
 
         /**
          * Remove an existing optic group
@@ -60,7 +60,7 @@ namespace Harmony::Optic {
          * @param fade_in   Fade-in animation
          * @param fade_out  Fade-out animation
          */
-        void render_sprite(Sprite *sprite, Math::Point2D position, std::uint8_t opacity, Math::Angle rotation, RenderGroup::Align align, long duration, Animation fade_in, Animation fade_out) noexcept;
+        void render_sprite(Sprite *sprite, Math::Point2D position, std::uint8_t opacity, float rotation, RenderGroup::Align align, long duration, Animation fade_in, Animation fade_out) noexcept;
 
         /**
          * Default constructor

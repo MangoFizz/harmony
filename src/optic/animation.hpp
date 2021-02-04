@@ -14,24 +14,25 @@ namespace Harmony::Optic {
     public:
         struct StateTransform {
             Math::Point2D position;
+            Sprite::Scale scale;
             int opacity;
-            Math::Angle rotation;
+            float rotation;
 
             StateTransform() {
                 position = {0.0f, 0.0f};
+                scale = {0.0f, 0.0f};
                 opacity = 0;
                 rotation = 0;
             }
         };
 
-        /**
-         * @todo Add scale to targets
-         */
         enum Target {
             TARGET_POSITION_X,
             TARGET_POSITION_Y,
             TARGET_ROTATION,
             TARGET_OPACITY,
+            TARGET_SCALE_X,
+            TARGET_SCALE_Y,
             TARGET_INVALID
         };
 

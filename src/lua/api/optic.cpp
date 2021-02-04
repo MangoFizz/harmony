@@ -102,7 +102,13 @@ namespace Harmony::Lua {
                             transform.opacity = luaL_checknumber(state, -1);
                             break;
                         case Optic::Animation::TARGET_ROTATION:
-                            transform.rotation = luaL_checknumber(state, -1);
+                            transform.rotation = RADIAN(luaL_checknumber(state, -1));
+                            break;
+                        case Optic::Animation::TARGET_SCALE_X:
+                            transform.scale.x = luaL_checknumber(state, -1);
+                            break;
+                        case Optic::Animation::TARGET_SCALE_Y:
+                            transform.scale.y = luaL_checknumber(state, -1);
                             break;
                     }
 
