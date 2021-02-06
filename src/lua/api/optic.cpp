@@ -166,7 +166,7 @@ namespace Harmony::Lua {
         return 0;
     }
 
-    static int lua_add_group(lua_State *state) noexcept {
+    static int lua_create_group(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args >= 5 && args <= 8) {
             auto name = get_optic_prefix(state) + luaL_checkstring(state, 1);
@@ -313,7 +313,7 @@ namespace Harmony::Lua {
         {"register_animation", lua_register_animation},
         {"add_animation_target", lua_add_animation_target},
         {"register_sprite", lua_register_sprite},
-        {"add_group", lua_add_group},
+        {"create_group", lua_create_group},
         {"render_sprite", lua_render_sprite},
         {"clear_renders", lua_clear_renders},
         {NULL, NULL}

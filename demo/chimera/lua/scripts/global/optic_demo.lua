@@ -18,7 +18,7 @@ optic.register_animation("slide", 300)
 optic.add_animation_target("slide", 0.4, 0.0, 0.6, 1.0, "position x", 60)
 
 -- Add demo render group
-optic.add_group("demo", 50, 400, 255, 4000, "fade in", "fade out", "slide")
+optic.create_group("demo", 50, 400, 255, 4000, "fade in", "fade out", "slide")
 
 -- Add sprite
 optic.register_sprite("sandia", "images/sandia.jpg", 50, 50)
