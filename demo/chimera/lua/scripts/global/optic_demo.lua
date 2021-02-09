@@ -18,7 +18,7 @@ optic.register_animation("slide", 300)
 optic.add_animation_target("slide", 0.4, 0.0, 0.6, 1.0, "position x", 60)
 
 -- Add demo render group
-optic.create_group("demo", 50, 400, 255, 4000, "fade in", "fade out", "slide")
+optic.create_group("demo", 50, 400, 255, math.random(0, 360), 4000, 0, "fade in", "fade out", "slide")
 
 -- Add sprite
 optic.register_sprite("sandia", "images/sandia.jpg", 50, 50)
@@ -32,7 +32,7 @@ function onMultiplayerSound(sound)
 		-- Hitmarker sprite
 		local screen_width = read_word(0x637CF2)
 		local screen_height = read_word(0x637CF0)
-		optic.render_sprite("hitmarker", (screen_width - 35) / 2, (screen_height - 35) / 2, 255, 200)
+		optic.render_sprite("hitmarker", (screen_width - 35) / 2, (screen_height - 35) / 2, 255, 0, 200)
 	end
 
 	return true

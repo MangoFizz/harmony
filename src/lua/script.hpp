@@ -7,28 +7,11 @@
 #include <vector>
 #include <map>
 #include <lua.hpp>
-#include "../optic/animation.hpp"
-#include "../optic/sprite.hpp"
+#include "optic_store.hpp"
 
 namespace Harmony::Lua {
     class Script {
     public:
-        struct OpticStore {
-            /** Animations */
-            std::map<std::string, Optic::Animation> animations;
-
-            /** Sprites */
-            std::map<std::string, Optic::Sprite> sprites;
-
-            /** Groups */
-            std::vector<std::string> groups;
-
-            /**
-            * Remove script optic groups
-            */
-            void remove_optic_groups() noexcept;
-        };
-
         /**
          * Get script name
          */

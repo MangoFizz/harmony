@@ -73,36 +73,20 @@ namespace Harmony::Optic {
 
     class RenderGroup {
     public:
-        enum Align {
-            ALIGN_LEFT,
-            ALIGN_RIGHT,
-            ALIGN_CENTER
-        };
-
-        /**
-         * Get queue position
-         */
-        Math::Point2D get_position() const noexcept;
-
-        /**
-         * Get opacity
-         */
-        std::uint8_t get_opacity() const noexcept;
-
-        /**
-         * Get rotation angle
-         */
-        float get_rotation() const noexcept;
-
-        /**
-         * Get queue align
-         */
-        Align get_align() const noexcept;
-
         /**
          * Get sprite default state
          */
         Sprite::State get_sprite_initial_state() noexcept;
+
+        /**
+         * Get queue align
+         */
+        float get_direction() const noexcept;
+
+        /**
+         * Get maximum number of renders
+         */
+        std::size_t get_maximum_renders() const noexcept;
 
         /**
          * Get render duration
@@ -149,11 +133,6 @@ namespace Harmony::Optic {
         void set_slide_anim(Animation anim) noexcept;
 
         /**
-         * Get maximum number of renders
-         */
-        std::size_t get_maximum_renders() const noexcept;
-
-        /**
          * Get renders
          */
         std::deque<Render> &get_renders() noexcept;
@@ -191,7 +170,7 @@ namespace Harmony::Optic {
          * @param rotation
          * @param align
          */
-        RenderGroup(Math::Point2D position, std::uint8_t opacity, float rotation, Align align, long render_duration, std::size_t maximum_renders = 0, bool single_render = false) noexcept;
+        RenderGroup(Sprite::State initial_render_state, float direction, std::size_t maximum_renders, long render_duration, bool single_render = false) noexcept;
 
         /**
          * Void constructor
@@ -199,17 +178,14 @@ namespace Harmony::Optic {
         RenderGroup() {}
 
     private:
-        /** Position of the render */
-        Math::Point2D position;
-
-        /** Opacity of the renders */
-        std::uint8_t opacity;
-
-        /** Rotation of the queue in degrees */
-        float rotation;
+        /** Initial state for sprites */
+        Sprite::State initial_render_state;
 
         /** Queue align */
-        Align align;
+        float direction;
+
+        /** Maximum active renders */
+        std::size_t max_renders;
 
         /** Render duration in ms */
         long render_duration;
@@ -223,9 +199,6 @@ namespace Harmony::Optic {
         /** Slide animation */
         Animation slide_anim;
 
-        /** Maximum active renders */
-        std::size_t max_renders = 0;
-
         /** Renders */
         std::deque<Render> renders;
 
@@ -236,7 +209,7 @@ namespace Harmony::Optic {
          * If this is set, the group will be removed after the render timelife ends
          * @todo Find a better way to do this
          */
-        bool single_render_group = false;
+        bool single_render_group;
     };
 }
 

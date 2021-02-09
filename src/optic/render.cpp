@@ -40,27 +40,16 @@ namespace Harmony::Optic {
         this->timestamp = std::chrono::steady_clock::now();
     }
 
-    Math::Point2D RenderGroup::get_position() const noexcept {
-        return this->position;
-    }
-
-    std::uint8_t RenderGroup::get_opacity() const noexcept {
-        return this->opacity;
-    }
-
-    float RenderGroup::get_rotation() const noexcept {
-        return this->rotation;
-    }
-
-    RenderGroup::Align RenderGroup::get_align() const noexcept {
-        return this->align;
-    }
-
     Sprite::State RenderGroup::get_sprite_initial_state() noexcept {
-        Sprite::State initial_state;
-        initial_state.position = this->position;
-        initial_state.color = {this->opacity, 255, 255, 255};
-        return initial_state;
+        return this->initial_render_state;
+    }
+
+    float RenderGroup::get_direction() const noexcept {
+        return this->direction;
+    }
+
+    std::size_t RenderGroup::get_maximum_renders() const noexcept {
+        return this->max_renders;
     }
 
     long RenderGroup::get_render_duration() const noexcept {
@@ -93,10 +82,6 @@ namespace Harmony::Optic {
 
     void RenderGroup::set_slide_anim(Animation anim) noexcept {
         this->slide_anim = anim;
-    }
-
-    std::size_t RenderGroup::get_maximum_renders() const noexcept {
-        return this->max_renders;
     }
 
     std::deque<Render> &RenderGroup::get_renders() noexcept {
@@ -133,13 +118,11 @@ namespace Harmony::Optic {
         return this->single_render_group;
     }
 
-    RenderGroup::RenderGroup(Math::Point2D position, std::uint8_t opacity, float rotation, Align align, long render_duration, std::size_t maximum_renders, bool single_render) noexcept {
-        this->position = position;
-        this->opacity = opacity;
-        this->rotation = rotation;
-        this->align = align;
+    RenderGroup::RenderGroup(Sprite::State initial_render_state, float direction, std::size_t maximum_renders, long render_duration, bool single_render) noexcept {
+        this->initial_render_state = initial_render_state;
+        this->direction = direction;
+        this->max_renders = maximum_renders;
         this->render_duration = render_duration;
-        
         this->single_render_group = single_render;
     }
 }

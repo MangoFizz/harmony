@@ -24,9 +24,9 @@ namespace Harmony::Optic {
         return nullptr;
     }
 
-    RenderGroup &Handler::add_render_group(const char *name, Math::Point2D position, std::uint8_t opacity, float rotation, RenderGroup::Align align, long render_duration) noexcept {
+    RenderGroup &Handler::add_render_group(std::string name, Sprite::State initial_state, float direction, std::size_t maximum_renders, long render_duration, bool single_render) noexcept {
         if(this->groups.find(name) == this->groups.end()) {
-            this->groups[name] = RenderGroup(position, opacity, rotation, align, render_duration);
+            this->groups[name] = RenderGroup(initial_state, direction, maximum_renders, render_duration, false);
             return this->groups[name];
         }
         message_box("Optic handler: Group %s already exists!", name);
@@ -43,9 +43,9 @@ namespace Harmony::Optic {
         }
     }
 
-    void Handler::render_sprite(Sprite *sprite, Math::Point2D position, std::uint8_t opacity, float rotation, RenderGroup::Align align, long duration, Animation fade_in, Animation fade_out) noexcept {
+    void Handler::render_sprite(Sprite *sprite, Sprite::State initial_state, long duration, Animation fade_in, Animation fade_out) noexcept {
         auto tmp_name = "tmp" + std::to_string(rand());
-        this->groups[tmp_name] = RenderGroup(position, opacity, rotation, align, duration, 0, true);
+        this->groups[tmp_name] = RenderGroup(initial_state, 0, 0, duration, true);
         auto &tmp_group = this->groups[tmp_name];
         tmp_group.set_fade_in_anim(fade_in);
         tmp_group.set_fade_out_anim(fade_out);

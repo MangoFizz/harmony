@@ -31,8 +31,9 @@ add_library(harmony MODULE
     src/halo_data/window.cpp
     src/lua/api/callback.cpp
     src/lua/api/optic.cpp
-    src/lua/script.cpp
     src/lua/library.cpp
+    src/lua/optic_store.cpp
+    src/lua/script.cpp
     src/math/geometry.cpp
     src/memory/signatures/client.cpp
     src/memory/codecave.cpp

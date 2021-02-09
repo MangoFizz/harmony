@@ -2,18 +2,9 @@
 
 #include <filesystem>
 #include "../halo_data/path.hpp"
-#include "../optic/handler.hpp"
-#include "../harmony.hpp"
 #include "script.hpp"
 
 namespace Harmony::Lua {
-    void Script::OpticStore::remove_optic_groups() noexcept {
-        auto &optic_handler = get_harmony().get_optic_handler();
-        for(std::size_t i = 0; i < this->groups.size(); i++) {
-            optic_handler.remove_render_group(this->groups[i]);
-        }
-    }
-
     const char *Script::get_name() const noexcept {
         return this->name.c_str();
     }
@@ -45,7 +36,7 @@ namespace Harmony::Lua {
         return this->callbacks["invalid"];
     }
 
-    Script::OpticStore &Script::get_optic_store() noexcept {
+    OpticStore &Script::get_optic_store() noexcept {
         return this->optic_store;
     }
 
@@ -89,6 +80,6 @@ namespace Harmony::Lua {
     }
 
     Script::~Script() noexcept {
-        this->optic_store.remove_optic_groups();
+        this->optic_store.remove_groups();
     }
 }

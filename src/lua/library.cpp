@@ -109,17 +109,15 @@ namespace Harmony::Lua {
 
     void Library::on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {
         for(auto &script : library->get_scripts()) {
-            for(auto &sprite : script.get_optic_store().sprites) {
-                sprite.second.load(device);
-            }
+            auto &store = script.get_optic_store();
+            store.load_sprites(device);
         }
     }
 
     void Library::on_d3d9_reset(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS *) noexcept {
         for(auto &script : library->get_scripts()) {
-            for(auto &sprite : script.get_optic_store().sprites) {
-                sprite.second.unload();
-            }
+            auto &store = script.get_optic_store();
+            store.release_sprites();
         }
     }
 
