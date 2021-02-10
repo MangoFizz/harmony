@@ -101,6 +101,7 @@ namespace Harmony::Lua {
 
         // Set up Lua script events
         add_multiplayer_sound_event(Library::multiplayer_sound_event);
+        add_multiplayer_event(Library::on_multiplayer_event);
     }
     
     void Library::on_map_load() noexcept {
@@ -119,6 +120,28 @@ namespace Harmony::Lua {
             auto &store = script.get_optic_store();
             store.release_sprites();
         }
+    }
+
+    bool Library::on_multiplayer_event(HaloData::MultiplayerEvent type, HaloData::PlayerID local, HaloData::PlayerID killer, HaloData::PlayerID victim) noexcept {
+        auto &scripts = library->get_scripts();
+        bool allow = true;
+        for(auto &script : scripts) {
+            auto *state = script.get_state();
+            auto &callbacks = script.get_callbacks("multiplayer event");
+            for(auto &callback : callbacks) {
+                lua_getglobal(state, callback.c_str());
+                lua_pushstring(state, HaloData::string_from_multiplayer_event(type).c_str());
+                lua_pushinteger(state, local.id);
+                lua_pushinteger(state, killer.id);
+                lua_pushinteger(state, victim.id);
+                if(lua_pcall(state, 4, 1, 0) == 0) {
+                    if(allow) {
+                        allow = lua_toboolean(state, -1);
+                    }
+                }
+            }
+        }
+        return allow;
     }
 
     bool Library::multiplayer_sound_event(HaloData::MultiplayerSound sound) noexcept {

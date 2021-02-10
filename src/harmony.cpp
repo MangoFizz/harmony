@@ -7,6 +7,7 @@
 #include "events/d3d9_reset.hpp"
 #include "lua/library.hpp"
 #include "events/map_load.hpp"
+#include "events/multiplayer_event.hpp"
 #include "events/multiplayer_sound.hpp"
 #include "events/tick.hpp"
 #include "memory/signature.hpp"
@@ -80,7 +81,8 @@ namespace Harmony {
       enable_d3d9_end_scene_hook();
       enable_d3d9_reset_hook();
 
-      // Set up multiplayer sounds event
+      // Set up multiplayer stuff
+      enable_multiplayer_event_hook();
       enable_multiplayer_sounds_hook();
    }
 }

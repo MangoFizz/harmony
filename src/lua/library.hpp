@@ -6,7 +6,9 @@
 #include <string>
 #include <vector>
 #include <lua.hpp>
+#include "../events/multiplayer_event.hpp"
 #include "../events/multiplayer_sound.hpp"
+#include "../halo_data/type.hpp"
 #include "script.hpp"
 
 namespace Harmony::Lua {
@@ -77,6 +79,7 @@ namespace Harmony::Lua {
         /** 
          * Script events dispatchers
          */
+        static bool on_multiplayer_event(HaloData::MultiplayerEvent type, HaloData::PlayerID local, HaloData::PlayerID killer, HaloData::PlayerID victim) noexcept;
         static bool multiplayer_sound_event(HaloData::MultiplayerSound sound) noexcept;
 
         /** 

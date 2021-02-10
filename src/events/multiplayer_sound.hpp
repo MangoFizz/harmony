@@ -3,7 +3,7 @@
 #ifndef HARMONY_EVENT_MULTIPLAYER_SOUND
 #define HARMONY_EVENT_MULTIPLAYER_SOUND
 
-#include "../halo_data/sounds.hpp"
+#include "../halo_data/multiplayer_sounds.hpp"
 #include "event.hpp"
 
 namespace Harmony {

@@ -22,12 +22,15 @@ add_library(harmony MODULE
     src/events/d3d9_reset.cpp
     src/events/d3d9_reset.S
     src/events/map_load.cpp
+    src/events/multiplayer_event.cpp
+    src/events/multiplayer_event.S
     src/events/multiplayer_sound.cpp
     src/events/multiplayer_sound.S
     src/events/tick.cpp
     src/halo_data/path.cpp
+    src/halo_data/multiplayer_events.cpp
+    src/halo_data/multiplayer_sounds.cpp
     src/halo_data/resolution.cpp
-    src/halo_data/sounds.cpp
     src/halo_data/window.cpp
     src/lua/api/callback.cpp
     src/lua/api/optic.cpp

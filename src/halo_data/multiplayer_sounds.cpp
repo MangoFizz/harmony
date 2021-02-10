@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "sounds.hpp"
+#include "multiplayer_sounds.hpp"
 
 namespace Harmony::HaloData {
     std::string string_from_multiplayer_sound(MultiplayerSound sound) noexcept {

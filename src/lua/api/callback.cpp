@@ -13,7 +13,7 @@ namespace Harmony::Lua {
             std::string callback = luaL_checkstring(state, 1);
             std::string function = luaL_checkstring(state, 2);
 
-            if(callback == "multiplayer sound") {
+            if(callback == "multiplayer event" || callback == "multiplayer sound") {
                 auto &harmony = get_harmony();
                 auto &handler = harmony.get_lua_library_handler();
                 auto *script  = handler.get_script(state);
