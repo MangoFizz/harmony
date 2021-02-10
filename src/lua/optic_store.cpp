@@ -63,6 +63,7 @@ namespace Harmony::Lua {
         for(std::size_t i = 0; i < this->groups.size(); i++) {
             if(this->groups[i] == name) {
                 this->groups.erase(this->groups.begin() + i);
+                break;
             }
         }
     }

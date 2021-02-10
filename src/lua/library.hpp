@@ -18,7 +18,7 @@ namespace Harmony::Lua {
          * Get scripts
          * @return      Constant reference to scripts
          */
-        std::vector<Script> &get_scripts() noexcept;
+        std::vector<std::unique_ptr<Script>> &get_scripts() noexcept;
 
         /**
          * Get a script by name
@@ -90,7 +90,7 @@ namespace Harmony::Lua {
 
     private:
         /** Loaded scripts */
-        std::vector<Script> scripts;
+        std::vector<std::unique_ptr<Script>> scripts;
     };
 
     /**

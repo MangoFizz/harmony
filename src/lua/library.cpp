@@ -15,14 +15,15 @@
 namespace Harmony::Lua {
     static Library *library = nullptr;
  
-    std::vector<Script> &Library::get_scripts() noexcept {
+    std::vector<std::unique_ptr<Script>> &Library::get_scripts() noexcept {
         return this->scripts;
     }
 
     Script *Library::get_script(std::string name) noexcept {
         for(std::size_t i = 0; i < this->scripts.size(); i++) {
-            if(this->scripts[i].get_name() == name) {
-                return &this->scripts[i];
+            auto *script = this->scripts[i].get();
+            if(script->get_name() == name) {
+                return script;
             }
         }
         return nullptr;
@@ -30,16 +31,17 @@ namespace Harmony::Lua {
 
     Script *Library::get_script(lua_State *state) noexcept {
         for(std::size_t i = 0; i < this->scripts.size(); i++) {
-            if(this->scripts[i].get_state() == state) {
-                return &this->scripts[i];
+            auto *script = this->scripts[i].get();
+            if(script->get_state() == state) {
+                return script;
             }
         }
         return nullptr;
     }
 
     void Library::load_script(lua_State *state) noexcept {
-        this->scripts.emplace_back(state);
-            
+        this->scripts.push_back(std::make_unique<Script>(state));
+
         // Set unload global funcion
         lua_pushcfunction(state, Library::lua_unload_script);
         lua_setglobal(state, "unload_harmony");
@@ -54,13 +56,16 @@ namespace Harmony::Lua {
     }
 
     void Library::unload_script(lua_State *state) noexcept {
-        for(std::size_t i = 0; i < this->scripts.size(); i++) {
-            if(this->scripts[i].get_state() == state) {
-                this->scripts.erase(this->scripts.begin() + i);
+        auto it = this->scripts.begin();
+        while(it != this->scripts.end()) {
+            auto *script = it->get();
+            if(script->get_state() == state) {
+                this->scripts.erase(it);
+                break;
             }
+            it++;
         }
     }
-
 
     void Library::unload_all_scripts() noexcept {
         this->scripts.clear();
@@ -69,7 +74,8 @@ namespace Harmony::Lua {
     void Library::unload_global_scripts() noexcept {
         auto it = this->scripts.begin();
         while(it != this->scripts.end()) {
-            std::string script_type = it->get_type();
+            auto *script = it->get();
+            std::string script_type = script->get_type();
             if(script_type == "global") {
                 it = this->scripts.erase(it);
             }
@@ -82,7 +88,8 @@ namespace Harmony::Lua {
     void Library::unload_map_script() noexcept {
         auto it = this->scripts.begin();
         while(it != this->scripts.end()) {
-            std::string script_type = it->get_type();
+            auto *script = it->get();
+            std::string script_type = script->get_type();
             if(script_type == "map") {
                 this->scripts.erase(it);
                 break;
@@ -110,14 +117,14 @@ namespace Harmony::Lua {
 
     void Library::on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {
         for(auto &script : library->get_scripts()) {
-            auto &store = script.get_optic_store();
+            auto &store = script.get()->get_optic_store();
             store.load_sprites(device);
         }
     }
 
     void Library::on_d3d9_reset(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS *) noexcept {
         for(auto &script : library->get_scripts()) {
-            auto &store = script.get_optic_store();
+            auto &store = script.get()->get_optic_store();
             store.release_sprites();
         }
     }
@@ -125,9 +132,11 @@ namespace Harmony::Lua {
     bool Library::on_multiplayer_event(HaloData::MultiplayerEvent type, HaloData::PlayerID local, HaloData::PlayerID killer, HaloData::PlayerID victim) noexcept {
         auto &scripts = library->get_scripts();
         bool allow = true;
-        for(auto &script : scripts) {
-            auto *state = script.get_state();
-            auto &callbacks = script.get_callbacks("multiplayer event");
+        auto it = scripts.begin();
+        while(it != scripts.end()) {
+            auto *script = it->get();
+            auto *state = script->get_state();
+            auto &callbacks = script->get_callbacks("multiplayer event");
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushstring(state, HaloData::string_from_multiplayer_event(type).c_str());
@@ -140,6 +149,7 @@ namespace Harmony::Lua {
                     }
                 }
             }
+            it++;
         }
         return allow;
     }
@@ -147,9 +157,11 @@ namespace Harmony::Lua {
     bool Library::multiplayer_sound_event(HaloData::MultiplayerSound sound) noexcept {
         auto &scripts = library->get_scripts();
         bool allow = true;
-        for(auto &script : scripts) {
-            auto *state = script.get_state();
-            auto &callbacks = script.get_callbacks("multiplayer sound");
+        auto it = scripts.begin();
+        while(it != scripts.end()) {
+            auto *script = it->get();
+            auto *state = script->get_state();
+            auto &callbacks = script->get_callbacks("multiplayer sound");
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushstring(state, HaloData::string_from_multiplayer_sound(sound).c_str());
@@ -159,6 +171,7 @@ namespace Harmony::Lua {
                     }
                 }
             }
+            it++;
         }
         return allow;
     }
