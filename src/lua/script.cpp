@@ -78,8 +78,4 @@ namespace Harmony::Lua {
         this->type = get_global_from_state(state, "script_type");
         this->data_path = this->get_script_data_path();
     }
-
-    Script::~Script() noexcept {
-        this->optic_store.remove_groups();
-    }
 }

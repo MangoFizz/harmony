@@ -66,11 +66,6 @@ namespace Harmony::Lua {
         Script(lua_State *state) noexcept;
 
         /**
-         * Destructor for script
-         */
-        ~Script() noexcept;
-
-        /**
          * Equals operator for std::find function
          */
         inline bool operator==(const std::string name) {
