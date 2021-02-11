@@ -31,24 +31,26 @@ namespace Harmony::HaloData {
                 return "local running riot";
             case HaloData::MultiplayerEvent::GAME_TIME_LEFT:
                 return "game time left";
-            case HaloData::MultiplayerEvent::ENEMY_SCORE:
-                return "enemy score";
-            case HaloData::MultiplayerEvent::ALLY_SCORE:
-                return "ally score";
-            case HaloData::MultiplayerEvent::ENEMY_STOLE_FLAG:
-                return "enemy stole flag";
-            case HaloData::MultiplayerEvent::ENEMY_RETURNED_FLAG:
-                return "enemy returned flag";
-            case HaloData::MultiplayerEvent::ALLY_STOLE_FLAG:
-                return "ally stole flag";
-            case HaloData::MultiplayerEvent::ALLY_RETURNED_FLAG:
-                return "ally returned flag";
-            case HaloData::MultiplayerEvent::FRIENDLY_FLAG_IDLE_RETURNED:
-                return "friendly flag idle returned";
-            case HaloData::MultiplayerEvent::ENEMY_FLAG_IDLE_RETURNED:
-                return "enemy flag idle returned";
+            case HaloData::LOCAL_CTF_SCORE:
+                return "local ctf score";
+            case HaloData::MultiplayerEvent::CTF_ENEMY_SCORE:
+                return "ctf enemy score";
+            case HaloData::MultiplayerEvent::CTF_ALLY_SCORE:
+                return "ctf ally score";
+            case HaloData::MultiplayerEvent::CTF_ENEMY_STOLE_FLAG:
+                return "ctf enemy stole flag";
+            case HaloData::MultiplayerEvent::CTF_ENEMY_RETURNED_FLAG:
+                return "ctf enemy returned flag";
+            case HaloData::MultiplayerEvent::CTF_ALLY_STOLE_FLAG:
+                return "ctf ally stole flag";
+            case HaloData::MultiplayerEvent::CTF_ALLY_RETURNED_FLAG:
+                return "ctf ally returned flag";
+            case HaloData::MultiplayerEvent::CTF_FRIENDLY_FLAG_IDLE_RETURNED:
+                return "ctf friendly flag idle returned";
+            case HaloData::MultiplayerEvent::CTF_ENEMY_FLAG_IDLE_RETURNED:
+                return "ctf enemy flag idle returned";
             default: {
-                auto str = "unknown event " + std::to_string(static_cast<std::uint32_t>(event));
+                auto str = "unknown event (" + std::to_string(event) + ")";
                 return str.c_str();
             }
         }
