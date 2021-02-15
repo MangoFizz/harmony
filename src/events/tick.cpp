@@ -38,9 +38,15 @@ namespace Harmony {
             return;
         }
         enabled = true;
+
+        // Get signature
+        static auto &on_tick_sig = get_harmony().get_signature("on_tick");
         
-        static Signature &on_tick_sig = get_harmony().get_signature("on_tick");
-        static Codecave on_tick_hook;
-        on_tick_hook.write_basic_hook(reinterpret_cast<void *>(on_tick), on_tick_sig.get_data());
+        // Write hacks
+        static Codecave on_tick_cave;
+        on_tick_cave.write_basic_codecave(on_tick_sig.get_data(), reinterpret_cast<void *>(on_tick));
+
+        // Hook multiplayer event call
+        on_tick_cave.hook();
     }
 }

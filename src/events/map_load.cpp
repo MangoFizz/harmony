@@ -37,9 +37,14 @@ namespace Harmony {
         }
         enabled = true;
 
-        // Hook!
+        // Get signature
         static auto &on_map_load_sig = get_harmony().get_signature("on_map_load");
-        static Codecave on_map_load_hook;
-        on_map_load_hook.write_basic_hook(reinterpret_cast<void *>(do_map_load_event), on_map_load_sig.get_data(), true);
+        
+        // Write hacks
+        static Codecave on_map_load_cave;
+        on_map_load_cave.write_basic_codecave(on_map_load_sig.get_data(), reinterpret_cast<void *>(do_map_load_event));
+
+        // Hook map load call
+        on_map_load_cave.hook();
     }
 }

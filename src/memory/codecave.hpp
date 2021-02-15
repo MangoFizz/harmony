@@ -3,70 +3,126 @@
 #ifndef CHIMERA_HOOK_HPP
 #define CHIMERA_HOOK_HPP
 
+#include <vector>
 #include <cstdint>
 
 namespace Harmony {
     class Codecave {
     public:
-        /** Hook data */
-        unsigned char data[64];
-
-        /** Data size */
-        std::size_t data_size;
-
-        /** Skip the original instruction */
-        bool skip_og_code;
+        /**
+         * Set whether or not to execute original code
+        */
+        void execute_original_code(bool setting) noexcept;
 
         /**
-         * Write a call instruction
-         * @param offset    Reference to data offset where the instruction will be written
-         * @param function  Function that will be called
+         * Write a basic cave
+         * @param function  Function to be called in the cave
+         * @param address   Pointer to instruction, nullptr by default
          * @param pushad    Insert pushad and pushfd instructions
          */
-        void write_function_call(std::size_t &offset, void *function, bool pushad = true) noexcept;
+        void write_basic_codecave(void *address, const void *function, bool pushad = true) noexcept;
 
         /**
-         * Copy a given instruction to out codecave
-         * @param offset        Reference to data offset where the instruction will be written
-         * @param instruction   Pointer to the instruction
-         * @param length        Length of the instruction
+         * Hook it!
          */
-        void copy_intruction(std::size_t &offset, void *instruction, std::size_t length) noexcept;
+        void hook() noexcept;
 
         /**
-         * Write a cmp instruction that checks if the skip og code flag is set
-         * @param offset    Reference to data offset where the instruction will be written
-         * @param bytes     The amount of bytes to jump
+         * Release hook, restore original code
          */
-        void write_skip_code_check(std::size_t &offset, std::uint8_t bytes) noexcept;
+        void release() noexcept;
 
         /**
-         * Write a jump intruction to exit codecave
-         * @param offset    Reference to data offset where the instruction will be written
-         * @param address   Address to jump
-         */
-        void write_exit(std::size_t &offset, void *address) noexcept;
-    
-        /**
-         * Write a hook jmp instruction
-         * @param address   Pointer where the jump will be written
-         * @param offset    Data offset to jump, 0 by default
-         */
-        void hook(void *address, std::size_t offset = 0) noexcept;
-
-        /**
-         * Write a basic hook over a call / jmp instruction
-         * @param function  Function to be called in the hook
-         * @param address   Pointer to the call/jmp instruction, nullptr by default
-         * @param pushad    Insert pushad and pushfd instructions
-         */
-        void write_basic_hook(void *function, void *address, bool pushad = true) noexcept;
-
-        /** 
-         * Constructor for Hook
-         * Enables code execution on the hook data memory
+         * Allocate memory for our cave
          */
         Codecave() noexcept;
+
+        /**
+         * Free cave memory
+         */
+        ~Codecave() noexcept;
+
+    private: 
+        /** Instruction to hook */
+        std::byte *instruction;
+
+        /** Cave itself */
+        std::byte *cave;
+
+        /** Cave size */
+        std::size_t size = 0;
+
+        /** Skip the original instruction */
+        bool execute_original_code_flag = true;
+
+        /** State */
+        bool hooked = false;
+
+        /** Original instruction */
+        std::vector<std::byte> original_instruction;
+
+        /** Cave original protection */
+        unsigned long original_page_protection;
+
+        /**
+         * Set cave as executable
+         */
+        void set_access_protection(bool setting = true) noexcept;
+
+        /**
+         * Calculate offset
+         * @param instruction       Instruction address
+         * @param address           Address where jump
+         */
+        std::uint32_t calculate_jmp_offset(const void *jmp, const void *destination) noexcept;
+
+        /**
+         * Write a function call instruction
+         * @param function  Function to be called
+         * @param pushad    Insert pushad and pushfd instructions
+         */
+        void write_function_call(const void *function, bool pushad = true) noexcept;
+
+        /**
+         * Copy a code instruction from a given address
+         * @param address   Instruction address
+         */
+        void copy_instruction(const void *address, std::uint8_t &instruction_size) noexcept;
+
+        /**
+         * Write cave return
+         * @param bytes     The amount of bytes to jump
+         */
+        void write_cave_return() noexcept;
+
+        /**
+         * Insert a byte into the cave
+         * @param byte  Byte to insert
+         */
+        template<typename T> inline void insert(T byte) noexcept {
+            cave[size] = static_cast<std::byte>(byte);
+            size++;
+        }
+
+        /**
+         * Insert byte array into cave
+         * @param bytes     Pointer to byte array
+         * @param lenght    Size of array
+         */
+        template<typename T> inline void insert(T *bytes, std::size_t lenght) noexcept {
+            for(std::size_t i = 0; i < lenght; i++, size++) {
+                cave[size] = reinterpret_cast<const std::byte *>(bytes)[i];
+            }
+        }
+
+        /**
+         * Insert an address into cave
+         * @param address   Address to insert
+         */
+        inline void insert_address(std::uint32_t address) noexcept {
+            *reinterpret_cast<std::uint32_t *>(&cave[size]) = address;
+            size += 4;
+        }
     };
 
 }

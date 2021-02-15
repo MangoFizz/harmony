@@ -41,9 +41,14 @@ namespace Harmony {
         }
         enabled = true;
 
-        // Add the hook
+        // Get signature
         static auto &d3d9_call_reset_sig = get_harmony().get_signature("d3d9_call_reset");
-        static Codecave d3d9_call_end_scene_hook;
-        d3d9_call_end_scene_hook.write_basic_hook(reinterpret_cast<void *>(on_d3d9_reset_asm), d3d9_call_reset_sig.get_data(), false);
+        
+        // Write hacks
+        static Codecave d3d9_reset_cave;
+        d3d9_reset_cave.write_basic_codecave(d3d9_call_reset_sig.get_data(), reinterpret_cast<void *>(on_d3d9_reset_asm), false);
+
+        // Hook D3D9 reset call
+        d3d9_reset_cave.hook();
     }
 }

@@ -1,135 +1,157 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <memory>
+#include <windows.h>
 #include "../messaging/message_box.hpp"
 #include "memory.hpp"
 #include "codecave.hpp"
 
 namespace Harmony {
-    void Codecave::write_function_call(std::size_t &offset, void *function, bool pushad) noexcept {
-        if(pushad) {
-            // pushfd
-            this->data[offset + 0] = 0x9C;
-            // pushad
-            this->data[offset + 1] = 0x60;
-
-            offset += 2;
+    void Codecave::set_access_protection(bool setting) noexcept {
+        if(setting) {
+            // enable code execution
+            VirtualProtect(this->cave, this->size, PAGE_EXECUTE_READWRITE, &this->original_page_protection);
         }
-
-        // call
-        this->data[offset + 0] = 0xE8;
-        auto *call_offset = reinterpret_cast<std::uint32_t *>(&this->data[offset + 1]);
-        *call_offset = reinterpret_cast<std::uint32_t>(function) - (reinterpret_cast<std::uint32_t>(call_offset) + 4);
-
-        offset += 5;
-
-        if(pushad) {
-            // popad
-            this->data[offset + 0] = 0x61;
-            // popfd
-            this->data[offset + 1] = 0x9D;
-
-            offset += 2;
+        else {
+            VirtualProtect(this->cave, this->size, this->original_page_protection, NULL);
         }
     }
 
-    void Codecave::copy_intruction(std::size_t &offset, void *instruction, std::size_t length) noexcept {
-        overwrite(&this->data[offset], reinterpret_cast<std::uint8_t *>(instruction), length);
-        offset += length;
+    std::uint32_t Codecave::calculate_jmp_offset(const void *jmp, const void *destination) noexcept {
+        auto offset = reinterpret_cast<std::uint32_t>(destination) - (reinterpret_cast<std::uint32_t>(jmp) + 5);
+        return offset;
     }
 
-    void Codecave::write_skip_code_check(std::size_t &offset, std::uint8_t bytes) noexcept {
-        // Check if the skip flag is set
-        this->data[offset + 0] = 0x83;
-        this->data[offset + 1] = 0x3D;
-        auto skip_code_address = reinterpret_cast<std::uint32_t>(&this->skip_og_code);
-        *reinterpret_cast<std::uint32_t *>(&this->data[offset + 2]) = skip_code_address;
-        this->data[offset + 6] = true;
+    void Codecave::write_function_call(const void *function, bool pushad) noexcept {
+        if(pushad) {
+            this->insert(0x9C); // pushfd
+            this->insert(0x60); // pushad
+        }
 
-        // je
-        this->data[offset + 7] = 0x74;
-        this->data[offset + 8] = bytes;
+        this->insert(0xE8); // call
+        auto fn_offset = this->calculate_jmp_offset(reinterpret_cast<void *>(&this->cave[this->size - 1]), function);
+        this->insert_address(fn_offset);
 
-        offset += 9;
+        if(pushad) {
+            this->insert(0x61); // popad
+            this->insert(0x9D); // popfd
+        }
     }
 
-    void Codecave::write_exit(std::size_t &offset, void *address) noexcept {
-        this->data[offset + 0] = 0xE9;
-        auto *jmp_offset = reinterpret_cast<std::uint32_t *>(&this->data[offset + 1]);
-        *jmp_offset = reinterpret_cast<std::uint32_t>(address) - (reinterpret_cast<std::uint32_t>(jmp_offset) + 4);
-
-        offset += 5;
-    }
-
-    void Codecave::hook(void *address, std::size_t offset) noexcept {
-        auto *ptr = reinterpret_cast<std::byte *>(address);
-        overwrite(ptr, static_cast<std::uint8_t>(0xE9));
-        overwrite(ptr + 1, reinterpret_cast<std::uint32_t>(&this->data[offset]) - reinterpret_cast<std::uint32_t>(ptr + 5));
-    }
-
-    void Codecave::write_basic_hook(void *function, void *address, bool pushad) noexcept {
-        // Keep everything tracked
-        std::size_t offset = this->data_size;
-
-        this->write_function_call(offset, function, pushad);
-
-        // Set skip code flag check
-        this->write_skip_code_check(offset, 0);
-
-        auto *instruction = static_cast<std::byte *>(address);
-        std::size_t instruction_size;
-        std::uint32_t instruction_end;
-
-        switch(*reinterpret_cast<std::uint8_t *>(instruction)) {
-            // call, jmp
-            case 0xE8:
+    void Codecave::copy_instruction(const void *address, std::uint8_t &instruction_size) noexcept {
+        auto *instruction_bytes = reinterpret_cast<const std::uint8_t *>(address);
+        switch(instruction_bytes[0]) {
+            // call rel32
+            case 0xE8: 
+            // jmp rel32
             case 0xE9: {
-                instruction_size = 0x5;
-                instruction_end = reinterpret_cast<std::uint32_t>(instruction + instruction_size);
+                this->insert(instruction_bytes[0]); // call or jmp
 
-                this->data[offset + 0] = *reinterpret_cast<char *>(instruction);
-                auto original_offset = *reinterpret_cast<std::uint32_t *>(instruction + 1);
-                auto *call_offset = reinterpret_cast<std::uint32_t *>(&this->data[offset + 1]);
-                *call_offset = original_offset + (instruction_end - (reinterpret_cast<std::uint32_t>(call_offset) + 4));
-
-                // Update exit jump offset
-                this->data[offset - 1] = instruction_size;
-
-                offset += 5;
+                // offset
+                auto original_offset = *reinterpret_cast<const std::uint32_t *>(&instruction_bytes[1]);
+                auto offset = original_offset + this->calculate_jmp_offset(&this->cave[this->size - 1], &instruction_bytes[5]);
+                this->insert_address(offset);
+                
+                instruction_size = 5;
+                
+                break;
             }
-            break;
+
+            // mov r/m8, imm8
+            case 0xC6: {
+                this->insert(0xC6); // opcode
+
+                // [esp + disp8], imm8
+                if(instruction_bytes[1] == 0x44 && instruction_bytes[2] == 0x24) {
+                    this->insert(&instruction_bytes[1], 4);
+                    instruction_size = 5;
+                }
+                else {
+                    message_box("Unsupported mov instruction.");
+                    std::terminate();
+                }
+                break;
+            }
 
             default: {
-                message_box("Unable to make a hook: unsupported instruction.");
+                message_box("Unable to build cave: unsupported instruction.");
                 std::terminate();
             }
-            break;
         }
 
-        // Write codecave exit
-        this->write_exit(offset, instruction + instruction_size);
+        // Backup original code
+        auto &original_code = this->original_instruction;
+        for(std::size_t i = 0; i < instruction_size; i++) {
+            original_code.push_back(static_cast<std::byte>(instruction_bytes[i]));
+        }
+    }
 
-        // Write jump to the hook
-        this->hook(address, this->data_size);
+    void Codecave::write_cave_return() noexcept {
+        // jmp
+        this->insert(0xE9);
 
-        // Update hook data size
-        this->data_size = offset;
+        // offset
+        auto offset = this->calculate_jmp_offset(&this->cave[this->size - 1], this->instruction + this->original_instruction.size());
+        this->insert_address(offset);
+    }
+
+    void Codecave::execute_original_code(bool setting) noexcept {
+        this->execute_original_code_flag = setting;
+    }
+
+    void Codecave::write_basic_codecave(void *address, const void *function, bool pushad) noexcept {
+        if(this->hooked) {
+            return;
+        }
+
+        this->instruction = reinterpret_cast<std::byte *>(address);
+
+        this->write_function_call(function, pushad);
+
+        // cmp dword ptr [flag], 0
+        this->insert(0x83);
+        this->insert(0x3D);
+        auto flag_address = reinterpret_cast<std::uint32_t>(&this->execute_original_code_flag);
+        this->insert_address(flag_address);
+        this->insert(0); // false
+
+        // je instruction_size
+        this->insert(0x74);
+        this->insert(0x0);
+
+        // Copy instruction code into cave
+        std::uint8_t &instruction_size = *reinterpret_cast<std::uint8_t *>(&this->cave[this->size - 1]);
+        this->copy_instruction(address, instruction_size);
+
+        // Write codecave return
+        this->write_cave_return();
+    }
+
+    void Codecave::hook() noexcept {
+        if(this->hooked || this->size > 5) {
+            return;
+        }
+        this->hooked = true;
+        set_access_protection();
+        overwrite(this->instruction, static_cast<std::byte>(0xE9));
+        overwrite(this->instruction + 1, this->calculate_jmp_offset(this->instruction, this->cave));
+    }
+
+    void Codecave::release() noexcept {
+        if(!this->hooked) {
+            return;
+        }
+        overwrite(this->instruction, this->original_instruction.data(), this->original_instruction.size());
+        set_access_protection(false);
+        this->hooked = false;
     }
 
     Codecave::Codecave() noexcept {
-        DWORD old_protection;
+        this->cave = reinterpret_cast<std::byte *>(malloc(32));
+    }
 
-        // enable code execution on the hook memory
-        VirtualProtect(this->data, sizeof(this->data), PAGE_EXECUTE_READWRITE, &old_protection);
-
-        // Set NOPs
-        for(std::size_t i = 0; i < sizeof(this->data); i++) {
-            this->data[i] = 0x90;
-        }
-
-        // set the skip flag
-        this->skip_og_code = false;
-
-        this->data_size = 0;
+    Codecave::~Codecave() noexcept {
+        this->release();
+        free(this->cave);
     }
 }

@@ -7,7 +7,7 @@
 #include "multiplayer_event.hpp"
 
 namespace Harmony {
-    static Codecave on_multiplayer_event_hook;
+    static Codecave on_multiplayer_event_cave;
     static std::vector<Event<MultiplayerEventFunction>> multiplayer_events;
 
     void add_multiplayer_event(MultiplayerEventFunction function, EventPriority priority) {
@@ -32,7 +32,7 @@ namespace Harmony {
     extern "C" void do_on_multiplayer_event(std::uint32_t event, std::uint32_t killer, std::uint32_t victim, std::uint32_t local_player) {
         bool allow = true;
         call_in_order_allow(multiplayer_events, allow, static_cast<HaloData::MultiplayerEvent>(event), local_player, killer, victim);
-        on_multiplayer_event_hook.skip_og_code = !allow;
+        on_multiplayer_event_cave.execute_original_code(allow);
     }
 
     void enable_multiplayer_event_hook() {
@@ -43,8 +43,13 @@ namespace Harmony {
         }
         enabled = true;
 
+        // Get signature
         static auto &on_multiplayer_event_sig = get_harmony().get_signature("on_multiplayer_event");
+        
+        // Write hacks
+        on_multiplayer_event_cave.write_basic_codecave(on_multiplayer_event_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_event_asm), false);
 
-        on_multiplayer_event_hook.write_basic_hook(reinterpret_cast<void *>(on_multiplayer_event_asm), on_multiplayer_event_sig.get_data(), false);
+        // Hook multiplayer event call
+        on_multiplayer_event_cave.hook();
     }
 }
