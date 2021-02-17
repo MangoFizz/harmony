@@ -128,7 +128,7 @@ namespace Harmony {
     }
 
     void Codecave::hook() noexcept {
-        if(this->hooked || this->size > 5) {
+        if(this->hooked && this->size > 0) {
             return;
         }
         this->hooked = true;
