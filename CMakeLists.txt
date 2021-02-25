@@ -27,10 +27,12 @@ add_library(harmony MODULE
     src/events/multiplayer_sound.cpp
     src/events/multiplayer_sound.S
     src/events/tick.cpp
-    src/halo_data/path.cpp
+    src/halo_data/game_engine.cpp
     src/halo_data/multiplayer_events.cpp
     src/halo_data/multiplayer_sounds.cpp
+    src/halo_data/path.cpp
     src/halo_data/resolution.cpp
+    src/halo_data/tag.cpp
     src/halo_data/window.cpp
     src/lua/api/callback.cpp
     src/lua/api/optic.cpp

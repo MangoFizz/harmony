@@ -140,9 +140,9 @@ namespace Harmony::Lua {
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushstring(state, HaloData::string_from_multiplayer_event(type).c_str());
-                lua_pushinteger(state, local.id);
-                lua_pushinteger(state, killer.id);
-                lua_pushinteger(state, victim.id);
+                lua_pushinteger(state, local.whole_id);
+                lua_pushinteger(state, killer.whole_id);
+                lua_pushinteger(state, victim.whole_id);
                 if(lua_pcall(state, 4, 1, 0) == 0) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
