@@ -26,7 +26,7 @@ namespace Harmony {
         if(address) {
             this->name = name;
             this->data = address + offset;
-            this->original_data.insert(this->original_data.begin(), this->data, this->data + lenght);
+            this->original_data.insert(this->original_data.begin(), this->data, this->data + lenght - offset);
         }
         else {
             char message[256] = {};
