@@ -21,6 +21,16 @@ namespace Harmony {
         auto offset = reinterpret_cast<std::uint32_t>(destination) - (reinterpret_cast<std::uint32_t>(jmp) + 5);
         return offset;
     }
+    
+    std::byte *Codecave::follow_jump(std::byte *jmp) noexcept {
+        if(jmp[0] != static_cast<std::byte>(0xE8) && jmp[0] != static_cast<std::byte>(0xE9)) {
+            message_box("Unable to follow jump. WHAT THE H*CK IS THIS!");
+        }
+        auto jmp_offset = *reinterpret_cast<std::uint32_t *>(jmp + 1);
+        auto jmp_end = reinterpret_cast<std::uint32_t>(jmp + 5);
+        auto *destination = reinterpret_cast<std::byte *>(jmp_offset + jmp_end);
+        return destination;
+    }
 
     void Codecave::write_function_call(const void *function, bool pushad) noexcept {
         if(pushad) {
@@ -39,50 +49,77 @@ namespace Harmony {
     }
 
     void Codecave::copy_instruction(const void *address, std::uint8_t &instruction_size) noexcept {
-        auto *instruction_bytes = reinterpret_cast<const std::uint8_t *>(address);
-        switch(instruction_bytes[0]) {
-            // call rel32
-            case 0xE8: 
-            // jmp rel32
-            case 0xE9: {
-                this->insert(instruction_bytes[0]); // call or jmp
+        instruction_size = 0;
+        auto *instruction = reinterpret_cast<const std::uint8_t *>(address);
+        while(instruction_size < 5) {
+            instruction += instruction_size;
+            switch(instruction[0]) {
+                // call rel32
+                case 0xE8: 
+                // jmp rel32
+                case 0xE9: {
+                    this->insert(instruction[0]); // call or jmp
 
-                // offset
-                auto original_offset = *reinterpret_cast<const std::uint32_t *>(&instruction_bytes[1]);
-                auto offset = original_offset + this->calculate_jmp_offset(&this->cave[this->size - 1], &instruction_bytes[5]);
-                this->insert_address(offset);
-                
-                instruction_size = 5;
-                
-                break;
-            }
-
-            // mov r/m8, imm8
-            case 0xC6: {
-                this->insert(0xC6); // opcode
-
-                // [esp + disp8], imm8
-                if(instruction_bytes[1] == 0x44 && instruction_bytes[2] == 0x24) {
-                    this->insert(&instruction_bytes[1], 4);
-                    instruction_size = 5;
+                    // offset
+                    auto original_offset = *reinterpret_cast<const std::uint32_t *>(&instruction[1]);
+                    auto offset = original_offset + this->calculate_jmp_offset(&this->cave[this->size - 1], &instruction[5]);
+                    this->insert_address(offset);
+                    
+                    instruction_size += 5;
+                    break;
                 }
-                else {
-                    message_box("Unsupported mov instruction.");
+
+                // mov r/m8, imm8
+                case 0xC6: {
+                    this->insert(0xC6);
+
+                    // mov [esp + disp8], imm8
+                    if(instruction[1] == 0x44 && instruction[2] == 0x24) {
+                        this->insert(&instruction[1], 4);
+                        instruction_size += 5;
+                    }
+                    else {
+                        message_box("Unsupported mov instruction.");
+                        std::terminate();
+                    }
+                    break;
+                }
+
+                // far call
+                case 0xFF: {
+                    this->insert(0xFF);
+
+                    // call dword ptr [edx + disp32]
+                    if(instruction[1] == 0x92) {
+                        this->insert(0x92);
+                        this->insert(&instruction[2], 4);
+
+                        instruction_size += 6;
+                        break;
+                    }
+                    // call dword ptr [edx + disp8]
+                    else if(instruction[1] == 0x52) {
+                        this->insert(0x52);
+                        this->insert(instruction[2]);
+
+                        instruction_size += 3;
+                        break;
+                    }
+                    else {
+                        message_box("Unsupported call instruction.");
+                        std::terminate();
+                    }
+                }
+
+                default: {
+                    message_box("Unable to build cave: unsupported instruction. \nOpcode: 0x%.2X at 0x%.8X", instruction[0], instruction);
                     std::terminate();
                 }
-                break;
             }
 
-            default: {
-                message_box("Unable to build cave: unsupported instruction.");
-                std::terminate();
-            }
-        }
-
-        // Backup original code
-        auto &original_code = this->original_instruction;
-        for(std::size_t i = 0; i < instruction_size; i++) {
-            original_code.push_back(static_cast<std::byte>(instruction_bytes[i]));
+            // Backup original instruction
+            auto *instruction_bytes = reinterpret_cast<const std::byte *>(instruction);
+            this->original_instruction.insert(this->original_instruction.end(), instruction_bytes, instruction_bytes + instruction_size);
         }
     }
 
@@ -127,12 +164,39 @@ namespace Harmony {
         this->write_cave_return();
     }
 
+    void Codecave::write_function_call(void *address, const void *function_before, const void *function_after, bool pushad) {
+        if(this->hooked) {
+            return;
+        }
+
+        this->instruction = reinterpret_cast<std::byte *>(address);
+
+        // Write function call 1
+        this->write_function_call(function_before, pushad);
+
+        // Copy instruction code into cave
+        std::uint8_t instruction_size = 0;
+        this->copy_instruction(address, instruction_size);
+
+        // Write function call 2
+        this->write_function_call(function_after, pushad);
+
+        // Write codecave return
+        this->write_cave_return();
+    }
+
     void Codecave::hook() noexcept {
         if(this->hooked && this->size > 0) {
             return;
         }
         this->hooked = true;
         set_access_protection();
+
+        // Kill original code
+        for(std::size_t i = 0; i < this->original_instruction.size(); i++) {
+            overwrite(this->instruction + i, static_cast<std::byte>(0x90));
+        }
+
         overwrite(this->instruction, static_cast<std::byte>(0xE9));
         overwrite(this->instruction + 1, this->calculate_jmp_offset(this->instruction, this->cave));
     }
