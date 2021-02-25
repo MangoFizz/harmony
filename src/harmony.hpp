@@ -19,6 +19,10 @@ namespace Harmony {
         class Handler;
     }
 
+    namespace UserInterface {
+        class WidescreenOverride;
+    }
+
     /** Harmony class */
     class Harmony {
     public:
@@ -40,6 +44,11 @@ namespace Harmony {
         Optic::Handler &get_optic_handler() noexcept;
 
         /**
+         * Get widescreen override handle
+         */
+        UserInterface::WidescreenOverride &get_widescreen_override_handle() noexcept;
+
+        /**
          * Constructor for everything
          */
         Harmony();
@@ -53,6 +62,9 @@ namespace Harmony {
 
         /** Optic Handler */
         std::unique_ptr<Optic::Handler> optic_handler;
+
+        /** Widescreen override */
+        std::unique_ptr<UserInterface::WidescreenOverride> widescreen_fix_override;
     };
 
     /**

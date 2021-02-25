@@ -111,6 +111,27 @@ namespace Harmony {
                     }
                 }
 
+                // test
+                case 0x85: {
+                    // test eax, eax (?)
+                    if(instruction[1] == 0xC0) {
+                        this->insert(0xC0);
+                        instruction_size += 2;
+                    }
+                    else {
+                        message_box("Unsupported test instruction.");
+                        std::terminate();
+                    }
+                    break;
+                }
+
+                // nop
+                case 0x90: {
+                    this->insert(0x90);
+                    instruction_size = 1;
+                    break;
+                }
+
                 default: {
                     message_box("Unable to build cave: unsupported instruction. \nOpcode: 0x%.2X at 0x%.8X", instruction[0], instruction);
                     std::terminate();
@@ -182,6 +203,38 @@ namespace Harmony {
         this->write_function_call(function_after, pushad);
 
         // Write codecave return
+        this->write_cave_return();
+    }
+
+    void Codecave::hack_chimera_override(void *address, const void *function, const void **cave_return) noexcept {
+        if(this->hooked) {
+            return;
+        }
+
+        this->instruction = reinterpret_cast<std::byte *>(address);
+
+        // Backup original jmp instruction
+        std::vector<std::byte> original_override_jmp;
+        for(std::size_t i = 0; i < 5; i++) {
+            original_override_jmp.push_back(this->instruction[i]);
+        }
+    
+        this->insert(0xE9);
+        this->insert_address(this->calculate_jmp_offset(&this->cave[this->size - 1], function));
+
+        // Set override return
+        *cave_return = &this->cave[this->size];
+
+        // Get code from Chimera cave
+        auto *chimera_cave = reinterpret_cast<std::byte *>(this->follow_jump(address));
+        std::uint8_t intruction_size = 0;
+        this->copy_instruction(reinterpret_cast<void *>(chimera_cave), intruction_size);
+        this->copy_instruction(reinterpret_cast<void *>(chimera_cave + 5), intruction_size);
+
+        // Save Chimera override jump
+        this->original_instruction = original_override_jmp;
+        
+        // Return
         this->write_cave_return();
     }
 

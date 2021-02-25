@@ -51,6 +51,9 @@ add_library(harmony MODULE
     src/optic/handler.cpp
     src/optic/render.cpp
     src/optic/sprite.cpp
+    src/user_interface/widescreen_element_reposition_menu.S
+    src/user_interface/widescreen_mouse.S
+    src/user_interface/widescreen_override.cpp
     src/harmony.cpp
 )
 

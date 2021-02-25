@@ -32,6 +32,12 @@ namespace Harmony {
         void write_function_call(void *address, const void *function_before, const void *function_after, bool pushad = true);
 
         /**
+         * Write an override for a Chimera's override cave
+         * @param address   Pointer to instruction
+         */
+        void hack_chimera_override(void *address, const void *function, const void **cave_return) noexcept;
+
+        /**
          * Hook it!
          */
         void hook() noexcept;
