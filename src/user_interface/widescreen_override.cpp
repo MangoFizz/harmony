@@ -76,7 +76,7 @@ namespace Harmony::UserInterface {
             *widescreen_fix_mouse_x_ptr = &gotya;
 
             auto *widescreen_mouse_cave = this->overrides.emplace_back(std::make_unique<Codecave>()).get();
-            widescreen_mouse_cave->write_basic_codecave(widescreen_mouse_address, reinterpret_cast<void *>(widescreen_mouse), false);
+            widescreen_mouse_cave->write_basic_cave(widescreen_mouse_address, reinterpret_cast<void *>(widescreen_mouse), false);
             widescreen_mouse_cave->execute_original_code(false);
 
             // Hook everything

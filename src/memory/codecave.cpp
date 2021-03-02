@@ -157,7 +157,7 @@ namespace Harmony {
         this->execute_original_code_flag = setting;
     }
 
-    void Codecave::write_basic_codecave(void *address, const void *function, bool pushad) noexcept {
+    void Codecave::write_basic_cave(void *address, const void *function, bool pushad) noexcept {
         if(this->hooked) {
             return;
         }

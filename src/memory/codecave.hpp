@@ -20,7 +20,7 @@ namespace Harmony {
          * @param function  Function to be called in the cave
          * @param pushad    Insert pushad and pushfd instructions
          */
-        void write_basic_codecave(void *address, const void *function, bool pushad = true) noexcept;
+        void write_basic_cave(void *address, const void *function, bool pushad = true) noexcept;
 
         /**
          * Write a double-call cave
