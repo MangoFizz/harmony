@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <cstdint>
-#include <cmath>
 #include "../events/map_load.hpp"
 #include "../events/tick.hpp"
 #include "../halo_data/resolution.hpp"
@@ -154,7 +153,7 @@ namespace Harmony::UserInterface {
         float aspect_ratio = static_cast<float>(resolution.width) / static_cast<float>(resolution.height);
         float width_480p = aspect_ratio * 480.000f;
 
-        if(round(instance->screen_width_480p) != round(width_480p)) {
+        if(static_cast<std::uint16_t>(instance->screen_width_480p) != static_cast<std::uint16_t>(width_480p)) {
             // Re-calculate widescreen values
             float menu_frame_width = instance->menu_aspect_ratio * 480.000f;
             instance->screen_width_480p = width_480p;
