@@ -66,3 +66,6 @@ set_target_properties(harmony PROPERTIES LINK_FLAGS "-static -static-libgcc -sta
 
 # Set required libraris
 target_link_libraries(harmony lua -ld3dx9 -ld3d9)
+
+# Install harmony.dll
+install(TARGETS harmony DESTINATION "${CMAKE_INSTALL_PREFIX}")
