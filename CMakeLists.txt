@@ -16,6 +16,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel")
 # Include Lua
 include("ext/lua/lua.cmake")
 
+# Include Soloud
+include("ext/soloud/soloud.cmake")
+
 add_library(harmony MODULE
     src/events/d3d9_end_scene.cpp
     src/events/d3d9_end_scene.S
@@ -55,6 +58,7 @@ add_library(harmony MODULE
 # Set Lua include path
 target_include_directories(harmony
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/ext/lua"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/ext/soloud/include"
 )
 
 # Set output name
@@ -65,7 +69,7 @@ set_target_properties(harmony PROPERTIES OUTPUT_NAME "harmony")
 set_target_properties(harmony PROPERTIES LINK_FLAGS "-static -static-libgcc -static-libstdc++")
 
 # Set required libraris
-target_link_libraries(harmony lua -ld3dx9 -ld3d9)
+target_link_libraries(harmony lua soloud -ld3dx9 -ld3d9)
 
 # Install harmony.dll
 install(TARGETS harmony DESTINATION "${CMAKE_INSTALL_PREFIX}")
