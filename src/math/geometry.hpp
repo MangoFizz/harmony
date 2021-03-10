@@ -28,7 +28,7 @@ namespace Harmony::Math {
         }
 
         friend bool operator!=(const Point2D &point_a, const Point2D &point_b) {
-            return point_a.x != point_b.x || point_a.y != point_b.y;;
+            return point_a.x != point_b.x || point_a.y != point_b.y;
         }
     };
 
