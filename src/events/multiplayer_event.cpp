@@ -30,9 +30,7 @@ namespace Harmony {
     extern "C" void on_multiplayer_event_asm();
         
     extern "C" void do_on_multiplayer_event(std::uint32_t event, std::uint32_t killer, std::uint32_t victim, std::uint32_t local_player) {
-        bool allow = true;
-        call_in_order_allow(multiplayer_events, allow, static_cast<HaloData::MultiplayerEvent>(event), local_player, killer, victim);
-        on_multiplayer_event_cave.execute_original_code(allow);
+        call_in_order(multiplayer_events, static_cast<HaloData::MultiplayerEvent>(event), local_player, killer, victim);
     }
 
     void enable_multiplayer_event_hook() {
