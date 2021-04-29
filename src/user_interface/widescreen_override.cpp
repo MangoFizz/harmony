@@ -88,9 +88,7 @@ namespace Harmony::UserInterface {
             // Register events
             add_tick_event(this->on_tick);
             add_map_load_event(this->on_map_load);
-
-            // Set up map changes
-            this->on_map_load();
+            add_map_load_event(this->reset_frame_aspect_ratio, EVENT_PRIORITY_BEFORE);
         }
         else {
             // Remove events
@@ -105,6 +103,13 @@ namespace Harmony::UserInterface {
             // Destroy all caves
             this->overrides.clear();
         }
+    }
+
+    void WidescreenOverride::set_aspect_ratio(std::uint16_t x, std::uint16_t y) noexcept {
+        this->menu_aspect_ratio = static_cast<float>(x) / static_cast<float>(y);
+
+        // Force widescreen readjustment
+        this->screen_width_480p = 0;
     }
 
     float WidescreenOverride::get_menu_extra_width() noexcept {
@@ -124,7 +129,7 @@ namespace Harmony::UserInterface {
         instance = this;
 
         // Default menu aspect ratio
-        this->menu_aspect_ratio = 16.0f / 9.0f;
+        this->menu_aspect_ratio = 4.0f / 3.0f;
     }
 
     void WidescreenOverride::jason_jones_menu_widget(const char *widget_path) noexcept {
@@ -142,7 +147,12 @@ namespace Harmony::UserInterface {
         }
     }
 
+    void WidescreenOverride::reset_frame_aspect_ratio() noexcept {
+        instance->set_aspect_ratio();
+    }
+
     void WidescreenOverride::on_map_load() noexcept {
+        // Do not stretch this
         instance->jason_jones_menu_widget("ui\\shell\\main_menu\\multiplayer_type_select\\join_game\\join_game_items_list");
         instance->jason_jones_menu_widget("ui\\shell\\main_menu\\settings_select\\player_setup\\player_profile_edit\\controls_setup\\controls_options_menu");
         instance->jason_jones_menu_widget("ui\\shell\\main_menu\\settings_select\\player_setup\\player_profile_edit\\gamepad_setup\\gamepad_setup_options");

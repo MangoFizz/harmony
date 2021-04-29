@@ -9,6 +9,7 @@
 #include "../events/map_load.hpp"
 #include "api/callback.hpp"
 #include "api/optic.hpp"
+#include "api/user_interface.hpp"
 #include "script.hpp"
 #include "library.hpp"
 
@@ -190,6 +191,11 @@ namespace Harmony::Lua {
 
         // Set optic functions
         set_optic_functions(state);
+
+        // Set UI functions only if script is NOT global
+        if(Script::get_global_from_state(state, "script_type") == "map") {
+            set_user_interface_functions(state);
+        }
 
         // Load it!!
         library->load_script(state);
