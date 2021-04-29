@@ -86,8 +86,6 @@ namespace Harmony::UserInterface {
                 cave.get()->hook();
             }
 
-            this->tabs = *reinterpret_cast<std::uint16_t **>(widescreen_text_tab_sig.get_data());
-
             // Register events
             add_tick_event(this->on_tick);
             add_map_load_event(this->on_map_load);
@@ -100,8 +98,6 @@ namespace Harmony::UserInterface {
 
             // Restore widescreen fix mouse x pointer
             *widescreen_fix_mouse_x_ptr = widescreen_mouse_x;
-
-            this->tabs = nullptr;
 
             // Destroy all caves
             this->overrides.clear();
@@ -122,10 +118,6 @@ namespace Harmony::UserInterface {
 
     float WidescreenOverride::get_menu_displacement() const noexcept {
         return this->menu_displacement;
-    }
-
-    std::uint16_t *WidescreenOverride::get_text_tabs() noexcept {
-        return this->tabs;
     }
 
     WidescreenOverride::WidescreenOverride() noexcept {
@@ -236,26 +228,9 @@ namespace Harmony::UserInterface {
 
     extern "C" void reposition_menu_text_element(std::int16_t *element) noexcept {
         auto displacement = instance->get_menu_displacement();
-        auto *tabs = instance->get_text_tabs();
 
         element[1] += displacement;
         element[3] += displacement;
-        
-        // This is for the score screens which use tabbing.
-        std::uint16_t tab_count = static_cast<std::uint16_t>(tabs[0]);
-
-        static std::int16_t last_increase = -1337;
-        if(tab_count == 0) {
-            last_increase = -1337;
-        }
-        else {
-            if(tabs[1] != last_increase) {
-                for(std::size_t i = 0; i < tab_count; i++) {
-                    tabs[i + 1] += displacement;
-                }
-                last_increase = tabs[1];
-            }
-        }
     }
 
     extern "C" void reposition_menu_text_input() noexcept {

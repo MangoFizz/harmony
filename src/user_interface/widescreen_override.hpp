@@ -35,11 +35,6 @@ namespace Harmony::UserInterface {
         float get_menu_displacement() const noexcept;
 
         /**
-         * Get text tabs
-         */
-        std::uint16_t *get_text_tabs() noexcept;
-
-        /**
          * Default constructor
          */
         WidescreenOverride() noexcept;
