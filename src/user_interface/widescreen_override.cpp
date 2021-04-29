@@ -41,6 +41,9 @@ namespace Harmony::UserInterface {
     }
 
     void WidescreenOverride::enable(bool setting) noexcept {
+        if(setting == this->enabled) {
+            return;
+        }
         if(setting) {
             static auto &widescreen_element_position_menu_sig = get_harmony().get_signature("widescreen_element_position_menu");
             static auto &widescreen_menu_text_sig = get_harmony().get_signature("widescreen_menu_text");
@@ -103,6 +106,7 @@ namespace Harmony::UserInterface {
             // Destroy all caves
             this->overrides.clear();
         }
+        this->enabled = setting;
     }
 
     void WidescreenOverride::set_aspect_ratio(std::uint16_t x, std::uint16_t y) noexcept {
