@@ -89,7 +89,7 @@ namespace Harmony::UserInterface {
             // Register events
             add_tick_event(this->on_tick);
             add_map_load_event(this->on_map_load);
-            //add_map_load_event(this->reset_frame_aspect_ratio, EVENT_PRIORITY_BEFORE);
+            add_map_load_event(this->reset_frame_aspect_ratio, EVENT_PRIORITY_BEFORE);
         }
         else {
             // Remove events
