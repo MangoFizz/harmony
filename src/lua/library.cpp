@@ -113,7 +113,7 @@ namespace Harmony::Lua {
     }
     
     void Library::on_map_load() noexcept {
-        library->unload_map_script();
+        //library->unload_map_script();
     }
 
     void Library::on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {
