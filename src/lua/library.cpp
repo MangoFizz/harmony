@@ -7,6 +7,8 @@
 #include "../events/d3d9_reset.hpp"
 #include "../events/multiplayer_sound.hpp"
 #include "../events/map_load.hpp"
+#include "../user_interface/widescreen_override.hpp"
+#include "../harmony.hpp"
 #include "api/callback.hpp"
 #include "api/optic.hpp"
 #include "api/user_interface.hpp"
@@ -178,6 +180,13 @@ namespace Harmony::Lua {
     }
 
     int Library::lua_unload_script(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        if(strcmp(script->get_type(), "map") == 0) {
+            /**
+             * Restore UI frame aspect ratio before map script unload
+             */
+            get_harmony().get_widescreen_override_handle().reset_frame_aspect_ratio();
+        }
         library->unload_script(state);
         return 0;
     }

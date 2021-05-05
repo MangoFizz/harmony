@@ -22,7 +22,12 @@ namespace Harmony::UserInterface {
          * @param x     Width of the menu frame
          * @param y     Height of the menu frame
          */
-        void set_aspect_ratio(std::uint16_t x = 4, std::uint16_t y = 3) noexcept;
+        void set_aspect_ratio(std::uint16_t x, std::uint16_t y) noexcept;
+
+        /**
+         * Reset widescreen aspect ratio
+         */
+        void reset_frame_aspect_ratio() noexcept;
 
         /**
          * Get widescreen fix displacement
@@ -75,7 +80,6 @@ namespace Harmony::UserInterface {
          */
         static void on_tick() noexcept;
         static void on_map_load() noexcept;
-        static void reset_frame_aspect_ratio() noexcept;
     };
 }
 

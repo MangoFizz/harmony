@@ -89,7 +89,6 @@ namespace Harmony::UserInterface {
             // Register events
             add_tick_event(this->on_tick);
             add_map_load_event(this->on_map_load);
-            add_map_load_event(this->reset_frame_aspect_ratio, EVENT_PRIORITY_BEFORE);
         }
         else {
             // Remove events
@@ -110,6 +109,10 @@ namespace Harmony::UserInterface {
 
         // Force widescreen readjustment
         this->screen_width_480p = 0;
+    }
+
+    void WidescreenOverride::reset_frame_aspect_ratio() noexcept {
+        this->set_aspect_ratio(4, 3);
     }
 
     float WidescreenOverride::get_menu_extra_width() noexcept {
@@ -141,10 +144,6 @@ namespace Harmony::UserInterface {
         if(bounds_left <= 1.0f && bounds_right >= 639.0f) {
             bounds_right = 638.9f;
         }
-    }
-
-    void WidescreenOverride::reset_frame_aspect_ratio() noexcept {
-        instance->set_aspect_ratio();
     }
 
     void WidescreenOverride::on_map_load() noexcept {
