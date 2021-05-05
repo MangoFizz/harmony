@@ -183,7 +183,10 @@ namespace Harmony::Lua {
         auto *script = library->get_script(state);
         if(strcmp(script->get_type(), "map") == 0) {
             /**
-             * Restore UI frame aspect ratio before map script unload
+             * Restore UI frame aspect ratio before map script unload.
+             * We can't put this in a map load callback because our event
+             * is executed after Chimera's map load event, so our map 
+             * script will load BEFORE we can restore the aspect ratio.
              */
             get_harmony().get_widescreen_override_handle().reset_frame_aspect_ratio();
         }
