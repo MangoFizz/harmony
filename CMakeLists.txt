@@ -31,6 +31,7 @@ add_library(harmony MODULE
     src/events/multiplayer_sound.S
     src/events/tick.cpp
     src/halo_data/path.cpp
+    src/halo_data/master_volume.cpp
     src/halo_data/multiplayer_events.cpp
     src/halo_data/multiplayer_sounds.cpp
     src/halo_data/resolution.cpp
