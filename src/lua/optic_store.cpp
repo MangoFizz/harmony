@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include "../messaging/message_box.hpp"
 #include "../harmony.hpp"
 #include "../optic/handler.hpp"
 #include "optic_store.hpp"
@@ -55,6 +56,32 @@ namespace Harmony::Lua {
         }
     }
 
+    Optic::Sound *OpticStore::get_sprite_sound(std::string name) noexcept {
+        if(this->sounds.find(name) != this->sounds.end()) {
+            return &(this->sounds[name]);
+        }
+        return nullptr;
+    }
+
+    void OpticStore::add_sprite_sound(std::string name, Optic::Sound sound) noexcept {
+        if(this->sprites.find(name) != this->sprites.end()) {
+            if(this->sounds.find(name) == this->sounds.end()) {
+                this->sounds[name] = sound;
+                this->sprites[name].set_sound(this->sounds.at(name));
+            }
+        }
+        else {
+            message_box("Failed to add sound to sprite '%s'. Sprite does not exists.", name.c_str());
+            std::terminate();
+        }
+    }
+
+    void OpticStore::remove_sprite_sound(std::string name) noexcept {
+        if(this->sounds.find(name) != this->sounds.end()) {
+            this->sounds.erase(name);
+        }
+    }
+
     void OpticStore::register_group(std::string name) noexcept {
         this->groups.push_back(name);
     }
@@ -77,5 +104,11 @@ namespace Harmony::Lua {
 
     OpticStore::~OpticStore() {
         this->remove_groups();
+        this->release_sprites();
+
+        // Please don't die
+        for(auto &sound : this->sounds) {
+            sound.second.mSoloud = nullptr;
+        }
     }
 }

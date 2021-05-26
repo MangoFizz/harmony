@@ -62,6 +62,24 @@ namespace Harmony::Lua {
         void release_sprites() noexcept;
 
         /**
+         * Get a sound
+         * @return  Pointer to sound, null if does not exist
+         */
+        Optic::Sound *get_sprite_sound(std::string name) noexcept;
+
+        /**
+         * Add a sound
+         * @param name      Name or ID of the sound
+         * @param sprite    The sound itself
+         */
+        void add_sprite_sound(std::string name, Optic::Sound sound) noexcept;
+
+        /**
+         * Remove a sound
+         */
+        void remove_sprite_sound(std::string name) noexcept;
+
+        /**
          * Create render group
          * @param name
          */
@@ -94,6 +112,9 @@ namespace Harmony::Lua {
 
         /** Sprites */
         std::map<std::string, Optic::Sprite> sprites;
+
+        /** Sprite playbacks */
+        std::map<std::string, Optic::Sound> sounds;
 
         /** Groups */
         std::vector<std::string> groups;

@@ -12,6 +12,7 @@
 #include "../math/geometry.hpp"
 #include "sprite.hpp"
 #include "animation.hpp"
+#include "sound.hpp"
 
 namespace Harmony::Optic {
     class Render {
@@ -159,6 +160,11 @@ namespace Harmony::Optic {
         void pop_render() noexcept;
 
         /**
+         * Get group playback
+         */
+        AudioEngine *get_audio_engine() const noexcept;
+
+        /**
          * Get if is a temp group
          */
         bool single_render() noexcept;
@@ -204,6 +210,9 @@ namespace Harmony::Optic {
 
         /** Render queue */
         std::queue<Sprite *> queue;
+
+        /** Playback */
+        std::unique_ptr<AudioEngine> audio_engine;
 
         /**
          * If this is set, the group will be removed after the render timelife ends

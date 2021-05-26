@@ -82,9 +82,10 @@ namespace Harmony::Optic {
             auto &renders = group.get_renders();
             auto &queue = group.get_sprites_queue();
             auto max_renders = group.get_maximum_renders();
+            auto *audio_engine = group.get_audio_engine();
 
             // Remove if is a temporal group
-            if(group.single_render() && queue.empty() && renders.empty()) {
+            if(audio_engine->getActiveVoiceCount() == 0 && group.single_render() && queue.empty() && renders.empty()) {
                 it = groups.erase(it);
                 continue;
             }
@@ -95,9 +96,15 @@ namespace Harmony::Optic {
             auto &slide_anim = group.get_slide_anim();
 
             // Render sprite from queue
-            if(!slide_anim.is_playing()) {
+            if(!slide_anim.is_playing() && audio_engine->getActiveVoiceCount() == 0) {
                 if(!queue.empty() && (max_renders == 0 || renders.size() < max_renders)) {
                     auto &render = group.render_sprite_from_queue();
+
+                    // Play sprite sound
+                    auto *sound = render.get_sprite()->get_sound();
+                    if(sound) {
+                        auto handle = audio_engine->play(*sound);
+                    }
 
                     // Play fade-in animation in the new render
                     render.play_animation(fade_in_anim);

@@ -4,12 +4,14 @@
 #define HARMONY_OPTIC_SPRITE_HPP
 
 #include <filesystem>
-#include "../math/color.hpp"
-#include "../math/geometry.hpp"
 #include <d3dx9.h>
 #include <d3dx9tex.h>
+#include "../math/color.hpp"
+#include "../math/geometry.hpp"
+#include "sound.hpp"
 
 namespace Harmony::Optic {
+
     class Sprite {
     public:
         struct Scale {
@@ -40,6 +42,23 @@ namespace Harmony::Optic {
          * Get sprite height
          */
         int get_height() const noexcept;
+
+        /**
+         * Get sprite sound
+         */
+        Sound *get_sound() const noexcept;
+
+        /**
+         * Set sprite sound
+         * @param sound     The sound itself
+         */
+        void set_sound(Sound &sound) noexcept;
+
+        /**
+         * Set sprite sound
+         * @param sound     Pointer to sound
+         */
+        void set_sound(Sound *sound) noexcept;
 
         /**
          * Load sprite into device
@@ -84,6 +103,9 @@ namespace Harmony::Optic {
 
         /** Sprite height */
         int height = 0;
+
+        /** Sprite sound */
+        Sound *sound;
 
         /** D3D9 texture of sprite */
         LPDIRECT3DTEXTURE9 texture;

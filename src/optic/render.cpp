@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include "../halo_data/master_volume.hpp"
 #include "../messaging/message_box.hpp"
 #include "render.hpp"
 
@@ -114,6 +115,10 @@ namespace Harmony::Optic {
         this->renders.pop_front();
     }
 
+    AudioEngine *RenderGroup::get_audio_engine() const noexcept {
+        return this->audio_engine.get();
+    }
+
     bool RenderGroup::single_render() noexcept {
         return this->single_render_group;
     }
@@ -124,5 +129,11 @@ namespace Harmony::Optic {
         this->max_renders = maximum_renders;
         this->render_duration = render_duration;
         this->single_render_group = single_render;
+
+        // Initialize SoLoud engine
+        this->audio_engine = std::make_unique<AudioEngine>();
+        auto *engine = this->audio_engine.get();
+        engine->init();
+        engine->setGlobalVolume(static_cast<float>(HaloData::get_master_volume()) / 10);
     }
 }

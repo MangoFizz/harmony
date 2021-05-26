@@ -13,6 +13,18 @@ namespace Harmony::Optic {
         return this->height;
     }
 
+    Sound *Sprite::get_sound() const noexcept {
+        return this->sound;
+    }
+
+    void Sprite::set_sound(Sound &sound) noexcept {
+        this->sound = &sound;
+    }
+
+    void Sprite::set_sound(Sound *sound) noexcept {
+        this->sound = sound;
+    }
+
     void Sprite::load(LPDIRECT3DDEVICE9 device) noexcept {
         if(this->loaded) {
             return;
