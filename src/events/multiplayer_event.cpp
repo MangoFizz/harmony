@@ -45,7 +45,7 @@ namespace Harmony {
         static auto &on_multiplayer_event_sig = get_harmony().get_signature("on_multiplayer_event");
         
         // Write hacks
-        on_multiplayer_event_cave.write_basic_codecave(on_multiplayer_event_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_event_asm), false);
+        on_multiplayer_event_cave.write_basic_cave(on_multiplayer_event_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_event_asm), false);
 
         // Hook multiplayer event call
         on_multiplayer_event_cave.hook();

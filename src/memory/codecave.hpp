@@ -16,11 +16,26 @@ namespace Harmony {
 
         /**
          * Write a basic cave
+         * @param address   Pointer to instruction
          * @param function  Function to be called in the cave
-         * @param address   Pointer to instruction, nullptr by default
          * @param pushad    Insert pushad and pushfd instructions
          */
-        void write_basic_codecave(void *address, const void *function, bool pushad = true) noexcept;
+        void write_basic_cave(void *address, const void *function, bool pushad = true) noexcept;
+
+        /**
+         * Write a double-call cave
+         * @param address           Pointer to instruction
+         * @param function_before   Function to be called BEFORE original code
+         * @param function_after    Function to be called AFTER original code
+         * @param pushad            Insert pushad and pushfd instructions
+         */
+        void write_function_call(void *address, const void *function_before, const void *function_after, bool pushad = true);
+
+        /**
+         * Write an override for a Chimera's override cave
+         * @param address   Pointer to instruction
+         */
+        void hack_chimera_override(void *address, const void *function, const void **cave_return) noexcept;
 
         /**
          * Hook it!
@@ -41,6 +56,27 @@ namespace Harmony {
          * Free cave memory
          */
         ~Codecave() noexcept;
+
+        /**
+         * Calculate offset
+         * @param instruction       Instruction address
+         * @param address           Address where jump
+         */
+        static std::uint32_t calculate_jmp_offset(const void *jmp, const void *destination) noexcept;
+
+        /**
+         * Follow a call/jmp instruction
+         * @param jmp   Pointer to instruction
+         */
+        static std::byte *follow_jump(std::byte *jmp) noexcept;
+
+        /**
+         * Follow a call/jmp instruction
+         * @param jmp   Pointer to instruction
+         */
+        static inline std::byte *follow_jump(void *jmp) noexcept {
+            return follow_jump(reinterpret_cast<std::byte *>(jmp));
+        }
 
     private: 
         /** Instruction to hook */
@@ -68,13 +104,6 @@ namespace Harmony {
          * Set cave as executable
          */
         void set_access_protection(bool setting = true) noexcept;
-
-        /**
-         * Calculate offset
-         * @param instruction       Instruction address
-         * @param address           Address where jump
-         */
-        std::uint32_t calculate_jmp_offset(const void *jmp, const void *destination) noexcept;
 
         /**
          * Write a function call instruction

@@ -46,7 +46,7 @@ namespace Harmony {
         
         // Write hacks
         static Codecave d3d9_reset_cave;
-        d3d9_reset_cave.write_basic_codecave(d3d9_call_reset_sig.get_data(), reinterpret_cast<void *>(on_d3d9_reset_asm), false);
+        d3d9_reset_cave.write_basic_cave(d3d9_call_reset_sig.get_data(), reinterpret_cast<void *>(on_d3d9_reset_asm), false);
 
         // Hook D3D9 reset call
         d3d9_reset_cave.hook();

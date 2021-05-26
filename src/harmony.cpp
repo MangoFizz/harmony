@@ -14,6 +14,7 @@
 #include "messaging/console_output.hpp"
 #include "messaging/message_box.hpp"
 #include "optic/handler.hpp"
+#include "user_interface/widescreen_override.hpp"
 #include "harmony.hpp"
 
 namespace Harmony {
@@ -42,6 +43,10 @@ namespace Harmony {
       return *(this->optic_handler.get());
    }
 
+   UserInterface::WidescreenOverride &Harmony::get_widescreen_override_handle() noexcept {
+      return *(this->widescreen_fix_override.get());
+   }
+
    Harmony::Harmony() : signatures(Signature::find_signatures()) {
       // Set instance pointer
       instance = this;
@@ -51,6 +56,9 @@ namespace Harmony {
 
       // Set up optic
       this->optic_handler = std::make_unique<Optic::Handler>();
+
+      // Set up widescreen override
+      this->widescreen_fix_override = std::make_unique<UserInterface::WidescreenOverride>();
 
       // Set up tick event hook
       enable_tick_event();
@@ -84,6 +92,9 @@ namespace Harmony {
       // Set up multiplayer stuff
       enable_multiplayer_event_hook();
       enable_multiplayer_sounds_hook();
+
+      // Override Chimera's widescreen fix
+      instance->get_widescreen_override_handle().enable(true);
    }
 }
 

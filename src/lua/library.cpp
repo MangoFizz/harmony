@@ -7,8 +7,11 @@
 #include "../events/d3d9_reset.hpp"
 #include "../events/multiplayer_sound.hpp"
 #include "../events/map_load.hpp"
+#include "../user_interface/widescreen_override.hpp"
+#include "../harmony.hpp"
 #include "api/callback.hpp"
 #include "api/optic.hpp"
+#include "api/user_interface.hpp"
 #include "script.hpp"
 #include "library.hpp"
 
@@ -112,7 +115,7 @@ namespace Harmony::Lua {
     }
     
     void Library::on_map_load() noexcept {
-        library->unload_map_script();
+        //library->unload_map_script();
     }
 
     void Library::on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {
@@ -140,9 +143,9 @@ namespace Harmony::Lua {
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushstring(state, HaloData::string_from_multiplayer_event(type).c_str());
-                lua_pushinteger(state, local.id);
-                lua_pushinteger(state, killer.id);
-                lua_pushinteger(state, victim.id);
+                lua_pushinteger(state, local.whole_id);
+                lua_pushinteger(state, killer.whole_id);
+                lua_pushinteger(state, victim.whole_id);
                 if(lua_pcall(state, 4, 1, 0) == 0) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
@@ -177,6 +180,16 @@ namespace Harmony::Lua {
     }
 
     int Library::lua_unload_script(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        if(strcmp(script->get_type(), "map") == 0) {
+            /**
+             * Restore UI frame aspect ratio before map script unload.
+             * We can't put this in a map load callback because our event
+             * is executed after Chimera's map load event, so our map 
+             * script will load BEFORE we can restore the aspect ratio.
+             */
+            get_harmony().get_widescreen_override_handle().reset_frame_aspect_ratio();
+        }
         library->unload_script(state);
         return 0;
     }
@@ -190,6 +203,11 @@ namespace Harmony::Lua {
 
         // Set optic functions
         set_optic_functions(state);
+
+        // Set UI functions only if script is NOT global
+        if(Script::get_global_from_state(state, "script_type") == "map") {
+            set_user_interface_functions(state);
+        }
 
         // Load it!!
         library->load_script(state);

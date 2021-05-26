@@ -42,7 +42,7 @@ namespace Harmony {
         
         // Write hacks
         static Codecave on_map_load_cave;
-        on_map_load_cave.write_basic_codecave(on_map_load_sig.get_data(), reinterpret_cast<void *>(do_map_load_event));
+        on_map_load_cave.write_basic_cave(on_map_load_sig.get_data(), reinterpret_cast<void *>(do_map_load_event));
 
         // Hook map load call
         on_map_load_cave.hook();

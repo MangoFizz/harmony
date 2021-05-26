@@ -32,12 +32,16 @@ add_library(harmony MODULE
     src/events/tick.cpp
     src/halo_data/path.cpp
     src/halo_data/master_volume.cpp
+    src/halo_data/game_engine.cpp
     src/halo_data/multiplayer_events.cpp
     src/halo_data/multiplayer_sounds.cpp
+    src/halo_data/path.cpp
     src/halo_data/resolution.cpp
+    src/halo_data/tag.cpp
     src/halo_data/window.cpp
     src/lua/api/callback.cpp
     src/lua/api/optic.cpp
+    src/lua/api/user_interface.cpp
     src/lua/library.cpp
     src/lua/optic_store.cpp
     src/lua/script.cpp
@@ -53,6 +57,9 @@ add_library(harmony MODULE
     src/optic/handler.cpp
     src/optic/render.cpp
     src/optic/sprite.cpp
+    src/user_interface/widescreen_element_reposition_menu.S
+    src/user_interface/widescreen_mouse.S
+    src/user_interface/widescreen_override.cpp
     src/harmony.cpp
 )
 

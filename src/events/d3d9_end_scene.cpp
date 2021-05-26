@@ -48,7 +48,7 @@ namespace Harmony {
         
         // Write hacks
         static Codecave d3d9_end_scene_cave;
-        d3d9_end_scene_cave.write_basic_codecave(d3d9_call_end_scene_sig.get_data(), reinterpret_cast<void *>(on_d3d9_end_scene_asm), false);
+        d3d9_end_scene_cave.write_basic_cave(d3d9_call_end_scene_sig.get_data(), reinterpret_cast<void *>(on_d3d9_end_scene_asm), false);
 
         // Hook D3D9 end scene call
         d3d9_end_scene_cave.hook();
