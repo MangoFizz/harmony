@@ -6,6 +6,8 @@
 #include <vector>
 #include <cstdint>
 
+#define CALL_INSTRUCTION_SIZE 0x5
+
 namespace Harmony {
     class Codecave {
     public:
@@ -15,7 +17,7 @@ namespace Harmony {
         void execute_original_code(bool setting) noexcept;
 
         /**
-         * Write a basic cave
+         * Write a basic cave. This cave can skip the original function.
          * @param address   Pointer to instruction
          * @param function  Function to be called in the cave
          * @param pushad    Insert pushad and pushfd instructions

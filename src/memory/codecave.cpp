@@ -166,8 +166,8 @@ namespace Harmony {
 
         this->write_function_call(function, pushad);
 
-        // cmp dword ptr [flag], 0
-        this->insert(0x83);
+        // cmp byte ptr [flag], 0
+        this->insert(0x80);
         this->insert(0x3D);
         auto flag_address = reinterpret_cast<std::uint32_t>(&this->execute_original_code_flag);
         this->insert_address(flag_address);
@@ -176,6 +176,7 @@ namespace Harmony {
         // je instruction_size
         this->insert(0x74);
         this->insert(0x0);
+        auto *je_offset =  reinterpret_cast<std::uint8_t *>(&this->cave[this->size - 1]);
 
         // Copy instruction code into cave
         std::uint8_t &instruction_size = *reinterpret_cast<std::uint8_t *>(&this->cave[this->size - 1]);
@@ -183,6 +184,12 @@ namespace Harmony {
 
         // Write codecave return
         this->write_cave_return();
+
+        // update je offset
+        *je_offset = instruction_size + CALL_INSTRUCTION_SIZE;
+
+        // insert function return
+        this->insert(0xC3);
     }
 
     void Codecave::write_function_call(void *address, const void *function_before, const void *function_after, bool pushad) {
