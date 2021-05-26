@@ -30,14 +30,10 @@ set(SOLOUD_CORE_SOURCES
 set(SOLOUD_AUDIOSOURCES_PATH ${SOLOUD_SOURCE_PATH}/audiosource)
 set(SOLOUD_AUDIOSOURCES_SOURCES
 	# wav
-	${SOLOUD_AUDIOSOURCES_PATH}/wav/dr_flac.h
 	${SOLOUD_AUDIOSOURCES_PATH}/wav/dr_impl.cpp
-	${SOLOUD_AUDIOSOURCES_PATH}/wav/dr_mp3.h
-	${SOLOUD_AUDIOSOURCES_PATH}/wav/dr_wav.h
 	${SOLOUD_AUDIOSOURCES_PATH}/wav/soloud_wav.cpp
 	${SOLOUD_AUDIOSOURCES_PATH}/wav/soloud_wavstream.cpp
 	${SOLOUD_AUDIOSOURCES_PATH}/wav/stb_vorbis.c
-	${SOLOUD_AUDIOSOURCES_PATH}/wav/stb_vorbis.h
 )
 
 # WASAPI backend
