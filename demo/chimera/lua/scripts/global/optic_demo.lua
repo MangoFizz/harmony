@@ -23,8 +23,9 @@ optic.create_group("demo", 50, 400, 255, math.random(0, 360), 4000, 0, "fade in"
 -- Add sprite
 optic.register_sprite("sandia", "images/sandia.jpg", 50, 50)
 optic.register_sprite("hitmarker", "images/hitmarker.png", 35, 35)
+optic.add_sound_to_sprite("hitmarker", "sounds/hit.wav")
 
-function onMultiplayerSound(sound)
+function on_multiplayer_sound(sound)
 	if(sound == "ting") then
 		-- Sandia sprite
 		optic.render_sprite("demo", "sandia")
@@ -38,4 +39,4 @@ function onMultiplayerSound(sound)
 	return true
 end
 
-harmony.set_callback("multiplayer sound", "onMultiplayerSound")
+harmony.set_callback("multiplayer sound", "on_multiplayer_sound")
