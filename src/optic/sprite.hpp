@@ -105,7 +105,7 @@ namespace Harmony::Optic {
         int height = 0;
 
         /** Sprite sound */
-        Sound *sound;
+        Sound *sound = nullptr;
 
         /** D3D9 texture of sprite */
         LPDIRECT3DTEXTURE9 texture;
