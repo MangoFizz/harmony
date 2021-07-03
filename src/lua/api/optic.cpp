@@ -123,7 +123,7 @@ namespace Harmony::Lua {
 
     static int lua_register_sprite(lua_State *state) noexcept {
         int args = lua_gettop(state);
-        if(args == 4) {
+        if(args == 4 || args == 5) {
             auto *script = library->get_script(state);
             auto &store = script->get_optic_store();
 
@@ -136,7 +136,20 @@ namespace Harmony::Lua {
                 // check if the texture file exists
                 if(script->path_is_valid(texture_path)) {
                     if(std::filesystem::exists(texture_path)) {
-                        store.add_sprite(name, Optic::Sprite(texture_path.c_str(), width, height));
+                        if(args == 5){
+                            std::string sound_path = std::string(script->get_data_path()) + "\\" + luaL_checkstring(state, 5);
+                            if(script->path_is_valid(sound_path)) {
+                                if(std::filesystem::exists(sound_path)) {
+                                    store.add_sprite(name, Optic::Sprite(texture_path.c_str(), width, height), sound_path);
+                                }
+                                else {
+                                    luaL_error(state, "sound file does not exists in harmony register_sprite function");
+                                }
+                            }
+                        }
+                        else {
+                            store.add_sprite(name, Optic::Sprite(texture_path.c_str(), width, height));
+                        }
                     }
                     else {
                         luaL_error(state, "texture does not exists in harmony register_sprite function");
@@ -152,46 +165,6 @@ namespace Harmony::Lua {
         }
         else {
             luaL_error(state, "invalid number of arguments in harmony register_sprite function");
-        }
-        return 0;
-    }
-
-    static int lua_add_sound_to_sprite(lua_State *state) noexcept {
-        int args = lua_gettop(state);
-        if(args == 2) {
-            auto *script = library->get_script(state);
-            auto &store = script->get_optic_store();
-
-            const char *name = luaL_checkstring(state, 1);
-            std::string sound_path = std::string(script->get_data_path()) + "\\" + luaL_checkstring(state, 2);
-            
-            if(store.get_sprite(name)) {
-                if(!store.get_sprite_sound(name)) {
-                    // check if the sound file exists
-                    if(script->path_is_valid(sound_path)) {
-                        if(std::filesystem::exists(sound_path)) {
-                            Optic::Sound sound;
-                            store.add_sprite_sound(name, sound);
-                            store.get_sprite_sound(name)->load(sound_path.c_str());
-                        }
-                        else {
-                            luaL_error(state, "sound file does not exists in harmony add_sprite_sounds function");
-                        }
-                    }
-                    else {
-                        luaL_error(state, "invalid sound file path in harmony add_sprite_sounds function");
-                    }
-                }
-                else {
-                    luaL_error(state, "invalid name for sound in harmony add_sprite_sounds function");
-                }
-            }
-            else {
-                luaL_error(state, "invalid name for sprite in harmony add_sprite_sounds function");
-            }
-        }
-        else {
-            luaL_error(state, "invalid number of arguments in harmony add_sprite_sounds function");
         }
         return 0;
     }
@@ -355,7 +328,6 @@ namespace Harmony::Lua {
         {"register_animation", lua_register_animation},
         {"add_animation_target", lua_add_animation_target},
         {"register_sprite", lua_register_sprite},
-        {"add_sound_to_sprite", lua_add_sound_to_sprite},
         {"create_group", lua_create_group},
         {"render_sprite", lua_render_sprite},
         {"clear_group_renders", lua_clear_renders},

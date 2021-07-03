@@ -56,11 +56,11 @@ optic.create_group("demo", 50, 400, 255, 180, 4000, 0, "fade in", "fade out", "s
 ## register_sprite
 Creates a sprite from an image.
 
-**Takes:** `string` sprite_name, `string` image_path, `number` width, `number` height
+**Takes:** `string` sprite_name, `string` image_path, `number` width, `number` height, `string` sound_path
 
 Example:
 ```lua
-optic.register_sprite("hitmarker", "images/hitmarker.png", 35, 35)
+optic.register_sprite("hitmarker", "images/hitmarker.png", 35, 35, "sounds/hit.wav")
 ```
 
 ## render_sprite
@@ -71,14 +71,4 @@ Renders a sprite on the specified render group.
 Example:
 ```lua
 optic.render_sprite("demo", "hitmarker")
-```
-
-## add_sound_to_sprite
-Attach a sound to a specific sprite.
-
-**Takes:** `string` sprite_name, `string` sound_path
-
-Example:
-```lua
-optic.add_sound_to_sprite("hitmarker", "sounds/hit.wav")
 ```

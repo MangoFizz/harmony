@@ -32,9 +32,16 @@ namespace Harmony::Lua {
         return nullptr;
     }
 
-    void OpticStore::add_sprite(std::string name, Optic::Sprite sprite) noexcept {
+    void OpticStore::add_sprite(std::string name, Optic::Sprite sprite, std::string soundifle) noexcept {
         if(this->sprites.find(name) == this->sprites.end()) {
             this->sprites[name] = sprite;
+            
+            if(!soundifle.empty()) {
+                auto elem = this->sounds.insert({name, Optic::Sound()});
+                auto *sound = &elem.first->second;
+                sound->load(soundifle.c_str());
+                this->sprites[name].set_sound(sound);
+            }
         }
     }
 
@@ -61,19 +68,6 @@ namespace Harmony::Lua {
             return &(this->sounds[name]);
         }
         return nullptr;
-    }
-
-    void OpticStore::add_sprite_sound(std::string name, Optic::Sound sound) noexcept {
-        if(this->sprites.find(name) != this->sprites.end()) {
-            if(this->sounds.find(name) == this->sounds.end()) {
-                this->sounds[name] = sound;
-                this->sprites[name].set_sound(this->sounds.at(name));
-            }
-        }
-        else {
-            message_box("Failed to add sound to sprite '%s'. Sprite does not exists.", name.c_str());
-            std::terminate();
-        }
     }
 
     void OpticStore::remove_sprite_sound(std::string name) noexcept {
