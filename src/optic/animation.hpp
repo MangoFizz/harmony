@@ -26,14 +26,17 @@ namespace Harmony::Optic {
             }
         };
 
-        enum Target {
-            TARGET_POSITION_X,
-            TARGET_POSITION_Y,
-            TARGET_ROTATION,
-            TARGET_OPACITY,
-            TARGET_SCALE_X,
-            TARGET_SCALE_Y,
-            TARGET_INVALID
+        /**
+         * @todo Move this enum to Render
+         */
+        enum RenderProperty {
+            RENDER_PROPERTY_POSITION_X,
+            RENDER_PROPERTY_POSITION_Y,
+            RENDER_PROPERTY_ROTATION,
+            RENDER_PROPERTY_OPACITY,
+            RENDER_PROPERTY_SCALE_X,
+            RENDER_PROPERTY_SCALE_Y,
+            RENDER_PROPERTY_INVALID
         };
 
         /**
@@ -59,11 +62,11 @@ namespace Harmony::Optic {
         void set_transform(StateTransform new_value) noexcept;
 
         /**
-         * Add target
-         * @param target    Target to apply animation
-         * @param curve     The quadratic bezier used to generate the target frames
+         * Set an animation curve for a property
+         * @param property      Render property
+         * @param curve         The quadratic bezier used to generate the property frames
          */
-        void add_target(Target target, Math::QuadraticBezier curve) noexcept;
+        void set_property_curve(RenderProperty property, Math::QuadraticBezier curve) noexcept;
 
         /**
          * Play the animation
@@ -93,15 +96,15 @@ namespace Harmony::Optic {
         long get_time_left() noexcept;
 
         /**
-         * Get animation tag
+         * Get animation name
          */
-        const char *get_tag() const noexcept;
+        const char *get_name() const noexcept;
 
         /**
-         * Set animation tag
-         * @param tag   New tag for animation
+         * Set animation name or ID
+         * @param name  New name for animation
          */
-        void set_tag(const char *new_tag) noexcept;
+        void set_name(const char *name) noexcept;
 
         /**
          * Constructor for animation
@@ -124,15 +127,15 @@ namespace Harmony::Optic {
          * Equals operator for std::find function
          */
         inline bool operator==(const Animation& anim) {
-            return this->tag == anim.get_tag();
+            return this->name == anim.get_name();
         }
 
         /**
-         * Get a target from a given string
-         * @param target_name   Name of the desired target
-         * @return              The target itself
+         * Get a property from a given string
+         * @param property_name     Name of the desired property
+         * @return                  The property itself
          */
-        static Target get_target_from_string(const char *target_name) noexcept;
+        static RenderProperty get_render_property_from_string(const char *property_name) noexcept;
 
         /**
          * Generic curves
@@ -145,7 +148,7 @@ namespace Harmony::Optic {
 
     private:
         /** Curves of the animation */
-        std::map<Target, Math::QuadraticBezier> curves;
+        std::map<RenderProperty, Math::QuadraticBezier> curves;
 
         /** Animation is playing */
         bool playing = false;
@@ -160,7 +163,7 @@ namespace Harmony::Optic {
         std::chrono::steady_clock::time_point start_time;
 
         /** Tag or ID of the animation. This is useful when we need a way to identify this animation. */
-        std::string tag;
+        std::string name;
 
         /**
          * Set up default animation

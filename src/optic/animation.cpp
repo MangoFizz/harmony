@@ -21,11 +21,11 @@ namespace Harmony::Optic {
         this->render_state_transform = new_value;
     }
 
-    void Animation::add_target(Target target, Math::QuadraticBezier curve) noexcept {
-        if(target == TARGET_INVALID) {
+    void Animation::set_property_curve(RenderProperty property, Math::QuadraticBezier curve) noexcept {
+        if(property == RENDER_PROPERTY_INVALID) {
             return;
         }
-        this->curves[target] = curve;
+        this->curves[property] = curve;
     }
 
     void Animation::play() noexcept {
@@ -54,29 +54,29 @@ namespace Harmony::Optic {
         }
 
         for(auto &elem : this->curves) {
-            auto target = elem.first;
+            auto property = elem.first;
             auto &curve = elem.second;
 
-            switch(target) {
-                case TARGET_POSITION_X:
+            switch(property) {
+                case RENDER_PROPERTY_POSITION_X:
                     state.position.x += this->render_state_transform.position.x * curve.get_point(t).y;
                     break;
-                case TARGET_POSITION_Y:
+                case RENDER_PROPERTY_POSITION_Y:
                     state.position.y += this->render_state_transform.position.y * curve.get_point(t).y;
                     break;
-                case TARGET_OPACITY:
+                case RENDER_PROPERTY_OPACITY:
                     state.color.a += this->render_state_transform.opacity * curve.get_point(t).y;
                     break;
-                case TARGET_ROTATION:
+                case RENDER_PROPERTY_ROTATION:
                     state.rotation += this->render_state_transform.rotation * curve.get_point(t).y;
                     break;
-                case TARGET_SCALE_X:
+                case RENDER_PROPERTY_SCALE_X:
                     state.scale.x += this->render_state_transform.scale.x * curve.get_point(t).y;
                     if(state.scale.x < 0) {
                         state.scale.x = 0;
                     }
                     break;
-                case TARGET_SCALE_Y:
+                case RENDER_PROPERTY_SCALE_Y:
                     state.scale.y += this->render_state_transform.scale.y * curve.get_point(t).y;
                     if(state.scale.y < 0) {
                         state.scale.y = 0;
@@ -101,12 +101,12 @@ namespace Harmony::Optic {
         return timeleft;
     }
 
-    const char *Animation::get_tag() const noexcept {
-        return this->tag.c_str();
+    const char *Animation::get_name() const noexcept {
+        return this->name.c_str();
     }
 
-    void Animation::set_tag(const char *new_tag) noexcept {
-        this->tag = new_tag;
+    void Animation::set_name(const char *name) noexcept {
+        this->name = name;
     }
 
     Animation::Animation(StateTransform transformation, long duration) noexcept {
@@ -120,8 +120,8 @@ namespace Harmony::Optic {
     }
 
     void Animation::set_up_default_animation() noexcept {
-        for(int target; target < TARGET_INVALID; target++) {
-            this->add_target(static_cast<Animation::Target>(target), Animation::flat());
+        for(int property; property < RENDER_PROPERTY_INVALID; property++) {
+            this->set_property_curve(static_cast<Animation::RenderProperty>(property), Animation::flat());
         }
     }
 
@@ -145,28 +145,28 @@ namespace Harmony::Optic {
         return Math::QuadraticBezier({0.4f, 0.0f}, {0.6f, 1.0f});
     }
 
-    Animation::Target Animation::get_target_from_string(const char *target_name) noexcept {
+    Animation::RenderProperty Animation::get_render_property_from_string(const char *target_name) noexcept {
         std::string target_str = target_name;
         if(target_str == "position x") {
-            return TARGET_POSITION_X;
+            return RENDER_PROPERTY_POSITION_X;
         }
         else if(target_str == "position y") {
-            return TARGET_POSITION_Y;
+            return RENDER_PROPERTY_POSITION_Y;
         }
         else if(target_str == "rotation") {
-            return TARGET_ROTATION;
+            return RENDER_PROPERTY_ROTATION;
         }
         else if(target_str == "opacity") {
-            return TARGET_OPACITY;
+            return RENDER_PROPERTY_OPACITY;
         }
         else if(target_str == "scale x") {
-            return TARGET_SCALE_X;
+            return RENDER_PROPERTY_SCALE_X;
         }
         else if(target_str == "scale y") {
-            return TARGET_SCALE_Y;
+            return RENDER_PROPERTY_SCALE_Y;
         }
         else {
-            return TARGET_INVALID;
+            return RENDER_PROPERTY_INVALID;
         }
     }
 }

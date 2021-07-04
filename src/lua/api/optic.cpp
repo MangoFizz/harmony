@@ -80,35 +80,35 @@ namespace Harmony::Lua {
                     curve = Math::QuadraticBezier({x1, x2}, {y1, y2});
                 }
 
-                auto target = Optic::Animation::get_target_from_string(luaL_checkstring(state, -2));
-                if(target != Optic::Animation::TARGET_INVALID) {
+                auto property = Optic::Animation::get_render_property_from_string(luaL_checkstring(state, -2));
+                if(property != Optic::Animation::RENDER_PROPERTY_INVALID) {
                     auto transform = anim->get_transform();
-                    switch(target) {
-                        case Optic::Animation::TARGET_POSITION_X:
+                    switch(property) {
+                        case Optic::Animation::RENDER_PROPERTY_POSITION_X:
                             transform.position.x = luaL_checknumber(state, -1);
                             break;
-                        case Optic::Animation::TARGET_POSITION_Y:
+                        case Optic::Animation::RENDER_PROPERTY_POSITION_Y:
                             transform.position.y = luaL_checknumber(state, -1);
                             break;
-                        case Optic::Animation::TARGET_OPACITY:
+                        case Optic::Animation::RENDER_PROPERTY_OPACITY:
                             transform.opacity = luaL_checknumber(state, -1);
                             break;
-                        case Optic::Animation::TARGET_ROTATION:
+                        case Optic::Animation::RENDER_PROPERTY_ROTATION:
                             transform.rotation = RADIAN(luaL_checknumber(state, -1));
                             break;
-                        case Optic::Animation::TARGET_SCALE_X:
+                        case Optic::Animation::RENDER_PROPERTY_SCALE_X:
                             transform.scale.x = luaL_checknumber(state, -1);
                             break;
-                        case Optic::Animation::TARGET_SCALE_Y:
+                        case Optic::Animation::RENDER_PROPERTY_SCALE_Y:
                             transform.scale.y = luaL_checknumber(state, -1);
                             break;
                     }
 
-                    anim->add_target(target, curve);
+                    anim->set_property_curve(property, curve);
                     anim->set_transform(transform);
                 }
                 else {
-                    luaL_error(state, "invalid target in harmony add_animation_curve function");
+                    luaL_error(state, "invalid render property in harmony add_animation_curve function");
                 }
             }
             else {

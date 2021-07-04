@@ -19,6 +19,9 @@ namespace Harmony::Optic {
             float y;
         };
 
+        /**
+         * @todo Move this to Render
+         */
         struct State {
             Math::Point2D position;
             Scale scale;
