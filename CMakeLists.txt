@@ -20,6 +20,7 @@ include("ext/lua/lua.cmake")
 include("ext/soloud/soloud.cmake")
 
 add_library(harmony MODULE
+    src/events/console_command.cpp
     src/events/d3d9_end_scene.cpp
     src/events/d3d9_end_scene.S
     src/events/d3d9_reset.cpp

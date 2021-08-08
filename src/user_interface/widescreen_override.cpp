@@ -53,13 +53,13 @@ namespace Harmony::UserInterface {
             static auto &widescreen_mouse_sig = get_harmony().get_signature("widescreen_mouse");
 
             auto *reposition_menu_cave = this->overrides.emplace_back(std::make_unique<Codecave>()).get();
-            reposition_menu_cave->hack_chimera_override(widescreen_element_position_menu_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu), &widescreen_element_position_menu_fn);
+            reposition_menu_cave->hack_chimera_function_override(widescreen_element_position_menu_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu), &widescreen_element_position_menu_fn);
 
             auto *reposition_menu_text_cave = this->overrides.emplace_back(std::make_unique<Codecave>()).get();
-            reposition_menu_text_cave->hack_chimera_override(widescreen_menu_text_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text), &widescreen_element_position_menu_text_fn);
+            reposition_menu_text_cave->hack_chimera_function_override(widescreen_menu_text_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text), &widescreen_element_position_menu_text_fn);
 
             auto *reposition_menu_text_2_cave = this->overrides.emplace_back(std::make_unique<Codecave>()).get();
-            reposition_menu_text_2_cave->hack_chimera_override(widescreen_menu_text_2_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text_2), &widescreen_element_position_menu_text_2_fn);
+            reposition_menu_text_2_cave->hack_chimera_function_override(widescreen_menu_text_2_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text_2), &widescreen_element_position_menu_text_2_fn);
             
             auto *reposition_input_text_cave = this->overrides.emplace_back(std::make_unique<Codecave>()).get();
             auto *widescreen_input_text_address = Codecave::follow_jump(widescreen_input_text_sig.get_data()) + 9;

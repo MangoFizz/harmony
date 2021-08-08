@@ -37,7 +37,16 @@ namespace Harmony {
          * Write an override for a Chimera's override cave
          * @param address   Pointer to instruction
          */
-        void hack_chimera_override(void *address, const void *function, const void **cave_return) noexcept;
+        void hack_chimera_function_override(void *address, const void *function, const void **cave_return) noexcept;
+
+        /**
+         * Write a cave over a Chimera cave
+         * @param address   Pointer to Chimera cave jump
+         * @param function_before   Function to be called BEFORE original code
+         * @param function_after    Function to be called AFTER original code
+         * @param pushad            Insert pushad and pushfd instructions
+         */
+        void hack_chimera_function_call(void *address, const void *function_before, const void *function_after, bool pushad = true) noexcept;
 
         /**
          * Hook it!

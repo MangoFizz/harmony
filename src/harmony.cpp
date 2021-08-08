@@ -6,6 +6,7 @@
 #include "events/d3d9_end_scene.hpp"
 #include "events/d3d9_reset.hpp"
 #include "lua/library.hpp"
+#include "events/console_command.hpp"
 #include "events/map_load.hpp"
 #include "events/multiplayer_event.hpp"
 #include "events/multiplayer_sound.hpp"
@@ -15,11 +16,13 @@
 #include "messaging/message_box.hpp"
 #include "optic/handler.hpp"
 #include "user_interface/widescreen_override.hpp"
+#include "version.hpp"
 #include "harmony.hpp"
 
 namespace Harmony {
    static Harmony *instance = nullptr;
    static void first_tick() noexcept;
+   static bool info_command(std::string command) noexcept;
 
    Signature &Harmony::get_signature(const char *name) noexcept {
       for(auto &signature : this->signatures) {
@@ -93,8 +96,24 @@ namespace Harmony {
       enable_multiplayer_event_hook();
       enable_multiplayer_sounds_hook();
 
+      // Set up console hook
+      enable_console_command_event();
+
+      // Add info command
+      add_console_command_event(info_command);
+
       // Override Chimera's widescreen fix
       instance->get_widescreen_override_handle().enable(true);
+   }
+
+   static bool info_command(std::string command) noexcept {
+      if(command == "harmony") {
+         ConsoleColor blue = {1, 0.1, 0.8, 0.9};
+         console_output(blue, "Harmony version %s", HARMONY_VERSION);
+         console_output(blue, "Optic API v%s", OPTIC_API_VERSION);
+         return false;
+      }
+      return true;
    }
 }
 

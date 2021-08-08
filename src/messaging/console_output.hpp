@@ -11,16 +11,6 @@ namespace Harmony {
         float r;
         float g;
         float b;
-
-        /** Color used for headers */
-        static ConsoleColor header_color() {
-            return { 1.0, 1.0, 0.65, 0.85 };
-        }
-
-        /** Color used for bodies */
-        static ConsoleColor body_color() {
-            return { 1.0, 0.49, 0.78, 0.77 };
-        }
     };
 
     /**

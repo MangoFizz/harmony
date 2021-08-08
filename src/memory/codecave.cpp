@@ -7,6 +7,8 @@
 #include "codecave.hpp"
 
 namespace Harmony {
+    using namespace Memory;
+
     void Codecave::set_access_protection(bool setting) noexcept {
         if(setting) {
             // enable code execution
@@ -176,7 +178,6 @@ namespace Harmony {
         // je instruction_size
         this->insert(0x74);
         this->insert(0x0);
-        auto *je_offset =  reinterpret_cast<std::uint8_t *>(&this->cave[this->size - 1]);
 
         // Copy instruction code into cave
         std::uint8_t &instruction_size = *reinterpret_cast<std::uint8_t *>(&this->cave[this->size - 1]);
@@ -184,12 +185,6 @@ namespace Harmony {
 
         // Write codecave return
         this->write_cave_return();
-
-        // update je offset
-        *je_offset = instruction_size + CALL_INSTRUCTION_SIZE;
-
-        // insert function return
-        this->insert(0xC3);
     }
 
     void Codecave::write_function_call(void *address, const void *function_before, const void *function_after, bool pushad) {
@@ -200,20 +195,24 @@ namespace Harmony {
         this->instruction = reinterpret_cast<std::byte *>(address);
 
         // Write function call 1
-        this->write_function_call(function_before, pushad);
+        if(function_before) {
+            this->write_function_call(function_before, pushad);
+        }
 
         // Copy instruction code into cave
         std::uint8_t instruction_size = 0;
         this->copy_instruction(address, instruction_size);
 
         // Write function call 2
-        this->write_function_call(function_after, pushad);
+        if(function_after) {   
+            this->write_function_call(function_after, pushad);
+        }
 
         // Write codecave return
         this->write_cave_return();
     }
 
-    void Codecave::hack_chimera_override(void *address, const void *function, const void **cave_return) noexcept {
+    void Codecave::hack_chimera_function_override(void *address, const void *function, const void **cave_return) noexcept {
         if(this->hooked) {
             return;
         }
@@ -232,7 +231,7 @@ namespace Harmony {
         // Set override return
         *cave_return = &this->cave[this->size];
 
-        // Get code from Chimera cave
+        // Get original code from Chimera cave
         auto *chimera_cave = reinterpret_cast<std::byte *>(this->follow_jump(address));
         std::uint8_t intruction_size = 0;
         this->copy_instruction(reinterpret_cast<void *>(chimera_cave), intruction_size);
@@ -243,6 +242,35 @@ namespace Harmony {
         
         // Return
         this->write_cave_return();
+    }
+
+    void Codecave::hack_chimera_function_call(void *address, const void *function_before, const void *function_after, bool pushad) noexcept {
+        if(this->hooked) {
+            return;
+        }
+
+        // Build function call cave
+        this->write_function_call(address, function_before, function_after, pushad);
+
+        // If there is no second function, we don't need to do anything
+        if(!function_before) {
+            return;
+        }
+
+        // Get Chimera's cave exit jmp
+        auto *chimera_cave_jmp = follow_jump(this->instruction);
+        for(auto &i = chimera_cave_jmp; *i != static_cast<std::byte>(ASM_JMP_IMM32_OPCODE); i++);
+        auto *exit_jmp_offset = reinterpret_cast<std::uint32_t *>(chimera_cave_jmp + 1);
+
+        // Calculate where is the second call in our cave
+        std::size_t second_call_offset = 0;
+        if(function_before) {
+            second_call_offset += (pushad ? 9 : 5);
+        }
+        second_call_offset += this->original_instruction.size();
+
+        // Redirect exit jump in Chimera's cave to our second function call
+        *exit_jmp_offset = calculate_jmp_offset(chimera_cave_jmp, this->cave + second_call_offset);
     }
 
     void Codecave::hook() noexcept {

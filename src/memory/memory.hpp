@@ -7,7 +7,14 @@
 #include <cstdint>
 #include <windows.h>
 
-namespace Harmony {
+namespace Harmony::Memory {
+    /** ASM memes */
+    #define ASM_RET_OPCODE 0xC3
+    #define ASM_JMP_IMM32_OPCODE 0xE9
+    #define ASM_CALL_IMM32_OPCODE 0xE8
+    #define ASM_PUSHFD_OPCODE 0x9C
+    #define ASM_POPFD_OPCODE 0x9D
+
     /**
      * Overwrite the data at the pointer with the given bytes, ignoring any wildcard bytes.
      * @param pointer This is the pointer that points to the data to be overwritten.
@@ -57,6 +64,14 @@ namespace Harmony {
      */
     template<typename T> inline void overwrite(void *pointer, const T &data) noexcept {
         return overwrite(pointer, &data, 1);
+    }
+    
+    /**
+     * Make a function do nothing
+     * @param function  Pointer to function
+     */
+    inline void nuke_function(void *function) noexcept {
+        overwrite(function, static_cast<std::byte>(ASM_RET_OPCODE));
     }
 }
 

@@ -7,6 +7,8 @@
 #include "signature.hpp"
 
 namespace Harmony {
+    using namespace Memory;
+
     const char *Signature::get_name() const noexcept {
         return this->name.c_str();
     }
