@@ -55,6 +55,7 @@ add_library(harmony MODULE
     src/messaging/console_output.S
     src/messaging/message_box.cpp
     src/optic/animation.cpp
+    src/optic/d3dx9.cpp
     src/optic/handler.cpp
     src/optic/render.cpp
     src/optic/sprite.cpp
@@ -78,7 +79,7 @@ set_target_properties(harmony PROPERTIES OUTPUT_NAME "harmony")
 set_target_properties(harmony PROPERTIES LINK_FLAGS "-static -static-libgcc -static-libstdc++")
 
 # Set required libraris
-target_link_libraries(harmony lua soloud -ld3dx9 -ld3d9)
+target_link_libraries(harmony lua soloud)
 
 # Install harmony.dll
 install(TARGETS harmony DESTINATION "${CMAKE_INSTALL_PREFIX}")
