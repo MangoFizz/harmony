@@ -14,17 +14,17 @@ set(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel")
 
 # Include Lua
-include("ext/lua/lua.cmake")
+include("ext/lua53/lua53.cmake")
 
 # Include Soloud
 include("ext/soloud/soloud.cmake")
 
-add_library(harmony MODULE
-    src/events/console_command.cpp
+add_library(harmony-core STATIC
     src/events/d3d9_end_scene.cpp
     src/events/d3d9_end_scene.S
     src/events/d3d9_reset.cpp
     src/events/d3d9_reset.S
+    src/events/console_command.cpp
     src/events/map_load.cpp
     src/events/multiplayer_event.cpp
     src/events/multiplayer_event.S
@@ -40,20 +40,23 @@ add_library(harmony MODULE
     src/halo_data/resolution.cpp
     src/halo_data/tag.cpp
     src/halo_data/window.cpp
+    src/math/geometry.cpp
+    src/memory/codecave.cpp
+    src/memory/codefinder.cpp
+    src/memory/signature.cpp
+    src/memory/signatures/client.cpp
+    src/messaging/console_output.cpp
+    src/messaging/console_output.S
+    src/messaging/message_box.cpp
+)
+
+add_library(harmony MODULE
     src/lua/api/callback.cpp
     src/lua/api/optic.cpp
     src/lua/api/user_interface.cpp
     src/lua/library.cpp
     src/lua/optic_store.cpp
     src/lua/script.cpp
-    src/math/geometry.cpp
-    src/memory/signatures/client.cpp
-    src/memory/codecave.cpp
-    src/memory/codefinder.cpp
-    src/memory/signature.cpp
-    src/messaging/console_output.cpp
-    src/messaging/console_output.S
-    src/messaging/message_box.cpp
     src/optic/animation.cpp
     src/optic/d3dx9.cpp
     src/optic/handler.cpp
@@ -65,9 +68,9 @@ add_library(harmony MODULE
     src/harmony.cpp
 )
 
-# Set Lua include path
+# Set includes path
 target_include_directories(harmony
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/ext/lua"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/ext/lua53"
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/ext/soloud/include"
 )
 
@@ -79,7 +82,7 @@ set_target_properties(harmony PROPERTIES OUTPUT_NAME "harmony")
 set_target_properties(harmony PROPERTIES LINK_FLAGS "-static -static-libgcc -static-libstdc++")
 
 # Set required libraris
-target_link_libraries(harmony lua soloud)
+target_link_libraries(harmony harmony-core lua53 soloud)
 
 # Install harmony.dll
 install(TARGETS harmony DESTINATION "${CMAKE_INSTALL_PREFIX}")
