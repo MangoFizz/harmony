@@ -10,14 +10,27 @@ namespace Harmony::Lua {
     int lua_set_callback(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 2) {
-            std::string callback = luaL_checkstring(state, 1);
+            std::string callback_name = luaL_checkstring(state, 1);
             std::string function = luaL_checkstring(state, 2);
 
-            if(callback == "multiplayer event" || callback == "multiplayer sound") {
+            auto callback_exists = [callback_name]() {
+                #define CHECK_CALLBACK(callback) (callback == callback_name) {}
+
+                if CHECK_CALLBACK("multiplayer event")
+                else if CHECK_CALLBACK("multiplayer sound")
+                else if CHECK_CALLBACK("menu accept")
+                else if CHECK_CALLBACK("menu back")
+                else if CHECK_CALLBACK("menu list tab")
+                else if CHECK_CALLBACK("menu mouse button press")
+                else return false;
+                return true;
+            };
+
+            if(callback_exists()) {
                 auto &harmony = get_harmony();
                 auto &handler = harmony.get_lua_library_handler();
                 auto *script  = handler.get_script(state);
-                script->add_callback(callback.c_str(), function.c_str());
+                script->add_callback(callback_name.c_str(), function.c_str());
             }
             else {
                 luaL_error(state, "invalid callback in harmony set_callback function");

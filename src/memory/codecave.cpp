@@ -91,7 +91,31 @@ namespace Harmony {
                     break;
                 }
 
-                // far call
+                // mov r8, byte ptr [r32 + disp8]
+                case 0x8A: {
+                    switch(instruction[1]) {
+                        case 0x47: { // al, edi
+                            this->insert(&instruction[0], 3);
+                            instruction_size = 3;
+                            break;
+                        }
+
+                        default: {
+                            message_box("Unsupported mov instruction.");
+                            std::terminate();
+                        }
+                    }
+                    break;
+                }
+
+                // test r/m8,r8
+                case 0x84: {
+                    this->insert(&instruction[0], 2);
+                    instruction_size = 2;
+                    break;
+                }
+
+                // far call / jump
                 case 0xFF: {
                     this->insert(0xFF);
 
@@ -111,6 +135,15 @@ namespace Harmony {
                         instruction_size = 3;
                         break;
                     }
+                    // jmp dword ptr [eax ^ 4 + m32]
+                    else if(instruction[1] == 0x24 && instruction[2] == 0x85) {
+                        this->insert(0x24);
+                        this->insert(0x85);
+                        this->insert(&instruction[3], 4);
+
+                        instruction_size = 7;
+                        break;
+                    }
                     else {
                         message_box("Unsupported call instruction.");
                         std::terminate();
@@ -128,6 +161,39 @@ namespace Harmony {
                         message_box("Unsupported test instruction.");
                         std::terminate();
                     }
+                    break;
+                }
+
+                // movzx
+                case 0x0F: {
+                    if(instruction[1] == 0xB6 && instruction[2] == 0x47) { // eax, byte ptr [edi + disp8]
+                        this->insert(&instruction[0], 4);
+                        instruction_size = 4;
+                    }
+                    else {
+                        message_box("Unsupported movzx instruction.");
+                        std::terminate();
+                    }
+                    break;
+                }
+
+                // cmp
+                case 0x66: {
+                    if(instruction[1] == 0x39 && instruction[2] == 0x46) { // word ptr [esi + disp8], ax
+                        this->insert(&instruction[0], 4);
+                        instruction_size = 4;
+                    }
+                    else {
+                        message_box("Unsupported cmp instruction.");
+                        std::terminate();
+                    }
+                    break;
+                }
+
+                // cmp al, imm8
+                case 0x3C: {
+                    this->insert(&instruction[0], 2);
+                    instruction_size = 2;
                     break;
                 }
 

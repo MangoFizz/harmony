@@ -26,6 +26,13 @@ add_library(harmony-core STATIC
     src/events/d3d9_reset.S
     src/events/console_command.cpp
     src/events/map_load.cpp
+    src/events/menu_accept.cpp
+    src/events/menu_accept.S
+    src/events/menu_back.cpp
+    src/events/menu_list_tab.cpp
+    src/events/menu_list_tab.S
+    src/events/menu_mouse_button_press.cpp
+    src/events/menu_mouse_button_press.S
     src/events/multiplayer_event.cpp
     src/events/multiplayer_event.S
     src/events/multiplayer_sound.cpp
@@ -33,6 +40,7 @@ add_library(harmony-core STATIC
     src/events/tick.cpp
     src/halo_data/path.cpp
     src/halo_data/master_volume.cpp
+    src/halo_data/menu.cpp
     src/halo_data/game_engine.cpp
     src/halo_data/multiplayer_events.cpp
     src/halo_data/multiplayer_sounds.cpp

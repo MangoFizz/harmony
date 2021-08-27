@@ -5,8 +5,9 @@
 #include "../messaging/message_box.hpp"
 #include "../events/d3d9_end_scene.hpp"
 #include "../events/d3d9_reset.hpp"
-#include "../events/multiplayer_sound.hpp"
 #include "../events/map_load.hpp"
+#include "../events/multiplayer_sound.hpp"
+#include "../events/menu_back.hpp"
 #include "../user_interface/widescreen_override.hpp"
 #include "../harmony.hpp"
 #include "api/callback.hpp"
@@ -111,7 +112,11 @@ namespace Harmony::Lua {
 
         // Set up Lua script events
         add_multiplayer_sound_event(Library::multiplayer_sound_event);
-        add_multiplayer_event(Library::on_multiplayer_event);
+        add_multiplayer_event(Library::multiplayer_event);
+        add_menu_accept_event(Library::menu_accept);
+        add_menu_back_event(Library::menu_back);
+        add_menu_mouse_button_press_event(Library::menu_mouse_button_press);
+        add_menu_list_tab_event(Library::menu_list_tab);
     }
     
     void Library::on_map_load() noexcept {
@@ -132,7 +137,7 @@ namespace Harmony::Lua {
         }
     }
 
-    bool Library::on_multiplayer_event(HaloData::MultiplayerEvent type, HaloData::PlayerID local, HaloData::PlayerID killer, HaloData::PlayerID victim) noexcept {
+    bool Library::multiplayer_event(HaloData::MultiplayerEvent type, HaloData::PlayerID local, HaloData::PlayerID killer, HaloData::PlayerID victim) noexcept {
         auto &scripts = library->get_scripts();
         bool allow = true;
         auto it = scripts.begin();
@@ -169,6 +174,96 @@ namespace Harmony::Lua {
                 lua_getglobal(state, callback.c_str());
                 lua_pushstring(state, HaloData::string_from_multiplayer_sound(sound).c_str());
                 if(lua_pcall(state, 1, 1, 0) == 0) {
+                    if(allow) {
+                        allow = lua_toboolean(state, -1);
+                    }
+                }
+            }
+            it++;
+        }
+        return allow;
+    }
+
+    bool Library::menu_accept(HaloData::TagID *tag_id) noexcept {
+        auto &scripts = library->get_scripts();
+        bool allow = true;
+        auto it = scripts.begin();
+        while(it != scripts.end()) {
+            auto *script = it->get();
+            auto *state = script->get_state();
+            auto &callbacks = script->get_callbacks("menu accept");
+            for(auto &callback : callbacks) {
+                lua_getglobal(state, callback.c_str());
+                lua_pushnumber(state, tag_id->whole_id);
+                if(lua_pcall(state, 1, 1, 0) == 0) {
+                    if(allow) {
+                        allow = lua_toboolean(state, -1);
+                    }
+                }
+            }
+            it++;
+        }
+        return allow;
+    }
+
+    bool Library::menu_back() noexcept {
+        auto &scripts = library->get_scripts();
+        bool allow = true;
+        auto it = scripts.begin();
+        while(it != scripts.end()) {
+            auto *script = it->get();
+            auto *state = script->get_state();
+            auto &callbacks = script->get_callbacks("menu back");
+            for(auto &callback : callbacks) {
+                lua_getglobal(state, callback.c_str());
+                if(lua_pcall(state, 0, 1, 0) == 0) {
+                    if(allow) {
+                        allow = lua_toboolean(state, -1);
+                    }
+                }
+            }
+            it++;
+        }
+        return allow;
+    }
+
+    bool Library::menu_list_tab(HaloData::MenuNavigationKeyCode key, HaloData::TagID list_id, HaloData::TagID button_id) noexcept {
+        auto &scripts = library->get_scripts();
+        bool allow = true;
+        auto it = scripts.begin();
+        while(it != scripts.end()) {
+            auto *script = it->get();
+            auto *state = script->get_state();
+            auto &callbacks = script->get_callbacks("menu list tab");
+            for(auto &callback : callbacks) {
+                lua_getglobal(state, callback.c_str());
+                lua_pushstring(state, HaloData::string_from_menu_key_code(key).c_str());
+                lua_pushnumber(state, list_id.whole_id);
+                lua_pushnumber(state, button_id.whole_id);
+                if(lua_pcall(state, 3, 1, 0) == 0) {
+                    if(allow) {
+                        allow = lua_toboolean(state, -1);
+                    }
+                }
+            }
+            it++;
+        }
+        return allow;
+    }
+
+    bool Library::menu_mouse_button_press(HaloData::TagID tag_id, HaloData::MenuMouseButtonCode button_code) noexcept {
+        auto &scripts = library->get_scripts();
+        bool allow = true;
+        auto it = scripts.begin();
+        while(it != scripts.end()) {
+            auto *script = it->get();
+            auto *state = script->get_state();
+            auto &callbacks = script->get_callbacks("menu mouse button press");
+            for(auto &callback : callbacks) {
+                lua_getglobal(state, callback.c_str());
+                lua_pushnumber(state, tag_id.whole_id);
+                lua_pushstring(state, HaloData::string_from_menu_mouse_button_code(button_code).c_str());
+                if(lua_pcall(state, 2, 1, 0) == 0) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
                     }
