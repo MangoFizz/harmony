@@ -5,6 +5,10 @@
 #include <lua.hpp>
 #include "events/d3d9_end_scene.hpp"
 #include "events/d3d9_reset.hpp"
+#include "events/menu_accept.hpp"
+#include "events/menu_back.hpp"
+#include "events/menu_list_tab.hpp"
+#include "events/menu_mouse_button_press.hpp"
 #include "lua/library.hpp"
 #include "events/console_command.hpp"
 #include "events/map_load.hpp"
@@ -33,7 +37,7 @@ namespace Harmony {
 
       // What the heck are you looking for?
       char message[256];
-      std::sprintf(message, "Could not find %s signature.", name);
+      std::sprintf(message, "Invalid %s signature. This may be a bug.", name);
       MessageBoxA(NULL, message, "Harmony: missing signature", MB_OK);
       std::terminate();
    }
@@ -64,10 +68,10 @@ namespace Harmony {
       this->widescreen_fix_override = std::make_unique<UserInterface::WidescreenOverride>();
 
       // Set up tick event hook
-      enable_tick_event();
+      set_up_tick_event();
 
       // Set up map load hook
-      enable_map_load_hook();
+      set_up_map_load_event();
 
       // Add first tick event
       add_tick_event(first_tick);
@@ -89,15 +93,21 @@ namespace Harmony {
       enable_output(true);
 
       // Set up d3d9 events
-      enable_d3d9_end_scene_hook();
-      enable_d3d9_reset_hook();
+      set_up_d3d9_end_scene_event();
+      set_up_d3d9_reset_event();
 
-      // Set up multiplayer stuff
-      enable_multiplayer_event_hook();
-      enable_multiplayer_sounds_hook();
+      // Set up multiplayer events
+      set_up_multiplayer_event();
+      set_up_multiplayer_sounds_event();
 
-      // Set up console hook
-      enable_console_command_event();
+      // Set up menu events
+      set_up_menu_accept_event();
+      set_up_menu_back_event();
+      set_up_menu_mouse_button_press_event();
+      set_up_menu_list_tab_event();
+
+      // Set up console command event
+      set_up_console_command_event();
 
       // Add info command
       add_console_command_event(info_command);
@@ -120,7 +130,7 @@ namespace Harmony {
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
    switch(fdwReason) {
       case DLL_PROCESS_ATTACH: {
-         auto *harmony = new Harmony::Harmony();
+         new Harmony::Harmony();
          break;
       }
       case DLL_PROCESS_DETACH: {

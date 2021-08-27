@@ -41,7 +41,7 @@ namespace Harmony {
         console_output_sig->restore();
     }
 
-    void enable_console_command_event() {
+    void set_up_console_command_event() {
         // Enable if not already enabled.
         static bool enabled = false;
         if(enabled) {

@@ -12,25 +12,25 @@ namespace Harmony {
      * This is an event that is triggered just before EndScene is called.
      * @param  device This is the device.
      */
-    using EndSceneEventFunction = void (*)(LPDIRECT3DDEVICE9 device);
+    using EndSceneEvent_t = void (*)(LPDIRECT3DDEVICE9 device);
 
     /**
      * Add or replace an EndScene event. This event occurs just before EndScene is executed.
      * @param function This is the function to add
      * @param priority This is the priority used to determine call order.
      */
-    void add_d3d9_end_scene_event(const EndSceneEventFunction function, EventPriority priority = EventPriority::EVENT_PRIORITY_DEFAULT);
+    void add_d3d9_end_scene_event(const EndSceneEvent_t function, EventPriority priority = EventPriority::EVENT_PRIORITY_DEFAULT);
 
     /**
      * Remove an EndScene event if the function is being used as an event.
      * @param function This is the function to remove
      */
-    void remove_d3d9_end_scene_event(const EndSceneEventFunction function);
+    void remove_d3d9_end_scene_event(const EndSceneEvent_t function);
 
     /**
-     * Set up d3d9 end scene hook
+     * Set up d3d9 end scene event
      */
-    void enable_d3d9_end_scene_hook();
+    void set_up_d3d9_end_scene_event();
 }
 
 #endif

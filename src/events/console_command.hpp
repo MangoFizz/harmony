@@ -11,7 +11,7 @@ namespace Harmony {
      * This is an event that is triggered when a console command is called.
      * @param command   Console command
      */
-    using ConsoleCommandEvent_t = bool (*)(std::string command);
+    using ConsoleCommandEvent_t = bool (*)(std::string);
 
     /**
      * Add a console command event.
@@ -27,9 +27,9 @@ namespace Harmony {
     void remove_console_command_event(ConsoleCommandEvent_t event_function) noexcept;
 
     /**
-     * Enable console command hook
+     * Set up console commands event
      */
-    void enable_console_command_event();
+    void set_up_console_command_event();
 }
 
 #endif

@@ -32,7 +32,7 @@ namespace Harmony {
         call_in_order(tick_events);
     }
 
-    void enable_tick_event() {
+    void set_up_tick_event() {
         static bool enabled = false;
         if(enabled) {
             return;

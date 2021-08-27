@@ -20,9 +20,9 @@ namespace Harmony {
     void remove_map_load_event(event_no_args event_function) noexcept;
 
     /**
-     * Enable d3d9 reset hook
+     * Set up map load event
      */
-    void enable_map_load_hook();
+    void set_up_map_load_event();
 }
 
 #endif

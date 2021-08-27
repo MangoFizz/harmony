@@ -29,7 +29,7 @@ namespace Harmony {
         call_in_order(events);
     }
 
-    void enable_map_load_hook() {
+    void set_up_map_load_event() {
         // Enable if not already enabled.
         static bool enabled = false;
         if(enabled) {

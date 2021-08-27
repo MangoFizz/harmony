@@ -37,7 +37,7 @@ namespace Harmony {
         on_multiplayer_sound_cave.execute_original_code(allow);
     }
 
-    void enable_multiplayer_sounds_hook() {
+    void set_up_multiplayer_sounds_event() {
         // Enable if not already enabled.
         static bool enabled = false;
         if(enabled) {

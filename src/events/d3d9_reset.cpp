@@ -6,21 +6,21 @@
 #include "d3d9_reset.hpp"
 
 namespace Harmony {
-    static std::vector<Event<ResetEventFunction>> reset_events;
+    static std::vector<Event<ResetEvent_t>> reset_events;
 
     extern "C" {
         void on_d3d9_reset_asm();
     }
 
-    void add_d3d9_reset_event(const ResetEventFunction function, EventPriority priority) {
+    void add_d3d9_reset_event(const ResetEvent_t function, EventPriority priority) {
         // Remove if exists
         remove_d3d9_reset_event(function);
 
         // Add the event
-        reset_events.emplace_back(Event<ResetEventFunction> { function, priority });
+        reset_events.emplace_back(Event<ResetEvent_t> { function, priority });
     }
 
-    void remove_d3d9_reset_event(const ResetEventFunction function) {
+    void remove_d3d9_reset_event(const ResetEvent_t function) {
         for(std::size_t i = 0; i < reset_events.size(); i++) {
             if(reset_events[i].function == function) {
                 reset_events.erase(reset_events.begin() + i);
@@ -33,7 +33,7 @@ namespace Harmony {
         call_in_order(reset_events, device, present);
     }
 
-    void enable_d3d9_reset_hook() {
+    void set_up_d3d9_reset_event() {
         // Enable if not already enabled.
         static bool enabled = false;
         if(enabled) {

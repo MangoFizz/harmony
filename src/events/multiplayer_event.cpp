@@ -33,7 +33,7 @@ namespace Harmony {
         call_in_order(multiplayer_events, static_cast<HaloData::MultiplayerEvent>(event), local_player, killer, victim);
     }
 
-    void enable_multiplayer_event_hook() {
+    void set_up_multiplayer_event() {
         // Enable if not already enabled.
         static bool enabled = false;
         if(enabled) {

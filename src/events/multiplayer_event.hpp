@@ -26,7 +26,7 @@ namespace Harmony {
     /**
      * Set up multiplayer event
      */
-    void enable_multiplayer_event_hook();
+    void set_up_multiplayer_event();
 }
 
 #endif

@@ -29,7 +29,7 @@ namespace Harmony {
     /**
      * Set up multiplayer sounds event
      */
-    void enable_multiplayer_sounds_hook();
+    void set_up_multiplayer_sounds_event();
 }
 
 #endif

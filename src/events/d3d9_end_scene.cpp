@@ -8,21 +8,21 @@
 #include "../harmony.hpp"
 
 namespace Harmony {
-    static std::vector<Event<EndSceneEventFunction>> end_scene_events;
+    static std::vector<Event<EndSceneEvent_t>> end_scene_events;
 
     extern "C" {
         void on_d3d9_end_scene_asm();
     }
 
-    void add_d3d9_end_scene_event(const EndSceneEventFunction function, EventPriority priority) {
+    void add_d3d9_end_scene_event(const EndSceneEvent_t function, EventPriority priority) {
         // Remove if exists
         remove_d3d9_end_scene_event(function);
 
         // Add the event
-        end_scene_events.emplace_back(Event<EndSceneEventFunction> { function, priority });
+        end_scene_events.emplace_back(Event<EndSceneEvent_t> { function, priority });
     }
 
-    void remove_d3d9_end_scene_event(const EndSceneEventFunction function) {
+    void remove_d3d9_end_scene_event(const EndSceneEvent_t function) {
         for(std::size_t i = 0; i < end_scene_events.size(); i++) {
             if(end_scene_events[i].function == function) {
                 end_scene_events.erase(end_scene_events.begin() + i);
@@ -35,7 +35,7 @@ namespace Harmony {
         call_in_order(end_scene_events, device);
     }
 
-    void enable_d3d9_end_scene_hook() {
+    void set_up_d3d9_end_scene_event() {
         // Enable if not already enabled.
         static bool enabled = false;
         if(enabled) {

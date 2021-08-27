@@ -12,25 +12,25 @@ namespace Harmony {
      * @param  device  This is the device.
      * @param  present This is the present parameters.
      */
-    using ResetEventFunction = void (*)(LPDIRECT3DDEVICE9 device, D3DPRESENT_PARAMETERS *present);
+    using ResetEvent_t = void (*)(LPDIRECT3DDEVICE9 device, D3DPRESENT_PARAMETERS *present);
 
     /**
      * Add or replace an Reset event. This event occurs just before Reset is executed.
      * @param function This is the function to add
      * @param priority This is the priority used to determine call order.
      */
-    void add_d3d9_reset_event(const ResetEventFunction function, EventPriority priority = EventPriority::EVENT_PRIORITY_DEFAULT);
+    void add_d3d9_reset_event(const ResetEvent_t function, EventPriority priority = EventPriority::EVENT_PRIORITY_DEFAULT);
 
     /**
      * Remove an Reset event if the function is being used as an event.
      * @param function This is the function to remove
      */
-    void remove_d3d9_reset_event(const ResetEventFunction function);
+    void remove_d3d9_reset_event(const ResetEvent_t function);
 
     /**
-     * Enable d3d9 reset hook
+     * Set up d3d9 reset event
      */
-    void enable_d3d9_reset_hook();
+    void set_up_d3d9_reset_event();
 }
 
 #endif

@@ -22,7 +22,7 @@ namespace Harmony {
     /**
      * Set up tick event
      */
-    void enable_tick_event();
+    void set_up_tick_event();
 }
 
 #endif
