@@ -70,9 +70,12 @@ namespace Harmony::Memory {
      * Make a function do nothing
      * @param function  Pointer to function
      */
-    inline void nuke_function(void *function) noexcept {
-        overwrite(function, static_cast<std::byte>(ASM_RET_OPCODE));
-    }
+    void nuke_function(void *function) noexcept;
+
+    /**
+     * Fill bytes with NOPs
+     */
+    void fill_with_nops(void *address, std::size_t length) noexcept;
 }
 
 #endif

@@ -50,11 +50,15 @@ namespace Harmony {
         }
     }
 
-    void Codecave::copy_instruction(const void *address, std::uint8_t &instruction_size) noexcept {
-        instruction_size = 0;
+    void Codecave::copy_instruction(const void *address, std::uint8_t &copied_bytes) noexcept {
         auto *instruction = reinterpret_cast<const std::uint8_t *>(address);
-        while(instruction_size < 5) {
+        std::size_t instruction_size = 0;
+
+        copied_bytes = 0;
+
+        while(copied_bytes < 5) {
             instruction += instruction_size;
+
             switch(instruction[0]) {
                 // call rel32
                 case 0xE8: 
@@ -67,7 +71,7 @@ namespace Harmony {
                     auto offset = original_offset + this->calculate_jmp_offset(&this->cave[this->size - 1], &instruction[5]);
                     this->insert_address(offset);
                     
-                    instruction_size += 5;
+                    instruction_size = 5;
                     break;
                 }
 
@@ -78,7 +82,7 @@ namespace Harmony {
                     // mov [esp + disp8], imm8
                     if(instruction[1] == 0x44 && instruction[2] == 0x24) {
                         this->insert(&instruction[1], 4);
-                        instruction_size += 5;
+                        instruction_size = 5;
                     }
                     else {
                         message_box("Unsupported mov instruction.");
@@ -96,7 +100,7 @@ namespace Harmony {
                         this->insert(0x92);
                         this->insert(&instruction[2], 4);
 
-                        instruction_size += 6;
+                        instruction_size = 6;
                         break;
                     }
                     // call dword ptr [edx + disp8]
@@ -104,7 +108,7 @@ namespace Harmony {
                         this->insert(0x52);
                         this->insert(instruction[2]);
 
-                        instruction_size += 3;
+                        instruction_size = 3;
                         break;
                     }
                     else {
@@ -118,7 +122,7 @@ namespace Harmony {
                     // test eax, eax (?)
                     if(instruction[1] == 0xC0) {
                         this->insert(0xC0);
-                        instruction_size += 2;
+                        instruction_size = 2;
                     }
                     else {
                         message_box("Unsupported test instruction.");
@@ -143,6 +147,8 @@ namespace Harmony {
             // Backup original instruction
             auto *instruction_bytes = reinterpret_cast<const std::byte *>(instruction);
             this->original_instruction.insert(this->original_instruction.end(), instruction_bytes, instruction_bytes + instruction_size);
+
+            copied_bytes += instruction_size;
         }
     }
 

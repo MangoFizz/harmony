@@ -3,7 +3,7 @@
 #include <windows.h>
 #include "memory.hpp"
 
-namespace Harmony {
+namespace Harmony::Memory {
     void write_code(void *pointer, const std::uint16_t *data, std::size_t length) noexcept {
         // Instantiate our new_protection and old_protection variables.
         DWORD new_protection = PAGE_EXECUTE_READWRITE, old_protection;
@@ -21,6 +21,17 @@ namespace Harmony {
         // Restore the older protection unless it's the same
         if(new_protection != old_protection) {
             VirtualProtect(pointer, length, old_protection, &new_protection);
+        }
+    }
+
+    void nuke_function(void *function) noexcept {
+        overwrite(function, static_cast<std::byte>(ASM_RET_OPCODE));
+    }
+
+    void fill_with_nops(void *address, std::size_t length) noexcept {
+        auto *bytes = reinterpret_cast<std::byte *>(address);
+        for(std::size_t i = 0; i < length; i++) {
+            overwrite(bytes + i, static_cast<std::byte>(0x90));
         }
     }
 }

@@ -43,6 +43,7 @@ add_library(harmony-core STATIC
     src/math/geometry.cpp
     src/memory/codecave.cpp
     src/memory/codefinder.cpp
+    src/memory/memory.cpp
     src/memory/signature.cpp
     src/memory/signatures/client.cpp
     src/messaging/console_output.cpp
