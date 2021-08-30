@@ -12,7 +12,12 @@ namespace Harmony {
 
     extern "C" {
         void menu_accept();
-        void *menu_accept_return = nullptr;
+
+        bool on_menu_accept(HaloData::TagID *tag_id) {
+            bool allow = true;
+            call_in_order_allow(events, allow, tag_id);
+            return allow;
+        }
     }
 
     void add_menu_accept_event(MenuAcceptEvent_t function, EventPriority priority) {
@@ -30,12 +35,6 @@ namespace Harmony {
                 return;
             }
         }
-    }
-
-    extern "C" bool on_menu_accept(HaloData::TagID *tag_id) {
-        bool allow = true;
-        call_in_order_allow(events, allow, tag_id);
-        return allow;
     }
 
     void set_up_menu_accept_event() {

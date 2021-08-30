@@ -12,7 +12,12 @@ namespace Harmony {
 
     extern "C" {
         void menu_mouse_button_press();
-        void *menu_mouse_button_press_return = nullptr;
+
+        bool on_menu_button_press(HaloData::TagID tag_id, HaloData::MenuMouseButtonCode button) {
+            bool allow = true;
+            call_in_order_allow(events, allow, tag_id, button);
+            return allow;
+        }
     }
 
     void add_menu_mouse_button_press_event(MenuMouseButtonPressEvent_t function, EventPriority priority) {
@@ -30,12 +35,6 @@ namespace Harmony {
                 return;
             }
         }
-    }
-
-    extern "C" bool on_menu_button_press(HaloData::TagID tag_id, HaloData::MenuMouseButtonCode button) {
-        bool allow = true;
-        call_in_order_allow(events, allow, tag_id, button);
-        return allow;
     }
 
     void set_up_menu_mouse_button_press_event() {
