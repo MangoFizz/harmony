@@ -170,6 +170,10 @@ namespace Harmony {
                         this->insert(&instruction[0], 4);
                         instruction_size = 4;
                     }
+                    else if(instruction[1] == 0xBF && instruction[2] == 0xC0) { // eax, ax
+                        this->insert(&instruction[0], 3);
+                        instruction_size = 3;
+                    }
                     else {
                         message_box("Unsupported movzx instruction.");
                         std::terminate();
@@ -194,6 +198,26 @@ namespace Harmony {
                 case 0x3C: {
                     this->insert(&instruction[0], 2);
                     instruction_size = 2;
+                    break;
+                }
+
+                // dec eax
+                case 0x48: {
+                    this->insert(&instruction[0], 1);
+                    instruction_size = 1;
+                    break;
+                }
+
+                // cmp
+                case 0x83: {
+                    if(instruction[1] == 0xF8) { // eax, imm8
+                        this->insert(&instruction[0], 3);
+                        instruction_size = 3;
+                    }
+                    else {
+                        message_box("Unsupported cmp instruction.");
+                        std::terminate();
+                    }
                     break;
                 }
 

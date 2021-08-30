@@ -3,6 +3,7 @@
 #include "../../harmony.hpp"
 #include "../script.hpp"
 #include "../library.hpp"
+#include "../../halo_data/sound.hpp"
 #include "../../user_interface/widescreen_override.hpp"
 #include "user_interface.hpp"
 
@@ -24,8 +25,38 @@ namespace Harmony::Lua {
         return 0;
     }
 
+    static int play_sound(lua_State *state) noexcept {
+        int args = lua_gettop(state);
+        if(args == 1) {
+            if(lua_type(state, 1) == LUA_TSTRING) {
+                const char *tag_path = luaL_checkstring(state, 1);
+                auto sound_id = HaloData::get_tag_id(tag_path, HaloData::TAG_CLASS_SOUND);
+                if(!sound_id.is_null()) {
+                    HaloData::play_sound(sound_id);
+                }
+                else {
+                    luaL_error(state, "invalid sound tag in harmony play_sound function");
+                }
+            }
+            else if(lua_type(state, 1) == LUA_TNUMBER) {
+                HaloData::TagID sound_id = luaL_checkinteger(state, 1);
+                if(HaloData::get_tag(sound_id)) {
+                    HaloData::play_sound(sound_id);
+                }
+                else {
+                    luaL_error(state, "invalid sound tag in harmony play_sound function");
+                }
+            }
+        }
+        else {
+            luaL_error(state, "invalid number of arguments in harmony play_sound function");
+        }
+        return 0;
+    }
+
     static const struct luaL_Reg user_interface[] = {
         {"set_aspect_ratio", set_widescreen_aspect_ratio},
+        {"play_sound", play_sound},
         {NULL, NULL}
     };
 

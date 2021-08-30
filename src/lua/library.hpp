@@ -11,6 +11,7 @@
 #include "../events/menu_accept.hpp"
 #include "../events/menu_list_tab.hpp"
 #include "../events/menu_mouse_button_press.hpp"
+#include "../events/menu_sound.hpp"
 #include "script.hpp"
 
 namespace Harmony::Lua {
@@ -84,9 +85,10 @@ namespace Harmony::Lua {
         static bool multiplayer_event(HaloData::MultiplayerEvent type, HaloData::PlayerID local, HaloData::PlayerID killer, HaloData::PlayerID victim) noexcept;
         static bool multiplayer_sound_event(HaloData::MultiplayerSound sound) noexcept;
         static bool menu_accept(HaloData::TagID *tag_id) noexcept;
-        static bool menu_back() noexcept;
+        static bool menu_back(HaloData::TagID menu_id) noexcept;
         static bool menu_mouse_button_press(HaloData::TagID tag_id, HaloData::MenuMouseButtonCode button_code) noexcept;
         static bool menu_list_tab(HaloData::MenuNavigationKeyCode key, HaloData::TagID list_id, HaloData::TagID button_id) noexcept;
+        static bool menu_sound(HaloData::TagID button_id, HaloData::MenuSound sound) noexcept;
 
         /** 
          * Unload script callback

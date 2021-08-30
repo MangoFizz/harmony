@@ -94,12 +94,12 @@ namespace Harmony::HaloData {
     }
 
     /**
-     * Get the tag
+     * Get tag ID
      * @param  path      path of the tag
      * @param  tag_class class of the tag
-     * @return           pointer to the tag if found, nullptr if not
+     * @return           ID of tag
      */
-    Tag *get_tag(const char *path, std::uint32_t tag_class) noexcept;
+    extern "C" TagID get_tag_id(const char *path, std::uint32_t tag_class) noexcept;
 
     /**
      * Get the tag
@@ -114,6 +114,14 @@ namespace Harmony::HaloData {
      * @return           pointer to the tag if found, nullptr if not
      */
     Tag *get_tag(std::size_t tag_index) noexcept;
+
+    /**
+     * Get the tag
+     * @param  path      path of the tag
+     * @param  tag_class class of the tag
+     * @return           pointer to the tag if found, nullptr if not
+     */
+    Tag *get_tag(const char *path, std::uint32_t tag_class) noexcept;
 }
 
 #endif

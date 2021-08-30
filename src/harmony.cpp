@@ -9,6 +9,7 @@
 #include "events/menu_back.hpp"
 #include "events/menu_list_tab.hpp"
 #include "events/menu_mouse_button_press.hpp"
+#include "events/menu_sound.hpp"
 #include "lua/library.hpp"
 #include "events/console_command.hpp"
 #include "events/map_load.hpp"
@@ -105,6 +106,7 @@ namespace Harmony {
       set_up_menu_back_event();
       set_up_menu_mouse_button_press_event();
       set_up_menu_list_tab_event();
+      set_up_menu_sound_event();
 
       // Set up console command event
       set_up_console_command_event();

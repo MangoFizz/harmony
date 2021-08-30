@@ -117,6 +117,7 @@ namespace Harmony::Lua {
         add_menu_back_event(Library::menu_back);
         add_menu_mouse_button_press_event(Library::menu_mouse_button_press);
         add_menu_list_tab_event(Library::menu_list_tab);
+        add_menu_sound_event(Library::menu_sound);
     }
     
     void Library::on_map_load() noexcept {
@@ -194,7 +195,7 @@ namespace Harmony::Lua {
             auto &callbacks = script->get_callbacks("menu accept");
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
-                lua_pushnumber(state, tag_id->whole_id);
+                lua_pushinteger(state, tag_id->whole_id);
                 if(lua_pcall(state, 1, 1, 0) == 0) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
@@ -206,7 +207,7 @@ namespace Harmony::Lua {
         return allow;
     }
 
-    bool Library::menu_back() noexcept {
+    bool Library::menu_back(HaloData::TagID menu_id) noexcept {
         auto &scripts = library->get_scripts();
         bool allow = true;
         auto it = scripts.begin();
@@ -216,7 +217,8 @@ namespace Harmony::Lua {
             auto &callbacks = script->get_callbacks("menu back");
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
-                if(lua_pcall(state, 0, 1, 0) == 0) {
+                lua_pushinteger(state, menu_id.whole_id);
+                if(lua_pcall(state, 1, 1, 0) == 0) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
                     }
@@ -238,8 +240,8 @@ namespace Harmony::Lua {
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushstring(state, HaloData::string_from_menu_key_code(key).c_str());
-                lua_pushnumber(state, list_id.whole_id);
-                lua_pushnumber(state, button_id.whole_id);
+                lua_pushinteger(state, list_id.whole_id);
+                lua_pushinteger(state, button_id.whole_id);
                 if(lua_pcall(state, 3, 1, 0) == 0) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
@@ -261,7 +263,7 @@ namespace Harmony::Lua {
             auto &callbacks = script->get_callbacks("menu mouse button press");
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
-                lua_pushnumber(state, tag_id.whole_id);
+                lua_pushinteger(state, tag_id.whole_id);
                 lua_pushstring(state, HaloData::string_from_menu_mouse_button_code(button_code).c_str());
                 if(lua_pcall(state, 2, 1, 0) == 0) {
                     if(allow) {
@@ -273,6 +275,30 @@ namespace Harmony::Lua {
         }
         return allow;
     }
+
+    bool Library::menu_sound(HaloData::TagID button_id, HaloData::MenuSound sound) noexcept {
+        auto &scripts = library->get_scripts();
+        bool allow = true;
+        auto it = scripts.begin();
+        while(it != scripts.end()) {
+            auto *script = it->get();
+            auto *state = script->get_state();
+            auto &callbacks = script->get_callbacks("menu sound");
+            for(auto &callback : callbacks) {
+                lua_getglobal(state, callback.c_str());
+                lua_pushinteger(state, button_id.whole_id);
+                lua_pushstring(state, HaloData::string_from_menu_sound(sound).c_str());
+                if(lua_pcall(state, 2, 1, 0) == 0) {
+                    if(allow) {
+                        allow = lua_toboolean(state, -1);
+                    }
+                }
+            }
+            it++;
+        }
+        return allow;
+    }
+
 
     int Library::lua_unload_script(lua_State *state) noexcept {
         auto *script = library->get_script(state);

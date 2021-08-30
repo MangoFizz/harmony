@@ -34,4 +34,18 @@ namespace Harmony::HaloData {
             }
         }
     }
+
+    std::string string_from_menu_sound(MenuSound sound) noexcept {
+        switch(sound) {
+            case MenuSound::MENU_SOUND_CURSOR:          return "cursor";
+            case MenuSound::MENU_SOUND_FORWARD:         return "forward";
+            case MenuSound::MENU_SOUND_BACK:            return "back";
+            case MenuSound::MENU_SOUND_FLAG_FAILURE:    return "flag failure";
+            
+            default: {
+                auto str = "unknown sound (" + std::to_string(sound) + ")";
+                return str.c_str();
+            }
+        }
+    }
 }

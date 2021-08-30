@@ -34,6 +34,8 @@ add_library(harmony-core STATIC
     src/events/menu_list_tab.S
     src/events/menu_mouse_button_press.cpp
     src/events/menu_mouse_button_press.S
+    src/events/menu_sound.cpp
+    src/events/menu_sound.S
     src/events/multiplayer_event.cpp
     src/events/multiplayer_event.S
     src/events/multiplayer_sound.cpp
@@ -47,7 +49,9 @@ add_library(harmony-core STATIC
     src/halo_data/multiplayer_sounds.cpp
     src/halo_data/path.cpp
     src/halo_data/resolution.cpp
+    src/halo_data/sound.S
     src/halo_data/tag.cpp
+    src/halo_data/tag.S
     src/halo_data/window.cpp
     src/math/geometry.cpp
     src/memory/codecave.cpp

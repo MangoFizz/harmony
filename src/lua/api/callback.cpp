@@ -22,6 +22,7 @@ namespace Harmony::Lua {
                 else if CHECK_CALLBACK("menu back")
                 else if CHECK_CALLBACK("menu list tab")
                 else if CHECK_CALLBACK("menu mouse button press")
+                else if CHECK_CALLBACK("menu sound")
                 else return false;
                 return true;
             };

@@ -5,6 +5,7 @@
 
 #include <string>
 #include <cstdint>
+#include "tag.hpp"
 
 namespace Harmony::HaloData {
     enum MenuNavigationKeyCode {
@@ -26,6 +27,14 @@ namespace Harmony::HaloData {
         MENU_MOUSE_BUTTON_DOUBLE_LEFT
     };
     std::string string_from_menu_mouse_button_code(MenuMouseButtonCode button) noexcept;
+
+    enum MenuSound {
+        MENU_SOUND_CURSOR = 0,
+        MENU_SOUND_FORWARD,
+        MENU_SOUND_BACK,
+        MENU_SOUND_FLAG_FAILURE
+    };
+    std::string string_from_menu_sound(MenuSound sound) noexcept;
 }
 
 #endif
