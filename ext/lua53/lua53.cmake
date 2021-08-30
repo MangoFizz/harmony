@@ -35,22 +35,4 @@ add_library(lua53 STATIC
 
     # libraries
     ${LUA53_SRC}/lauxlib.c
-    #${LUA53_SRC}/lbaselib.c
-    #${LUA53_SRC}/lbitlib.c
-    #${LUA53_SRC}/lcorolib.c
-    #${LUA53_SRC}/ldblib.c
-    #${LUA53_SRC}/linit.c
-    #${LUA53_SRC}/liolib.c
-    #${LUA53_SRC}/lmathlib.c
-    #${LUA53_SRC}/loadlib.c
-    #${LUA53_SRC}/loslib.c
-    #${LUA53_SRC}/lstrlib.c
-    #${LUA53_SRC}/ltablib.c
-    #${LUA53_SRC}/lutf8lib.c
-
-    # interpreter
-    #${LUA53_SRC}/lua.c
-
-    # compiler
-    #${LUA53_SRC}/luac.c
 )
