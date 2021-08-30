@@ -29,6 +29,7 @@ add_library(harmony-core STATIC
     src/events/menu_accept.cpp
     src/events/menu_accept.S
     src/events/menu_back.cpp
+    src/events/menu_back.S
     src/events/menu_list_tab.cpp
     src/events/menu_list_tab.S
     src/events/menu_mouse_button_press.cpp

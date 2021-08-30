@@ -3,13 +3,14 @@
 #ifndef HARMONY_EVENT_MENU_BACK_HPP
 #define HARMONY_EVENT_MENU_BACK_HPP
 
+#include "../halo_data/tag.hpp"
 #include "event.hpp"
 
 namespace Harmony {
-    using MenuBackEvent_t = bool (*)();
+    using MenuBackEvent_t = bool (*)(HaloData::TagID);
 
     /**
-     * Add a menu mouse button press event
+     * Add a menu back event
      * @param function  Function to be executed when the event occurs
      * @param priority  This is the priority that defines the order in which the event will be called
      */
