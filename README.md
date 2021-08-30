@@ -9,9 +9,17 @@ A set of additional features for Chimera using the Lua API.
 - [Lua API](#lua-api)
 
 ## Installation
+### Manual
 1. [Install Chimera](https://github.com/SnowyMouse/chimera#installation)
 2. Create a folder called "mods" (e.g. "D:\Halo Custom Edition\mods")
 3. Copy harmony.dll file to your mods folder  
+
+### Mercury
+Get Harmony on [Mercury](https://github.com/Sledmine/Mercury) by using the
+following command:
+```
+mercury install harmony
+```
 
 Note: Like Chimera, Harmony requires DirectX 9 to be installed in your
 system.
