@@ -20,7 +20,7 @@
 #include "messaging/console_output.hpp"
 #include "messaging/message_box.hpp"
 #include "optic/handler.hpp"
-#include "user_interface/widescreen_override.hpp"
+#include "menu/widescreen_override.hpp"
 #include "version.hpp"
 #include "harmony.hpp"
 

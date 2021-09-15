@@ -67,7 +67,7 @@ add_library(harmony-core STATIC
 add_library(harmony MODULE
     src/lua/api/callback.cpp
     src/lua/api/optic.cpp
-    src/lua/api/user_interface.cpp
+    src/lua/api/menu.cpp
     src/lua/library.cpp
     src/lua/optic_store.cpp
     src/lua/script.cpp
@@ -76,9 +76,9 @@ add_library(harmony MODULE
     src/optic/handler.cpp
     src/optic/render.cpp
     src/optic/sprite.cpp
-    src/user_interface/widescreen_element_reposition_menu.S
-    src/user_interface/widescreen_mouse.S
-    src/user_interface/widescreen_override.cpp
+    src/menu/widescreen_element_reposition_menu.S
+    src/menu/widescreen_mouse.S
+    src/menu/widescreen_override.cpp
     src/harmony.cpp
 )
 

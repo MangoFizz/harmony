@@ -8,11 +8,11 @@
 #include "../events/map_load.hpp"
 #include "../events/multiplayer_sound.hpp"
 #include "../events/menu_back.hpp"
-#include "../user_interface/widescreen_override.hpp"
+#include "../menu/widescreen_override.hpp"
 #include "../harmony.hpp"
 #include "api/callback.hpp"
 #include "api/optic.hpp"
-#include "api/user_interface.hpp"
+#include "api/menu.hpp"
 #include "script.hpp"
 #include "library.hpp"
 
@@ -327,7 +327,7 @@ namespace Harmony::Lua {
 
         // Set UI functions only if script is NOT global
         if(Script::get_global_from_state(state, "script_type") == "map") {
-            set_user_interface_functions(state);
+            set_menu_functions(state);
         }
 
         // Load it!!

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef HARMONY_MENU_WIDESCREEN_HPP
-#define HARMONY_MENU_WIDESCREEN_HPP
+#ifndef HARMONY_menu_WIDESCREEN_HPP
+#define HARMONY_menu_WIDESCREEN_HPP
 
 #include <vector>
 #include <utility>

@@ -4,8 +4,8 @@
 #include "../script.hpp"
 #include "../library.hpp"
 #include "../../halo_data/sound.hpp"
-#include "../../user_interface/widescreen_override.hpp"
-#include "user_interface.hpp"
+#include "../../menu/widescreen_override.hpp"
+#include "menu.hpp"
 
 namespace Harmony::Lua {
     static int set_widescreen_aspect_ratio(lua_State *state) noexcept {
@@ -54,16 +54,16 @@ namespace Harmony::Lua {
         return 0;
     }
 
-    static const struct luaL_Reg user_interface[] = {
+    static const struct luaL_Reg menu[] = {
         {"set_aspect_ratio", set_widescreen_aspect_ratio},
         {"play_sound", play_sound},
         {NULL, NULL}
     };
 
-    void set_user_interface_functions(lua_State *state) noexcept {
+    void set_menu_functions(lua_State *state) noexcept {
         lua_pushstring(state, "ui");
-        luaL_newlibtable(state, user_interface);
-        luaL_setfuncs(state, user_interface, 0);
+        luaL_newlibtable(state, menu);
+        luaL_setfuncs(state, menu, 0);
 
         lua_settable(state, -3);
     }
