@@ -206,7 +206,7 @@ namespace Harmony::UserInterface {
         float menu_extra_width = instance->get_menu_extra_width();
         float displacement = instance->get_menu_displacement();
 
-        if(min_x <= 1.0f && max_x >= 639.0f) {
+        if(min_x == 0.0f && max_x == 640.0f) {
             // Revert widescreen fix displacement
             element.corners[CORNER_TOP_RIGHT].x -= menu_extra_width / 2.0f;
             element.corners[CORNER_BOTTOM_RIGHT].x -= menu_extra_width / 2.0f;
