@@ -8,11 +8,11 @@
 #include "../events/map_load.hpp"
 #include "../events/multiplayer_sound.hpp"
 #include "../events/menu_back.hpp"
-#include "../menu/widescreen_override.hpp"
 #include "../harmony.hpp"
 #include "api/callback.hpp"
 #include "api/optic.hpp"
 #include "api/menu.hpp"
+#include "api/unload.hpp"
 #include "script.hpp"
 #include "library.hpp"
 
@@ -45,18 +45,6 @@ namespace Harmony::Lua {
 
     void Library::load_script(lua_State *state) noexcept {
         this->scripts.push_back(std::make_unique<Script>(state));
-
-        // Set unload global funcion
-        lua_pushcfunction(state, Library::lua_unload_script);
-        lua_setglobal(state, "unload_harmony");
-
-        // Set chimera unload callback
-        lua_getglobal(state, "set_callback");
-        lua_pushstring(state, "unload");
-        lua_pushstring(state, "unload_harmony");
-        if(lua_pcall(state, 2, 0, 0) != 0) {
-            luaL_error(state, "failed to set harmony unload callback");
-        }
     }
 
     void Library::unload_script(lua_State *state) noexcept {
@@ -121,7 +109,7 @@ namespace Harmony::Lua {
     }
     
     void Library::on_map_load() noexcept {
-        //library->unload_map_script();
+        library->unload_map_script();
     }
 
     void Library::on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {
@@ -299,22 +287,6 @@ namespace Harmony::Lua {
         return allow;
     }
 
-
-    int Library::lua_unload_script(lua_State *state) noexcept {
-        auto *script = library->get_script(state);
-        if(strcmp(script->get_type(), "map") == 0) {
-            /**
-             * Restore UI frame aspect ratio before map script unload.
-             * We can't put this in a map load callback because our event
-             * is executed after Chimera's map load event, so our map 
-             * script will load BEFORE we can restore the aspect ratio.
-             */
-            get_harmony().get_widescreen_override_handle().reset_frame_aspect_ratio();
-        }
-        library->unload_script(state);
-        return 0;
-    }
-
     int luaopen_mods_harmony(lua_State *state) noexcept {
         // Create Harmony library table
         lua_newtable(state);
@@ -329,6 +301,9 @@ namespace Harmony::Lua {
         if(Script::get_global_from_state(state, "script_type") == "map") {
             set_menu_functions(state);
         }
+
+        // Set unload global funcion
+        set_unload_functions(state);
 
         // Load it!!
         library->load_script(state);

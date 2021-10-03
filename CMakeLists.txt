@@ -68,6 +68,7 @@ add_library(harmony MODULE
     src/lua/api/callback.cpp
     src/lua/api/optic.cpp
     src/lua/api/menu.cpp
+    src/lua/api/unload.cpp
     src/lua/library.cpp
     src/lua/optic_store.cpp
     src/lua/script.cpp
