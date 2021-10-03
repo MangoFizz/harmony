@@ -109,7 +109,7 @@ namespace Harmony {
       set_up_menu_sound_event();
 
       // Set up console command event
-      set_up_console_command_event();
+      //set_up_console_command_event();
 
       // Add info command
       add_console_command_event(info_command);
