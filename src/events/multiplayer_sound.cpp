@@ -49,7 +49,7 @@ namespace Harmony {
         static auto &on_multiplayer_sound_sig = get_harmony().get_signature("on_multiplayer_sound");
         
         // Write hacks
-        on_multiplayer_sound_cave.write_basic_cave(on_multiplayer_sound_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_sound_asm), false);
+        on_multiplayer_sound_cave.write_function_override(on_multiplayer_sound_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_sound_asm), true);
 
         // Hook multiplayer event call
         on_multiplayer_sound_cave.hook();

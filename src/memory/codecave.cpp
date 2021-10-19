@@ -308,6 +308,37 @@ namespace Harmony {
         this->write_cave_return();
     }
 
+    void Codecave::write_function_override(void *address, const void *function, bool pushad) {
+        if(this->hooked) {
+            return;
+        }
+
+        this->instruction = reinterpret_cast<std::byte *>(address);
+
+        this->write_function_call(function, pushad);
+
+        // cmp byte ptr [flag], 0
+        this->insert(0x80);
+        this->insert(0x3D);
+        auto flag_address = reinterpret_cast<std::uint32_t>(&this->execute_original_code_flag);
+        this->insert_address(flag_address);
+        this->insert(0); // false
+
+        // je instruction_size
+        this->insert(0x74);
+        this->insert(0x0);
+
+        std::uint8_t &instruction_size = *reinterpret_cast<std::uint8_t *>(&this->cave[this->size - 1]);
+        this->copy_instruction(address, instruction_size);
+
+        // Write codecave return
+        this->write_cave_return();
+        instruction_size += 5;
+
+        // Function return
+        this->insert(0xC3);
+    }
+
     void Codecave::hack_chimera_function_override(void *address, const void *function, const void **cave_return) noexcept {
         if(this->hooked) {
             return;

@@ -34,6 +34,13 @@ namespace Harmony {
         void write_function_call(void *address, const void *function_before, const void *function_after, bool pushad = true);
 
         /**
+         * Write function overide
+         * @param address       Pointer to instruction
+         * @param function      Function to be called
+         */
+        void write_function_override(void *address, const void *function, bool pushad = true);
+
+        /**
          * Write an override for a Chimera's override cave
          * @param address   Pointer to instruction
          */
