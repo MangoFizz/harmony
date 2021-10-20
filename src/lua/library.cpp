@@ -140,10 +140,13 @@ namespace Harmony::Lua {
                 lua_pushinteger(state, local.whole_id);
                 lua_pushinteger(state, killer.whole_id);
                 lua_pushinteger(state, victim.whole_id);
-                if(lua_pcall(state, 4, 1, 0) == 0) {
+                if(lua_pcall(state, 4, 1, 0) == LUA_OK) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
                     }
+                }
+                else {
+                    script->print_last_error();
                 }
             }
             it++;
@@ -162,10 +165,13 @@ namespace Harmony::Lua {
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushstring(state, HaloData::string_from_multiplayer_sound(sound).c_str());
-                if(lua_pcall(state, 1, 1, 0) == 0) {
+                if(lua_pcall(state, 1, 1, 0) == LUA_OK) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
                     }
+                }
+                else {
+                    script->print_last_error();
                 }
             }
             it++;
@@ -184,10 +190,13 @@ namespace Harmony::Lua {
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushinteger(state, tag_id->whole_id);
-                if(lua_pcall(state, 1, 1, 0) == 0) {
+                if(lua_pcall(state, 1, 1, 0) == LUA_OK) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
                     }
+                }
+                else {
+                    script->print_last_error();
                 }
             }
             it++;
@@ -206,10 +215,13 @@ namespace Harmony::Lua {
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushinteger(state, menu_id.whole_id);
-                if(lua_pcall(state, 1, 1, 0) == 0) {
+                if(lua_pcall(state, 1, 1, 0) == LUA_OK) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
                     }
+                }
+                else {
+                    script->print_last_error();
                 }
             }
             it++;
@@ -230,10 +242,13 @@ namespace Harmony::Lua {
                 lua_pushstring(state, HaloData::string_from_menu_key_code(key).c_str());
                 lua_pushinteger(state, list_id.whole_id);
                 lua_pushinteger(state, button_id.whole_id);
-                if(lua_pcall(state, 3, 1, 0) == 0) {
+                if(lua_pcall(state, 3, 1, 0) == LUA_OK) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
                     }
+                }
+                else {
+                    script->print_last_error();
                 }
             }
             it++;
@@ -253,10 +268,13 @@ namespace Harmony::Lua {
                 lua_getglobal(state, callback.c_str());
                 lua_pushinteger(state, tag_id.whole_id);
                 lua_pushstring(state, HaloData::string_from_menu_mouse_button_code(button_code).c_str());
-                if(lua_pcall(state, 2, 1, 0) == 0) {
+                if(lua_pcall(state, 2, 1, 0) == LUA_OK) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
                     }
+                }
+                else {
+                    script->print_last_error();
                 }
             }
             it++;
@@ -276,10 +294,13 @@ namespace Harmony::Lua {
                 lua_getglobal(state, callback.c_str());
                 lua_pushinteger(state, button_id.whole_id);
                 lua_pushstring(state, HaloData::string_from_menu_sound(sound).c_str());
-                if(lua_pcall(state, 2, 1, 0) == 0) {
+                if(lua_pcall(state, 2, 1, 0) == LUA_OK) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
                     }
+                }
+                else {
+                    script->print_last_error();
                 }
             }
             it++;

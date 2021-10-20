@@ -60,6 +60,11 @@ namespace Harmony::Lua {
         void add_callback(const char *callback, const char *function) noexcept;
 
         /**
+         * Print last error of script state
+         */
+        void print_last_error() noexcept;
+
+        /**
          * Constructor for script
          * @param state     Pointer to Lua script state
          */

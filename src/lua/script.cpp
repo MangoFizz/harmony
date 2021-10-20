@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include "../halo_data/path.hpp"
+#include "../messaging/console_output.hpp"
 #include "script.hpp"
 
 namespace Harmony::Lua {
@@ -46,6 +47,12 @@ namespace Harmony::Lua {
 
     void Script::add_callback(const char *callback, const char *function) noexcept {
         this->callbacks[callback].emplace_back(function);
+    }
+
+    void Script::print_last_error() noexcept {
+        const char *err = lua_tostring(script, -1);
+        console_error(err);
+        lua_pop(script, 1);
     }
 
     std::string Script::get_global_from_state(lua_State *state, const char *global) noexcept {
