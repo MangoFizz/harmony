@@ -336,7 +336,7 @@ namespace Harmony::Lua {
 
     void set_optic_functions(lua_State *state) noexcept {
         if(!library && !optic_handler) {
-            auto &harmony = get_harmony();
+            auto &harmony = Harmony::get();
             library = &(harmony.get_lua_library_handler());
             optic_handler = &(harmony.get_optic_handler());
         }

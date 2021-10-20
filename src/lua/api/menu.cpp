@@ -11,7 +11,7 @@ namespace Harmony::Lua {
     static int set_widescreen_aspect_ratio(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 2) {
-            static auto &harmony = get_harmony();
+            static auto &harmony = Harmony::get();
             auto &ws_override = harmony.get_widescreen_override_handle();
 
             std::uint16_t x = luaL_checknumber(state, 1);

@@ -10,7 +10,7 @@ namespace Harmony::HaloData {
     Path get_path() noexcept {
         static const char *path = nullptr;
         if(!path) {
-            path = *reinterpret_cast<const char **>(get_harmony().get_signature("halo_path").get_data());
+            path = *reinterpret_cast<const char **>(Harmony::get().get_signature("halo_path").get_data());
         }
         return Path(path);
     }

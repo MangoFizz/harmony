@@ -42,7 +42,7 @@ namespace Harmony {
         enabled = true;
 
         // Get signature
-        static auto &on_multiplayer_event_sig = get_harmony().get_signature("on_multiplayer_event");
+        static auto &on_multiplayer_event_sig = Harmony::get().get_signature("on_multiplayer_event");
         
         // Write hacks
         on_multiplayer_event_cave.write_basic_cave(on_multiplayer_event_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_event_asm), false);

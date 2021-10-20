@@ -46,7 +46,7 @@ namespace Harmony {
         enabled = true;
 
         // Get signature
-        auto &menu_sound_play_function_sig = get_harmony().get_signature("menu_sound_play_function");
+        auto &menu_sound_play_function_sig = Harmony::get().get_signature("menu_sound_play_function");
         
         // Write the hacks
         menu_sound_cave.write_function_call(menu_sound_play_function_sig.get_data(), nullptr, reinterpret_cast<void *>(menu_sound), false);

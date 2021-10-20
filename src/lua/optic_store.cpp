@@ -90,7 +90,7 @@ namespace Harmony::Lua {
     }
 
     void OpticStore::remove_groups() noexcept {
-        auto &optic_handler = get_harmony().get_optic_handler();
+        auto &optic_handler = Harmony::get().get_optic_handler();
         for(std::size_t i = 0; i < this->groups.size(); i++) {
             optic_handler.remove_render_group(this->groups[i]);
         }

@@ -25,9 +25,10 @@
 #include "harmony.hpp"
 
 namespace Harmony {
-   static Harmony *instance = nullptr;
    static void first_tick() noexcept;
    static bool info_command(std::string command) noexcept;
+
+   Harmony *Harmony::instance = nullptr;
 
    Signature &Harmony::get_signature(const char *name) noexcept {
       for(auto &signature : this->signatures) {
@@ -78,12 +79,12 @@ namespace Harmony {
       add_tick_event(first_tick);
    }
 
-   Harmony &get_harmony() {
-      return *instance;
+   Harmony &Harmony::get() {
+      return *Harmony::instance;
    }
 
    extern "C" std::byte *get_address_for_signature(const char *name) noexcept {
-      return instance->get_signature(name).get_data();
+      return Harmony::get().get_signature(name).get_data();
    }
 
    static void first_tick() noexcept {      
@@ -115,7 +116,7 @@ namespace Harmony {
       add_console_command_event(info_command);
 
       // Override Chimera's widescreen fix
-      instance->get_widescreen_override_handle().enable(true);
+      Harmony::get().get_widescreen_override_handle().enable(true);
    }
 
    static bool info_command(std::string command) noexcept {

@@ -44,7 +44,7 @@ namespace Harmony {
         enabled = true;
 
         // Get signature
-        static auto &d3d9_call_end_scene_sig = get_harmony().get_signature("d3d9_call_end_scene");
+        static auto &d3d9_call_end_scene_sig = Harmony::get().get_signature("d3d9_call_end_scene");
         
         // Write hacks
         static Codecave d3d9_end_scene_cave;

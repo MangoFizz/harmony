@@ -52,10 +52,10 @@ namespace Harmony {
         enabled = true;
 
         // Get signature
-        auto &menu_back_call_button_press_sig = get_harmony().get_signature("menu_back_call_button_press");
-        auto &menu_back_call_escape_key_sig = get_harmony().get_signature("menu_back_call_escape_key");
-        auto &menu_back_call_multiplayer_lobby_sig = get_harmony().get_signature("menu_back_call_multiplayer_lobby");
-        auto &menu_back_call_controls_menu_sig = get_harmony().get_signature("menu_back_call_controls_menu");
+        auto &menu_back_call_button_press_sig = Harmony::get().get_signature("menu_back_call_button_press");
+        auto &menu_back_call_escape_key_sig = Harmony::get().get_signature("menu_back_call_escape_key");
+        auto &menu_back_call_multiplayer_lobby_sig = Harmony::get().get_signature("menu_back_call_multiplayer_lobby");
+        auto &menu_back_call_controls_menu_sig = Harmony::get().get_signature("menu_back_call_controls_menu");
         
         // Write the hacks
         menu_back_button_press_cave.write_basic_cave(menu_back_call_button_press_sig.get_data(), reinterpret_cast<void *>(menu_back_event));

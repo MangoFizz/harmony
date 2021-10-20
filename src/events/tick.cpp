@@ -40,7 +40,7 @@ namespace Harmony {
         enabled = true;
 
         // Get signature
-        static auto &on_tick_sig = get_harmony().get_signature("on_tick");
+        static auto &on_tick_sig = Harmony::get().get_signature("on_tick");
         
         // Write hacks
         static Codecave on_tick_cave;

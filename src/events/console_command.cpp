@@ -50,8 +50,8 @@ namespace Harmony {
         enabled = true;
 
         // Get signatures
-        static auto &on_console_command_sig = get_harmony().get_signature("console_call");
-        console_output_sig = &get_harmony().get_signature("console_out");
+        static auto &on_console_command_sig = Harmony::get().get_signature("console_call");
+        console_output_sig = &Harmony::get().get_signature("console_out");
         
         // Write hacks
         on_console_command_cave.hack_chimera_function_call(on_console_command_sig.get_data(), reinterpret_cast<void *>(do_on_console_command), reinterpret_cast<void *>(restore_console_output));

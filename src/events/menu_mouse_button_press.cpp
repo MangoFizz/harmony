@@ -46,7 +46,7 @@ namespace Harmony {
         enabled = true;
 
         // Get signature
-        auto &on_menu_button_press_sig = get_harmony().get_signature("menu_mouse_pressed_button_check");
+        auto &on_menu_button_press_sig = Harmony::get().get_signature("menu_mouse_pressed_button_check");
         auto *on_menu_button_press_address = on_menu_button_press_sig.get_data();
         
         // Write the hacks

@@ -28,7 +28,7 @@ namespace Harmony::Lua {
             };
 
             if(callback_exists()) {
-                auto &harmony = get_harmony();
+                auto &harmony = Harmony::get();
                 auto &handler = harmony.get_lua_library_handler();
                 auto *script  = handler.get_script(state);
                 script->add_callback(callback_name.c_str(), function.c_str());

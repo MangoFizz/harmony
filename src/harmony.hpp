@@ -6,8 +6,6 @@
 #include <vector>
 #include <memory>
 
-struct lua_State;
-
 namespace Harmony {
     class Signature;
 
@@ -53,6 +51,12 @@ namespace Harmony {
          */
         Harmony();
 
+        /**
+         * Get current Harmony instance
+         * @return  Reference to Harmony instance
+         */
+        static Harmony &get();
+
     private:
         /** Harmony signatures */
         std::vector<Signature> signatures;
@@ -65,13 +69,10 @@ namespace Harmony {
 
         /** Widescreen override */
         std::unique_ptr<UserInterface::WidescreenOverride> widescreen_fix_override;
-    };
 
-    /**
-     * Get current Harmony instance
-     * @return  Reference to Harmony instance
-     */
-    Harmony &get_harmony();
+        /** Instance pointer */
+        static Harmony *instance;
+    };
 }
 
 #endif

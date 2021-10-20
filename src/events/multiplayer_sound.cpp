@@ -46,7 +46,7 @@ namespace Harmony {
         enabled = true;
 
         // Get signature
-        static auto &on_multiplayer_sound_sig = get_harmony().get_signature("on_multiplayer_sound");
+        static auto &on_multiplayer_sound_sig = Harmony::get().get_signature("on_multiplayer_sound");
         
         // Write hacks
         on_multiplayer_sound_cave.write_function_override(on_multiplayer_sound_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_sound_asm), true);

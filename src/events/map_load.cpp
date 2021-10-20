@@ -38,7 +38,7 @@ namespace Harmony {
         enabled = true;
 
         // Get signature
-        static auto &on_map_load_sig = get_harmony().get_signature("on_map_load");
+        static auto &on_map_load_sig = Harmony::get().get_signature("on_map_load");
         
         // Write hacks
         static Codecave on_map_load_cave;

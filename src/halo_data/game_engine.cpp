@@ -8,7 +8,7 @@
 
 namespace Harmony::HaloData {
     GameEngine game_engine() noexcept {
-        static auto &game_engine_sig = get_harmony().get_signature("game_engine");
+        static auto &game_engine_sig = Harmony::get().get_signature("game_engine");
         static auto *game_engine = *reinterpret_cast<const char **>(game_engine_sig.get_data());
         static std::optional<GameEngine> game_engine_used;
         if(!game_engine_used.has_value()) {

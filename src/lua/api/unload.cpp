@@ -9,7 +9,7 @@
 
 namespace Harmony::Lua {
     int lua_unload_script(lua_State *state) noexcept {
-        auto &harmony = get_harmony();
+        auto &harmony = Harmony::get();
         auto &library = harmony.get_lua_library_handler();
         auto *script = library.get_script(state);
         if(strcmp(script->get_type(), "map") == 0) {

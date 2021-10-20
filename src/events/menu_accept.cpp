@@ -46,7 +46,7 @@ namespace Harmony {
         enabled = true;
 
         // Get signature
-        auto &menu_button_accept_event_check_sig = get_harmony().get_signature("menu_accept_event_check");
+        auto &menu_button_accept_event_check_sig = Harmony::get().get_signature("menu_accept_event_check");
         
         // Write the hacks
         menu_accept_event_cave.write_function_call(menu_button_accept_event_check_sig.get_data(), nullptr, reinterpret_cast<void *>(menu_accept), false);

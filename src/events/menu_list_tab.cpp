@@ -57,13 +57,13 @@ namespace Harmony {
         enabled = true;
 
         // Get signatures
-        auto &menu_tab_list_items_next_vertical_sig = get_harmony().get_signature("menu_tab_list_items_next_vertical_call");
-        auto &menu_tab_list_items_next_horizontal_sig = get_harmony().get_signature("menu_tab_list_items_next_horizontal_call");
-        auto &menu_tab_list_items_previous_vertical_sig = get_harmony().get_signature("menu_tab_list_items_previous_vertical_call");
-        auto &menu_tab_list_items_previous_horizontal_sig = get_harmony().get_signature("menu_tab_list_items_previous_horizontal_call");
-        auto &menu_tab_children_next_vertical_sig = get_harmony().get_signature("menu_tab_children_next_vertical_call");
-        auto &menu_tab_children_next_horizontal_sig = get_harmony().get_signature("menu_tab_children_next_horizontal_call");
-        auto &menu_tab_children_previous_sig = get_harmony().get_signature("menu_tab_children_previous_call");
+        auto &menu_tab_list_items_next_vertical_sig = Harmony::get().get_signature("menu_tab_list_items_next_vertical_call");
+        auto &menu_tab_list_items_next_horizontal_sig = Harmony::get().get_signature("menu_tab_list_items_next_horizontal_call");
+        auto &menu_tab_list_items_previous_vertical_sig = Harmony::get().get_signature("menu_tab_list_items_previous_vertical_call");
+        auto &menu_tab_list_items_previous_horizontal_sig = Harmony::get().get_signature("menu_tab_list_items_previous_horizontal_call");
+        auto &menu_tab_children_next_vertical_sig = Harmony::get().get_signature("menu_tab_children_next_vertical_call");
+        auto &menu_tab_children_next_horizontal_sig = Harmony::get().get_signature("menu_tab_children_next_horizontal_call");
+        auto &menu_tab_children_previous_sig = Harmony::get().get_signature("menu_tab_children_previous_call");
         
         // Write a ton of hacks
         menu_tab_list_items_next_vertical_cave.write_basic_cave(menu_tab_list_items_next_vertical_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);

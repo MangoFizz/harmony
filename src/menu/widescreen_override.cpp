@@ -45,12 +45,12 @@ namespace Harmony::UserInterface {
             return;
         }
         if(setting) {
-            static auto &widescreen_element_position_menu_sig = get_harmony().get_signature("widescreen_element_position_menu");
-            static auto &widescreen_menu_text_sig = get_harmony().get_signature("widescreen_menu_text");
-            static auto &widescreen_menu_text_2_sig = get_harmony().get_signature("widescreen_menu_text_2");
-            static auto &widescreen_input_text_sig = get_harmony().get_signature("widescreen_input_text");
-            static auto &widescreen_text_tab_sig = get_harmony().get_signature("widescreen_text_tab");
-            static auto &widescreen_mouse_sig = get_harmony().get_signature("widescreen_mouse");
+            static auto &widescreen_element_position_menu_sig = Harmony::get().get_signature("widescreen_element_position_menu");
+            static auto &widescreen_menu_text_sig = Harmony::get().get_signature("widescreen_menu_text");
+            static auto &widescreen_menu_text_2_sig = Harmony::get().get_signature("widescreen_menu_text_2");
+            static auto &widescreen_input_text_sig = Harmony::get().get_signature("widescreen_input_text");
+            static auto &widescreen_text_tab_sig = Harmony::get().get_signature("widescreen_text_tab");
+            static auto &widescreen_mouse_sig = Harmony::get().get_signature("widescreen_mouse");
 
             auto *reposition_menu_cave = this->overrides.emplace_back(std::make_unique<Codecave>()).get();
             reposition_menu_cave->hack_chimera_function_override(widescreen_element_position_menu_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu), &widescreen_element_position_menu_fn);
