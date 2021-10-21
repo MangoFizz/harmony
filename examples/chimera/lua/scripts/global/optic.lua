@@ -1,6 +1,6 @@
 clua_version = 2.056
 
-harmony = require "mods.harmony"
+local harmony = require "mods.harmony"
 
 local optic = harmony.optic
 

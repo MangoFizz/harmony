@@ -1,7 +1,3 @@
---------------------------------------
--- UI true widescreen demo
---------------------------------------
-
 clua_version = 2.056
 
 local harmony = require "mods.harmony"
@@ -24,7 +20,7 @@ function onMenuListTab(key, list_id, button_id)
 end
 
 function onMenuMouseButtonPress(tag_id, button)
-    console_out("[" .. button .. "] " .. button)
+    console_out("[" .. button .. "] " .. tag_id)
     return true
 end
 
