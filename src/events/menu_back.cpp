@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "../memory/codecave.hpp"
+#include "../messaging/message_box.hpp"
+#include "../memory/hook.hpp"
 #include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "menu_back.hpp"
 
 namespace Harmony {
-    static Codecave menu_back_button_press_cave;
-    static Codecave menu_back_call_escape_key_cave;
-    static Codecave menu_back_call_multiplayer_lobby_cave;
-    static Codecave menu_back_call_controls_menu_cave;
+    static Memory::SwitchHook menu_back_button_press_hook;
+    static Memory::SwitchHook menu_back_call_escape_key_hook;
+    static Memory::SwitchHook menu_back_call_multiplayer_lobby_hook;
+    static Memory::SwitchHook menu_back_call_controls_menu_hook;
     static std::vector<Event<MenuBackEvent_t>> events;
 
     extern "C" {
@@ -19,10 +20,10 @@ namespace Harmony {
         void on_menu_back(HaloData::TagID menu_id) {
             bool allow = true;
             call_in_order_allow(events, allow, menu_id);
-            menu_back_button_press_cave.execute_original_code(allow);
-            menu_back_call_escape_key_cave.execute_original_code(allow);
-            menu_back_call_multiplayer_lobby_cave.execute_original_code(allow);
-            menu_back_call_controls_menu_cave.execute_original_code(allow);
+            menu_back_button_press_hook.execute_original_code(allow);
+            menu_back_call_escape_key_hook.execute_original_code(allow);
+            menu_back_call_multiplayer_lobby_hook.execute_original_code(allow);
+            menu_back_call_controls_menu_hook.execute_original_code(allow);
         }
     }
 
@@ -51,22 +52,21 @@ namespace Harmony {
         }
         enabled = true;
 
-        // Get signature
-        auto &menu_back_call_button_press_sig = Harmony::get().get_signature("menu_back_call_button_press");
-        auto &menu_back_call_escape_key_sig = Harmony::get().get_signature("menu_back_call_escape_key");
-        auto &menu_back_call_multiplayer_lobby_sig = Harmony::get().get_signature("menu_back_call_multiplayer_lobby");
-        auto &menu_back_call_controls_menu_sig = Harmony::get().get_signature("menu_back_call_controls_menu");
-        
         // Write the hacks
-        menu_back_button_press_cave.write_basic_cave(menu_back_call_button_press_sig.get_data(), reinterpret_cast<void *>(menu_back_event));
-        menu_back_call_escape_key_cave.write_basic_cave(menu_back_call_escape_key_sig.get_data(), reinterpret_cast<void *>(menu_back_event));
-        menu_back_call_multiplayer_lobby_cave.write_basic_cave(menu_back_call_multiplayer_lobby_sig.get_data(), reinterpret_cast<void *>(menu_back_event));
-        menu_back_call_controls_menu_cave.write_basic_cave(menu_back_call_controls_menu_sig.get_data(), reinterpret_cast<void *>(menu_back_event));
-
-        // Hook it
-        menu_back_button_press_cave.hook();
-        menu_back_call_escape_key_cave.hook();
-        menu_back_call_multiplayer_lobby_cave.hook();
-        menu_back_call_controls_menu_cave.hook();
+        auto &menu_back_call_button_press_sig = Harmony::get().get_signature("menu_back_call_button_press");
+        menu_back_button_press_hook.initialize(menu_back_call_button_press_sig.get_data(), reinterpret_cast<void *>(menu_back_event));
+        menu_back_button_press_hook.hook();
+        
+        auto &menu_back_call_escape_key_sig = Harmony::get().get_signature("menu_back_call_escape_key");
+        menu_back_call_escape_key_hook.initialize(menu_back_call_escape_key_sig.get_data(), reinterpret_cast<void *>(menu_back_event));
+        menu_back_call_escape_key_hook.hook();
+        
+        auto &menu_back_call_multiplayer_lobby_sig = Harmony::get().get_signature("menu_back_call_multiplayer_lobby");
+        menu_back_call_multiplayer_lobby_hook.initialize(menu_back_call_multiplayer_lobby_sig.get_data(), reinterpret_cast<void *>(menu_back_event));
+        menu_back_call_multiplayer_lobby_hook.hook();
+        
+        auto &menu_back_call_controls_menu_sig = Harmony::get().get_signature("menu_back_call_controls_menu");
+        menu_back_call_controls_menu_hook.initialize(menu_back_call_controls_menu_sig.get_data(), reinterpret_cast<void *>(menu_back_event));
+        menu_back_call_controls_menu_hook.hook();
     }
 }

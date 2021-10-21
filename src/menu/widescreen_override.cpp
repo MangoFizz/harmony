@@ -7,9 +7,8 @@
 #include "../halo_data/tag.hpp"
 #include "../halo_data/tag_class.hpp"
 #include "../memory/signature.hpp"
-#include "../memory/codecave.hpp"
 #include "../memory/memory.hpp"
-#include "../memory/padding.hpp"
+#include "../memory/struct.hpp"
 #include "../messaging/message_box.hpp"
 #include "../harmony.hpp"
 #include "widescreen_override.hpp"
@@ -46,29 +45,23 @@ namespace Harmony::UserInterface {
         }
         if(setting) {
             static auto &widescreen_element_position_menu_sig = Harmony::get().get_signature("widescreen_element_position_menu");
+            this->overrides.emplace_back(std::make_unique<Memory::ChimeraFunctionOverride>(widescreen_element_position_menu_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu), &widescreen_element_position_menu_fn));
+
             static auto &widescreen_menu_text_sig = Harmony::get().get_signature("widescreen_menu_text");
-            static auto &widescreen_menu_text_2_sig = Harmony::get().get_signature("widescreen_menu_text_2");
-            static auto &widescreen_input_text_sig = Harmony::get().get_signature("widescreen_input_text");
-            static auto &widescreen_text_tab_sig = Harmony::get().get_signature("widescreen_text_tab");
-            static auto &widescreen_mouse_sig = Harmony::get().get_signature("widescreen_mouse");
-
-            auto *reposition_menu_cave = this->overrides.emplace_back(std::make_unique<Codecave>()).get();
-            reposition_menu_cave->hack_chimera_function_override(widescreen_element_position_menu_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu), &widescreen_element_position_menu_fn);
-
-            auto *reposition_menu_text_cave = this->overrides.emplace_back(std::make_unique<Codecave>()).get();
-            reposition_menu_text_cave->hack_chimera_function_override(widescreen_menu_text_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text), &widescreen_element_position_menu_text_fn);
-
-            auto *reposition_menu_text_2_cave = this->overrides.emplace_back(std::make_unique<Codecave>()).get();
-            reposition_menu_text_2_cave->hack_chimera_function_override(widescreen_menu_text_2_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text_2), &widescreen_element_position_menu_text_2_fn);
+            this->overrides.emplace_back(std::make_unique<Memory::ChimeraFunctionOverride>(widescreen_menu_text_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text), &widescreen_element_position_menu_text_fn));
             
-            auto *reposition_input_text_cave = this->overrides.emplace_back(std::make_unique<Codecave>()).get();
-            auto *widescreen_input_text_address = Codecave::follow_jump(widescreen_input_text_sig.get_data()) + 9;
-            reposition_input_text_cave->write_function_call(widescreen_input_text_address, reinterpret_cast<void *>(widescreen_input_text), reinterpret_cast<void *>(widescreen_input_text_undo));
+            static auto &widescreen_menu_text_2_sig = Harmony::get().get_signature("widescreen_menu_text_2");
+            this->overrides.emplace_back(std::make_unique<Memory::ChimeraFunctionOverride>(widescreen_menu_text_2_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text_2), &widescreen_element_position_menu_text_2_fn));
+            
+            static auto &widescreen_input_text_sig = Harmony::get().get_signature("widescreen_input_text");
+            auto *widescreen_input_text_address = Memory::Hook::follow_jump(widescreen_input_text_sig.get_data()) + 9;
+            this->overrides.emplace_back(std::make_unique<Memory::Hook>(widescreen_input_text_address, reinterpret_cast<void *>(widescreen_input_text), reinterpret_cast<void *>(widescreen_input_text_undo)));
 
             // Get mouse bounds
+            static auto &widescreen_mouse_sig = Harmony::get().get_signature("widescreen_mouse");
             auto *widescreen_mouse_address = widescreen_mouse_sig.get_data();
-            auto *original_cave = Codecave::follow_jump(widescreen_mouse_address);
-            auto *original_widescreen_mouse_fn = Codecave::follow_jump(original_cave);
+            auto *original_cave = Memory::Hook::follow_jump(widescreen_mouse_address);
+            auto *original_widescreen_mouse_fn = Memory::Hook::follow_jump(original_cave);
             widescreen_fix_mouse_x_ptr = *reinterpret_cast<std::int32_t ***>(original_widescreen_mouse_fn + 0x28);
             widescreen_mouse_x = *widescreen_fix_mouse_x_ptr;
             widescreen_mouse_y = widescreen_mouse_x + 1;
@@ -77,13 +70,13 @@ namespace Harmony::UserInterface {
             static std::int32_t gotya = 0;
             *widescreen_fix_mouse_x_ptr = &gotya;
 
-            auto *widescreen_mouse_cave = this->overrides.emplace_back(std::make_unique<Codecave>()).get();
-            widescreen_mouse_cave->write_basic_cave(widescreen_mouse_address, reinterpret_cast<void *>(widescreen_mouse), false);
-            widescreen_mouse_cave->execute_original_code(false);
+            // Get and recast the meme to disble original code execution
+            auto *widescreen_mouse_cave = this->overrides.emplace_back(std::make_unique<Memory::SwitchHook>(widescreen_mouse_address, reinterpret_cast<void *>(widescreen_mouse), false)).get();
+            static_cast<Memory::SwitchHook *>(widescreen_mouse_cave)->execute_original_code(false);
 
             // Hook everything
-            for(auto &cave : this->overrides) {
-                cave.get()->hook();
+            for(auto &hook : this->overrides) {
+                hook.get()->hook();
             }
 
             // Register events

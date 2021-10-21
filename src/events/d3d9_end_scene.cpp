@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "d3d9_end_scene.hpp"
-#include "../memory/codecave.hpp"
+#include "../memory/hook.hpp"
 #include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../messaging/message_box.hpp"
 #include "../harmony.hpp"
 
 namespace Harmony {
+    static Memory::Hook d3d9_end_scene_hook;
     static std::vector<Event<EndSceneEvent_t>> end_scene_events;
 
     extern "C" {
@@ -47,10 +48,7 @@ namespace Harmony {
         static auto &d3d9_call_end_scene_sig = Harmony::get().get_signature("d3d9_call_end_scene");
         
         // Write hacks
-        static Codecave d3d9_end_scene_cave;
-        d3d9_end_scene_cave.write_basic_cave(d3d9_call_end_scene_sig.get_data(), reinterpret_cast<void *>(on_d3d9_end_scene_asm), false);
-
-        // Hook D3D9 end scene call
-        d3d9_end_scene_cave.hook();
+        d3d9_end_scene_hook.initialize(d3d9_call_end_scene_sig.get_data(), reinterpret_cast<void *>(on_d3d9_end_scene_asm), nullptr, false);
+        d3d9_end_scene_hook.hook();
     }
 }

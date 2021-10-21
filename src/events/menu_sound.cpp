@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "../memory/codecave.hpp"
+#include "../memory/hook.hpp"
 #include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "menu_sound.hpp"
 
 namespace Harmony {
-    static Codecave menu_sound_cave;
+    static Memory::Hook menu_sound_hook;
     static std::vector<Event<MenuSoundEvent_t>> events;
 
     extern "C" {
@@ -49,9 +49,7 @@ namespace Harmony {
         auto &menu_sound_play_function_sig = Harmony::get().get_signature("menu_sound_play_function");
         
         // Write the hacks
-        menu_sound_cave.write_function_call(menu_sound_play_function_sig.get_data(), nullptr, reinterpret_cast<void *>(menu_sound), false);
-
-        // Hook it
-        menu_sound_cave.hook();
+        menu_sound_hook.initialize(menu_sound_play_function_sig.get_data(), nullptr, reinterpret_cast<void *>(menu_sound), false);
+        menu_sound_hook.hook();
     }
 }

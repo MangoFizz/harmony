@@ -11,7 +11,6 @@
 #include "events/menu_mouse_button_press.hpp"
 #include "events/menu_sound.hpp"
 #include "lua/library.hpp"
-#include "events/console_command.hpp"
 #include "events/map_load.hpp"
 #include "events/multiplayer_event.hpp"
 #include "events/multiplayer_sound.hpp"
@@ -113,7 +112,7 @@ namespace Harmony {
       //set_up_console_command_event();
 
       // Add info command
-      add_console_command_event(info_command);
+      //add_console_command_event(info_command);
 
       // Override Chimera's widescreen fix
       Harmony::get().get_widescreen_override_handle().enable(true);

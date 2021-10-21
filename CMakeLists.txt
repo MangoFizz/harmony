@@ -24,7 +24,6 @@ add_library(harmony-core STATIC
     src/events/d3d9_end_scene.S
     src/events/d3d9_reset.cpp
     src/events/d3d9_reset.S
-    src/events/console_command.cpp
     src/events/map_load.cpp
     src/events/menu_accept.cpp
     src/events/menu_accept.S
@@ -56,6 +55,7 @@ add_library(harmony-core STATIC
     src/math/geometry.cpp
     src/memory/codecave.cpp
     src/memory/codefinder.cpp
+    src/memory/hook.cpp
     src/memory/memory.cpp
     src/memory/signature.cpp
     src/memory/signatures/client.cpp

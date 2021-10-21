@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "../memory/codecave.hpp"
+#include "../memory/hook.hpp"
 #include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "menu_accept.hpp"
 
 namespace Harmony {
-    static Codecave menu_accept_event_cave;
+    static Memory::Hook menu_accept_event_hook;
     static std::vector<Event<MenuAcceptEvent_t>> events;
 
     extern "C" {
@@ -49,9 +49,7 @@ namespace Harmony {
         auto &menu_button_accept_event_check_sig = Harmony::get().get_signature("menu_accept_event_check");
         
         // Write the hacks
-        menu_accept_event_cave.write_function_call(menu_button_accept_event_check_sig.get_data(), nullptr, reinterpret_cast<void *>(menu_accept), false);
-
-        // Hook it
-        menu_accept_event_cave.hook();
+        menu_accept_event_hook.initialize(menu_button_accept_event_check_sig.get_data(), nullptr, reinterpret_cast<void *>(menu_accept), false);
+        menu_accept_event_hook.hook();
     }
 }

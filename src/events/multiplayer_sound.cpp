@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "../memory/codecave.hpp"
+#include "../memory/hook.hpp"
 #include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "multiplayer_sound.hpp"
 
 namespace Harmony {
-    static Codecave on_multiplayer_sound_cave;
+    static Memory::FunctionOverride on_multiplayer_sound_hook;
     static std::vector<Event<MultiplayerSoundEventFunction>> multiplayer_sound_events;
 
     extern "C" {
@@ -34,7 +34,7 @@ namespace Harmony {
     extern "C" void do_on_multiplayer_sound(HaloData::MultiplayerSound sound) {
         bool allow = true;
         call_in_order_allow(multiplayer_sound_events, allow, sound);
-        on_multiplayer_sound_cave.execute_original_code(allow);
+        on_multiplayer_sound_hook.execute_original_code(allow);
     }
 
     void set_up_multiplayer_sounds_event() {
@@ -49,9 +49,7 @@ namespace Harmony {
         static auto &on_multiplayer_sound_sig = Harmony::get().get_signature("on_multiplayer_sound");
         
         // Write hacks
-        on_multiplayer_sound_cave.write_function_override(on_multiplayer_sound_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_sound_asm), true);
-
-        // Hook multiplayer event call
-        on_multiplayer_sound_cave.hook();
+        on_multiplayer_sound_hook.initialize(on_multiplayer_sound_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_sound_asm), true);
+        on_multiplayer_sound_hook.hook();
     }
 }

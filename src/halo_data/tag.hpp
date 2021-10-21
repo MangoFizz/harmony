@@ -6,7 +6,7 @@
 #include <cstring>
 #include <cstddef>
 
-#include "../memory/padding.hpp"
+#include "../memory/struct.hpp"
 #include "type.hpp"
 #include "tag_class.hpp"
 

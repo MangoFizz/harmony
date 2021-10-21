@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "../memory/codecave.hpp"
+#include "../memory/hook.hpp"
 #include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "menu_list_tab.hpp"
 
 namespace Harmony {
-    static Codecave menu_tab_list_items_next_vertical_cave;
-    static Codecave menu_tab_list_items_next_horizontal_cave;
-    static Codecave menu_tab_list_items_previous_vertical_cave;
-    static Codecave menu_tab_list_items_previous_horizontal_cave;
-    static Codecave menu_tab_children_next_vertical_cave;
-    static Codecave menu_tab_children_next_horizontal_cave;
-    static Codecave menu_tab_children_previous_cave;
+    static Memory::SwitchHook menu_tab_list_items_next_vertical_hook;
+    static Memory::SwitchHook menu_tab_list_items_next_horizontal_hook;
+    static Memory::SwitchHook menu_tab_list_items_previous_vertical_hook;
+    static Memory::SwitchHook menu_tab_list_items_previous_horizontal_hook;
+    static Memory::SwitchHook menu_tab_children_next_vertical_hook;
+    static Memory::SwitchHook menu_tab_children_next_horizontal_hook;
+    static Memory::SwitchHook menu_tab_children_previous_hook;
     static std::vector<Event<MenuListTabEvent_t>> events;
 
     extern "C" {
@@ -22,13 +22,13 @@ namespace Harmony {
         void on_menu_list_tab(HaloData::MenuNavigationKeyCode key, HaloData::TagID list, HaloData::TagID button) {
             bool allow = true;
             call_in_order_allow(events, allow, key, list, button);
-            menu_tab_list_items_next_vertical_cave.execute_original_code(allow);
-            menu_tab_list_items_next_horizontal_cave.execute_original_code(allow);
-            menu_tab_list_items_previous_vertical_cave.execute_original_code(allow);
-            menu_tab_list_items_previous_horizontal_cave.execute_original_code(allow);
-            menu_tab_children_next_vertical_cave.execute_original_code(allow);
-            menu_tab_children_next_horizontal_cave.execute_original_code(allow);
-            menu_tab_children_previous_cave.execute_original_code(allow);
+            menu_tab_list_items_next_vertical_hook.execute_original_code(allow);
+            menu_tab_list_items_next_horizontal_hook.execute_original_code(allow);
+            menu_tab_list_items_previous_vertical_hook.execute_original_code(allow);
+            menu_tab_list_items_previous_horizontal_hook.execute_original_code(allow);
+            menu_tab_children_next_vertical_hook.execute_original_code(allow);
+            menu_tab_children_next_horizontal_hook.execute_original_code(allow);
+            menu_tab_children_previous_hook.execute_original_code(allow);
         }
     }
 
@@ -56,31 +56,33 @@ namespace Harmony {
         }
         enabled = true;
 
-        // Get signatures
-        auto &menu_tab_list_items_next_vertical_sig = Harmony::get().get_signature("menu_tab_list_items_next_vertical_call");
-        auto &menu_tab_list_items_next_horizontal_sig = Harmony::get().get_signature("menu_tab_list_items_next_horizontal_call");
-        auto &menu_tab_list_items_previous_vertical_sig = Harmony::get().get_signature("menu_tab_list_items_previous_vertical_call");
-        auto &menu_tab_list_items_previous_horizontal_sig = Harmony::get().get_signature("menu_tab_list_items_previous_horizontal_call");
-        auto &menu_tab_children_next_vertical_sig = Harmony::get().get_signature("menu_tab_children_next_vertical_call");
-        auto &menu_tab_children_next_horizontal_sig = Harmony::get().get_signature("menu_tab_children_next_horizontal_call");
-        auto &menu_tab_children_previous_sig = Harmony::get().get_signature("menu_tab_children_previous_call");
-        
         // Write a ton of hacks
-        menu_tab_list_items_next_vertical_cave.write_basic_cave(menu_tab_list_items_next_vertical_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
-        menu_tab_list_items_next_horizontal_cave.write_basic_cave(menu_tab_list_items_next_horizontal_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
-        menu_tab_list_items_previous_vertical_cave.write_basic_cave(menu_tab_list_items_previous_vertical_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
-        menu_tab_list_items_previous_horizontal_cave.write_basic_cave(menu_tab_list_items_previous_horizontal_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
-        menu_tab_children_next_vertical_cave.write_basic_cave(menu_tab_children_next_vertical_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
-        menu_tab_children_next_horizontal_cave.write_basic_cave(menu_tab_children_next_horizontal_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
-        menu_tab_children_previous_cave.write_basic_cave(menu_tab_children_previous_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
-
-        // Hook it
-        menu_tab_list_items_next_vertical_cave.hook();
-        menu_tab_list_items_next_horizontal_cave.hook();
-        menu_tab_list_items_previous_vertical_cave.hook();
-        menu_tab_list_items_previous_horizontal_cave.hook();
-        menu_tab_children_next_vertical_cave.hook();
-        menu_tab_children_next_horizontal_cave.hook();
-        menu_tab_children_previous_cave.hook();
+        auto &menu_tab_list_items_next_vertical_sig = Harmony::get().get_signature("menu_tab_list_items_next_vertical_call");
+        menu_tab_list_items_next_vertical_hook.initialize(menu_tab_list_items_next_vertical_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
+        menu_tab_list_items_next_vertical_hook.hook();
+        
+        auto &menu_tab_list_items_next_horizontal_sig = Harmony::get().get_signature("menu_tab_list_items_next_horizontal_call");
+        menu_tab_list_items_next_horizontal_hook.initialize(menu_tab_list_items_next_horizontal_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
+        menu_tab_list_items_next_horizontal_hook.hook();
+        
+        auto &menu_tab_list_items_previous_vertical_sig = Harmony::get().get_signature("menu_tab_list_items_previous_vertical_call");
+        menu_tab_list_items_previous_vertical_hook.initialize(menu_tab_list_items_previous_vertical_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
+        menu_tab_list_items_previous_vertical_hook.hook();
+        
+        auto &menu_tab_list_items_previous_horizontal_sig = Harmony::get().get_signature("menu_tab_list_items_previous_horizontal_call");
+        menu_tab_list_items_previous_horizontal_hook.initialize(menu_tab_list_items_previous_horizontal_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
+        menu_tab_list_items_previous_horizontal_hook.hook();
+        
+        auto &menu_tab_children_next_vertical_sig = Harmony::get().get_signature("menu_tab_children_next_vertical_call");
+        menu_tab_children_next_vertical_hook.initialize(menu_tab_children_next_vertical_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
+        menu_tab_children_next_vertical_hook.hook();
+        
+        auto &menu_tab_children_next_horizontal_sig = Harmony::get().get_signature("menu_tab_children_next_horizontal_call");
+        menu_tab_children_next_horizontal_hook.initialize(menu_tab_children_next_horizontal_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
+        menu_tab_children_next_horizontal_hook.hook();
+        
+        auto &menu_tab_children_previous_sig = Harmony::get().get_signature("menu_tab_children_previous_call");
+        menu_tab_children_previous_hook.initialize(menu_tab_children_previous_sig.get_data(), reinterpret_cast<void *>(menu_list_tab), false);
+        menu_tab_children_previous_hook.hook();
     }
 }

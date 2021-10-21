@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "../memory/codecave.hpp"
+#include "../memory/hook.hpp"
 #include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "multiplayer_event.hpp"
 
 namespace Harmony {
-    static Codecave on_multiplayer_event_cave;
+    static Memory::Hook on_multiplayer_event_hook;
     static std::vector<Event<MultiplayerEventFunction>> multiplayer_events;
 
     void add_multiplayer_event(MultiplayerEventFunction function, EventPriority priority) {
@@ -45,9 +45,7 @@ namespace Harmony {
         static auto &on_multiplayer_event_sig = Harmony::get().get_signature("on_multiplayer_event");
         
         // Write hacks
-        on_multiplayer_event_cave.write_basic_cave(on_multiplayer_event_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_event_asm), false);
-
-        // Hook multiplayer event call
-        on_multiplayer_event_cave.hook();
+        on_multiplayer_event_hook.initialize(on_multiplayer_event_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_event_asm), nullptr, false);
+        on_multiplayer_event_hook.hook();
     }
 }

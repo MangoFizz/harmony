@@ -7,7 +7,7 @@
 #include <utility>
 #include <memory>
 #include <cstddef>
-#include "../memory/codecave.hpp"
+#include "../memory/hook.hpp"
 
 namespace Harmony::UserInterface {
     class WidescreenOverride {
@@ -67,7 +67,7 @@ namespace Harmony::UserInterface {
         std::uint16_t *tabs;
         
         /** Chimera widescreen hooks */
-        std::vector<std::unique_ptr<Codecave>> overrides;
+        std::vector<std::unique_ptr<Memory::Hook>> overrides;
 
         /**
          * Force fullscreen-widget scaling

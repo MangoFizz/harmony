@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "../memory/codecave.hpp"
+#include "../memory/hook.hpp"
 #include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "menu_mouse_button_press.hpp"
 
 namespace Harmony {
-    static Codecave on_menu_mouse_button_press_cave;
+    static Memory::Hook on_menu_mouse_button_press_hook;
     static std::vector<Event<MenuMouseButtonPressEvent_t>> events;
 
     extern "C" {
@@ -51,9 +51,7 @@ namespace Harmony {
         
         // Write the hacks
         Memory::fill_with_nops(reinterpret_cast<void *>(on_menu_button_press_sig.get_data()), 0x1E); // Remove original code
-        on_menu_mouse_button_press_cave.write_function_call(on_menu_button_press_sig.get_data(), reinterpret_cast<void *>(menu_mouse_button_press), nullptr, false);
-
-        // Hook it
-        on_menu_mouse_button_press_cave.hook();
+        on_menu_mouse_button_press_hook.initialize(on_menu_button_press_sig.get_data(), reinterpret_cast<void *>(menu_mouse_button_press), nullptr, false);
+        on_menu_mouse_button_press_hook.hook();
     }
 }

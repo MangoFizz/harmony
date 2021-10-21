@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include <vector>
-#include <cstddef>
-#include "../memory/codecave.hpp"
+#include "../memory/hook.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "tick.hpp"
 
 namespace Harmony {
+    static Memory::Hook on_tick_hook;
     static std::vector<Event<event_no_args>> tick_events;
 
     void add_tick_event(event_no_args event_function, EventPriority priority) {
@@ -43,10 +42,7 @@ namespace Harmony {
         static auto &on_tick_sig = Harmony::get().get_signature("on_tick");
         
         // Write hacks
-        static Codecave on_tick_cave;
-        on_tick_cave.write_basic_cave(on_tick_sig.get_data(), reinterpret_cast<void *>(on_tick));
-
-        // Hook multiplayer event call
-        on_tick_cave.hook();
+        on_tick_hook.initialize(on_tick_sig.get_data(), reinterpret_cast<void *>(on_tick));
+        on_tick_hook.hook();
     }
 }

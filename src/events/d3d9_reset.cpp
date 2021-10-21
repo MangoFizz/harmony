@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "../memory/codecave.hpp"
+#include "../memory/hook.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "d3d9_reset.hpp"
 
 namespace Harmony {
+    static Memory::Hook d3d9_reset_hook;
     static std::vector<Event<ResetEvent_t>> reset_events;
 
     extern "C" {
@@ -45,10 +46,7 @@ namespace Harmony {
         static auto &d3d9_call_reset_sig = Harmony::get().get_signature("d3d9_call_reset");
         
         // Write hacks
-        static Codecave d3d9_reset_cave;
-        d3d9_reset_cave.write_basic_cave(d3d9_call_reset_sig.get_data(), reinterpret_cast<void *>(on_d3d9_reset_asm), false);
-
-        // Hook D3D9 reset call
-        d3d9_reset_cave.hook();
+        d3d9_reset_hook.initialize(d3d9_call_reset_sig.get_data(), reinterpret_cast<void *>(on_d3d9_reset_asm), nullptr, false);
+        d3d9_reset_hook.hook();
     }
 }

@@ -1,122 +1,41 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef CHIMERA_HOOK_HPP
-#define CHIMERA_HOOK_HPP
+#ifndef HARMONY_MEMORY_CODECAVE_HPP
+#define HARMONY_MEMORY_CODECAVE_HPP
 
-#include <vector>
+#include <memory>
 #include <cstdint>
 
-#define CALL_INSTRUCTION_SIZE 0x5
+#define DEFAULT_CAVE_SIZE 64
 
-namespace Harmony {
+namespace Harmony::Memory {
     class Codecave {
+    friend class Hook;
     public:
         /**
-         * Set whether or not to execute original code
-        */
-        void execute_original_code(bool setting) noexcept;
+         * Get cave top
+         */
+        std::byte &get_top() const noexcept;
 
         /**
-         * Write a basic cave. This cave can skip the original function.
-         * @param address   Pointer to instruction
-         * @param function  Function to be called in the cave
-         * @param pushad    Insert pushad and pushfd instructions
+         * Get data
          */
-        void write_basic_cave(void *address, const void *function, bool pushad = true) noexcept;
+        std::byte *get_data() const noexcept;
 
         /**
-         * Write a double-call cave
-         * @param address           Pointer to instruction
-         * @param function_before   Function to be called BEFORE original code
-         * @param function_after    Function to be called AFTER original code
-         * @param pushad            Insert pushad and pushfd instructions
+         * Check if cave is empty.
          */
-        void write_function_call(void *address, const void *function_before, const void *function_after, bool pushad = true);
+        bool empty() const noexcept;
 
         /**
-         * Write function overide
-         * @param address       Pointer to instruction
-         * @param function      Function to be called
+         * Prevents bytes from being inserted
          */
-        void write_function_override(void *address, const void *function, bool pushad = true);
+        void lock() noexcept;
 
         /**
-         * Write an override for a Chimera's override cave
-         * @param address   Pointer to instruction
+         * Allow bytes from being inserted again
          */
-        void hack_chimera_function_override(void *address, const void *function, const void **cave_return) noexcept;
-
-        /**
-         * Write a cave over a Chimera cave
-         * @param address   Pointer to Chimera cave jump
-         * @param function_before   Function to be called BEFORE original code
-         * @param function_after    Function to be called AFTER original code
-         * @param pushad            Insert pushad and pushfd instructions
-         */
-        void hack_chimera_function_call(void *address, const void *function_before, const void *function_after, bool pushad = true) noexcept;
-
-        /**
-         * Hook it!
-         */
-        void hook() noexcept;
-
-        /**
-         * Release hook, restore original code
-         */
-        void release() noexcept;
-
-        /**
-         * Allocate memory for our cave
-         */
-        Codecave() noexcept;
-
-        /**
-         * Free cave memory
-         */
-        ~Codecave() noexcept;
-
-        /**
-         * Calculate offset
-         * @param instruction       Instruction address
-         * @param address           Address where jump
-         */
-        static std::uint32_t calculate_jmp_offset(const void *jmp, const void *destination) noexcept;
-
-        /**
-         * Follow a call/jmp instruction
-         * @param jmp   Pointer to instruction
-         */
-        static std::byte *follow_jump(std::byte *jmp) noexcept;
-
-        /**
-         * Follow a call/jmp instruction
-         * @param jmp   Pointer to instruction
-         */
-        static inline std::byte *follow_jump(void *jmp) noexcept {
-            return follow_jump(reinterpret_cast<std::byte *>(jmp));
-        }
-
-    private: 
-        /** Instruction to hook */
-        std::byte *instruction;
-
-        /** Cave itself */
-        std::byte *cave;
-
-        /** Cave size */
-        std::size_t size = 0;
-
-        /** Skip the original instruction */
-        bool execute_original_code_flag = true;
-
-        /** State */
-        bool hooked = false;
-
-        /** Original instruction */
-        std::vector<std::byte> original_instruction;
-
-        /** Cave original protection */
-        unsigned long original_page_protection;
+        void unlock() noexcept;
 
         /**
          * Set cave as executable
@@ -124,31 +43,20 @@ namespace Harmony {
         void set_access_protection(bool setting = true) noexcept;
 
         /**
-         * Write a function call instruction
-         * @param function  Function to be called
-         * @param pushad    Insert pushad and pushfd instructions
+         * Allocate memory for our cave
          */
-        void write_function_call(const void *function, bool pushad = true) noexcept;
-
-        /**
-         * Copy a code instruction from a given address
-         * @param address   Instruction address
-         */
-        void copy_instruction(const void *address, std::uint8_t &instruction_size) noexcept;
-
-        /**
-         * Write cave return
-         * @param bytes     The amount of bytes to jump
-         */
-        void write_cave_return() noexcept;
+        Codecave() noexcept;
 
         /**
          * Insert a byte into the cave
          * @param byte  Byte to insert
          */
         template<typename T> inline void insert(T byte) noexcept {
-            cave[size] = static_cast<std::byte>(byte);
-            size++;
+            if(locked) {
+                return;
+            }
+            data[top] = static_cast<std::byte>(byte);
+            top++;
         }
 
         /**
@@ -157,8 +65,11 @@ namespace Harmony {
          * @param lenght    Size of array
          */
         template<typename T> inline void insert(T *bytes, std::size_t lenght) noexcept {
-            for(std::size_t i = 0; i < lenght; i++, size++) {
-                cave[size] = reinterpret_cast<const std::byte *>(bytes)[i];
+            if(locked) {
+                return;
+            }
+            for(std::size_t i = 0; i < lenght; i++, top++) {
+                data[top] = reinterpret_cast<const std::byte *>(bytes)[i];
             }
         }
 
@@ -166,12 +77,27 @@ namespace Harmony {
          * Insert an address into cave
          * @param address   Address to insert
          */
-        inline void insert_address(std::uint32_t address) noexcept {
-            *reinterpret_cast<std::uint32_t *>(&cave[size]) = address;
-            size += 4;
+        inline void insert_address(std::uintptr_t address) noexcept {
+            if(locked) {
+                return;
+            }
+            *reinterpret_cast<std::uintptr_t *>(&data[top]) = address;
+            top += 4;
         }
-    };
 
+    private:
+        /** Cave itself */
+        std::unique_ptr<std::byte[]> data;
+
+        /** Cave size */
+        std::size_t top = 0;
+
+        /** Cave is locked? */
+        bool locked = false;
+
+        /** Original data protection */
+        unsigned long original_page_protection;
+    };
 }
 
 #endif
