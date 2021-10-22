@@ -43,6 +43,15 @@ namespace Harmony {
       std::terminate();
    }
 
+   bool Harmony::signature_exists(const char *name) noexcept {
+      for(auto &signature : this->signatures) {
+         if(std::strcmp(signature.get_name(), name) == 0) {
+            return true;
+         }
+      }
+      return false;
+   }
+
    Lua::Library &Harmony::get_lua_library_handler() noexcept{
       return *(this->lua_handler.get());
    }

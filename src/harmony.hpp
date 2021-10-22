@@ -31,6 +31,13 @@ namespace Harmony {
          */
         Signature &get_signature(const char *name) noexcept;
 
+        /** 
+         * Look for a signature
+         * @param name  Name of signature
+         * @return      True if signature exists, false if not
+         */
+        bool signature_exists(const char *name) noexcept;
+
         /**
          * Get Lua library handler
          */
