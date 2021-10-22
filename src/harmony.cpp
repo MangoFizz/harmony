@@ -26,6 +26,7 @@
 namespace Harmony {
    static void first_tick() noexcept;
    static bool info_command(std::string command) noexcept;
+   static void terminate() noexcept;
 
    Harmony *Harmony::instance = nullptr;
 
@@ -77,6 +78,9 @@ namespace Harmony {
       // Set up widescreen override
       this->widescreen_fix_override = std::make_unique<UserInterface::WidescreenOverride>();
 
+      // Set error handling
+      std::set_terminate(terminate);
+
       // Set up tick event hook
       set_up_tick_event();
 
@@ -117,12 +121,6 @@ namespace Harmony {
       set_up_menu_list_tab_event();
       set_up_menu_sound_event();
 
-      // Set up console command event
-      //set_up_console_command_event();
-
-      // Add info command
-      //add_console_command_event(info_command);
-
       // Override Chimera's widescreen fix
       Harmony::get().get_widescreen_override_handle().enable(true);
    }
@@ -135,6 +133,11 @@ namespace Harmony {
          return false;
       }
       return true;
+   }
+
+   static void terminate() noexcept {
+      message_box("Uncaught exception. This may be a bug.");
+      std::abort();
    }
 }
 
