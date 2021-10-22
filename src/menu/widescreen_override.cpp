@@ -9,6 +9,7 @@
 #include "../memory/signature.hpp"
 #include "../memory/memory.hpp"
 #include "../memory/struct.hpp"
+#include "../messaging/console_output.hpp"
 #include "../messaging/message_box.hpp"
 #include "../harmony.hpp"
 #include "widescreen_override.hpp"
@@ -44,35 +45,42 @@ namespace Harmony::UserInterface {
             return;
         }
         if(setting) {
-            static auto &widescreen_element_position_menu_sig = Harmony::get().get_signature("widescreen_element_position_menu");
-            this->overrides.emplace_back(std::make_unique<Memory::ChimeraFunctionOverride>(widescreen_element_position_menu_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu), &widescreen_element_position_menu_fn));
+            try {
+                static auto &widescreen_element_position_menu_sig = Harmony::get().get_signature("widescreen_element_position_menu");
+                this->overrides.emplace_back(std::make_unique<Memory::ChimeraFunctionOverride>(widescreen_element_position_menu_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu), &widescreen_element_position_menu_fn));
 
-            static auto &widescreen_menu_text_sig = Harmony::get().get_signature("widescreen_menu_text");
-            this->overrides.emplace_back(std::make_unique<Memory::ChimeraFunctionOverride>(widescreen_menu_text_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text), &widescreen_element_position_menu_text_fn));
-            
-            static auto &widescreen_menu_text_2_sig = Harmony::get().get_signature("widescreen_menu_text_2");
-            this->overrides.emplace_back(std::make_unique<Memory::ChimeraFunctionOverride>(widescreen_menu_text_2_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text_2), &widescreen_element_position_menu_text_2_fn));
-            
-            static auto &widescreen_input_text_sig = Harmony::get().get_signature("widescreen_input_text");
-            auto *widescreen_input_text_address = Memory::Hook::follow_jump(widescreen_input_text_sig.get_data()) + 9;
-            this->overrides.emplace_back(std::make_unique<Memory::Hook>(widescreen_input_text_address, reinterpret_cast<void *>(widescreen_input_text), reinterpret_cast<void *>(widescreen_input_text_undo)));
+                static auto &widescreen_menu_text_sig = Harmony::get().get_signature("widescreen_menu_text");
+                this->overrides.emplace_back(std::make_unique<Memory::ChimeraFunctionOverride>(widescreen_menu_text_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text), &widescreen_element_position_menu_text_fn));
+                
+                static auto &widescreen_menu_text_2_sig = Harmony::get().get_signature("widescreen_menu_text_2");
+                this->overrides.emplace_back(std::make_unique<Memory::ChimeraFunctionOverride>(widescreen_menu_text_2_sig.get_data(), reinterpret_cast<void *>(widescreen_element_reposition_menu_text_2), &widescreen_element_position_menu_text_2_fn));
+                
+                static auto &widescreen_input_text_sig = Harmony::get().get_signature("widescreen_input_text");
+                auto *widescreen_input_text_address = Memory::Hook::follow_jump(widescreen_input_text_sig.get_data()) + 9;
+                this->overrides.emplace_back(std::make_unique<Memory::Hook>(widescreen_input_text_address, reinterpret_cast<void *>(widescreen_input_text), reinterpret_cast<void *>(widescreen_input_text_undo)));
 
-            // Get mouse bounds
-            static auto &widescreen_mouse_sig = Harmony::get().get_signature("widescreen_mouse");
-            auto *widescreen_mouse_address = widescreen_mouse_sig.get_data();
-            auto *original_cave = Memory::Hook::follow_jump(widescreen_mouse_address);
-            auto *original_widescreen_mouse_fn = Memory::Hook::follow_jump(original_cave);
-            widescreen_fix_mouse_x_ptr = *reinterpret_cast<std::int32_t ***>(original_widescreen_mouse_fn + 0x28);
-            widescreen_mouse_x = *widescreen_fix_mouse_x_ptr;
-            widescreen_mouse_y = widescreen_mouse_x + 1;
+                // Get mouse bounds
+                static auto &widescreen_mouse_sig = Harmony::get().get_signature("widescreen_mouse");
+                auto *widescreen_mouse_address = widescreen_mouse_sig.get_data();
+                auto *original_cave = Memory::Hook::follow_jump(widescreen_mouse_address);
+                auto *original_widescreen_mouse_fn = Memory::Hook::follow_jump(original_cave);
+                widescreen_fix_mouse_x_ptr = *reinterpret_cast<std::int32_t ***>(original_widescreen_mouse_fn + 0x28);
+                widescreen_mouse_x = *widescreen_fix_mouse_x_ptr;
+                widescreen_mouse_y = widescreen_mouse_x + 1;
 
-            // Redirect widescreen fix mouse x pointer to a fake variable
-            static std::int32_t gotya = 0;
-            *widescreen_fix_mouse_x_ptr = &gotya;
+                // Redirect widescreen fix mouse x pointer to a fake variable
+                static std::int32_t gotya = 0;
+                *widescreen_fix_mouse_x_ptr = &gotya;
 
-            // Get and recast the meme to disble original code execution
-            auto *widescreen_mouse_cave = this->overrides.emplace_back(std::make_unique<Memory::SwitchHook>(widescreen_mouse_address, reinterpret_cast<void *>(widescreen_mouse), false)).get();
-            static_cast<Memory::SwitchHook *>(widescreen_mouse_cave)->execute_original_code(false);
+                // Get and recast the meme to disble original code execution
+                auto *widescreen_mouse_cave = this->overrides.emplace_back(std::make_unique<Memory::SwitchHook>(widescreen_mouse_address, reinterpret_cast<void *>(widescreen_mouse), false)).get();
+                static_cast<Memory::SwitchHook *>(widescreen_mouse_cave)->execute_original_code(false);
+            }
+            catch(Memory::Hook::Exception &e) {
+                console_error("Failed to enable widescreen override: Chimera's widescreen fix is disabled!");
+                this->overrides.clear();
+                return;
+            }
 
             // Hook everything
             for(auto &hook : this->overrides) {
