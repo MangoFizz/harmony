@@ -354,7 +354,7 @@ namespace Harmony::Memory {
         std::uint8_t instruction_size;
         try {
             // Copy instructions
-            this->copy_instructions(instruction);
+            this->copy_instructions(instruction, instruction_size);
         }
         catch(Hook::Exception &e) {
             throw;
@@ -401,7 +401,7 @@ namespace Harmony::Memory {
         std::uint8_t instruction_size;
         try {
             // Copy instructions
-            this->copy_instructions(instruction);
+            this->copy_instructions(instruction, instruction_size);
         }
         catch(Hook::Exception &e) {
             throw;

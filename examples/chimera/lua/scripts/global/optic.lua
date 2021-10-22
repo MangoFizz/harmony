@@ -33,6 +33,8 @@ function on_multiplayer_sound(sound)
 		local screen_width = read_word(0x637CF2)
 		local screen_height = read_word(0x637CF0)
 		optic.render_sprite("hitmarker", (screen_width - 35) / 2, (screen_height - 35) / 2, 255, 0, 200)
+		
+		return false
 	end
 
 	return true
