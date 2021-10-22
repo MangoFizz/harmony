@@ -94,7 +94,6 @@ namespace Harmony::Lua {
         library = this;
 
         // Set up library events
-        add_map_load_event(Library::on_map_load, EVENT_PRIORITY_BEFORE);
         add_d3d9_end_scene_event(Library::on_d3d9_end_scene);
         add_d3d9_reset_event(Library::on_d3d9_reset);
 
@@ -106,10 +105,6 @@ namespace Harmony::Lua {
         add_menu_mouse_button_press_event(Library::menu_mouse_button_press);
         add_menu_list_tab_event(Library::menu_list_tab);
         add_menu_sound_event(Library::menu_sound);
-    }
-    
-    void Library::on_map_load() noexcept {
-        library->unload_map_script();
     }
 
     void Library::on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {

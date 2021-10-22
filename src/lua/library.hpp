@@ -66,12 +66,6 @@ namespace Harmony::Lua {
          */
         Library() noexcept;
 
-        /**
-         * Map load event
-         * This will unload the map script
-         */
-        static void on_map_load() noexcept;
-
         /** 
          * Sprite management stuff
          * These events are in charge of loading/unloading the sprites from all scripts
