@@ -29,8 +29,14 @@ function onMenuSound(button_id, sound)
     return true
 end
 
+function OnUnload()
+    harmony.unload()
+end
+
 harmony.set_callback("menu accept", "onMenuAccept")
 harmony.set_callback("menu back", "onMenuBack")
 harmony.set_callback("menu list tab", "onMenuListTab")
 harmony.set_callback("menu mouse button press", "onMenuMouseButtonPress")
 harmony.set_callback("menu sound", "onMenuSound")
+
+set_callback("unload", "OnUnload")

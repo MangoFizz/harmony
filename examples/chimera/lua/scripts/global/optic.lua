@@ -40,4 +40,10 @@ function on_multiplayer_sound(sound)
 	return true
 end
 
+function OnUnload()
+    harmony.unload()
+end
+
 harmony.set_callback("multiplayer sound", "on_multiplayer_sound")
+
+set_callback("unload", "OnUnload")
