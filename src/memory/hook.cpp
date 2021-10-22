@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include <string>
 #include <memory>
+#include <exception>
 #include <windows.h>
 #include "../messaging/message_box.hpp"
 #include "memory.hpp"
@@ -40,7 +42,7 @@ namespace Harmony::Memory {
         this->hooked = false;
     }
 
-    void Hook::initialize(void *instruction, const void *function_before, const void *function_after, bool pushad) noexcept {
+    void Hook::initialize(void *instruction, const void *function_before, const void *function_after, bool pushad) {
         if(this->hooked) {
             return;
         }
@@ -53,8 +55,13 @@ namespace Harmony::Memory {
             this->write_function_call(function_before, pushad);
         }
 
-        // Copy instructions
-        this->copy_instructions(instruction);
+        try {
+            // Copy instructions
+            this->copy_instructions(instruction);
+        }
+        catch(Hook::Exception &e) {
+            throw;
+        }
 
         // Write function after
         if(function_after) {
@@ -97,11 +104,10 @@ namespace Harmony::Memory {
         }
     }
 
-    void Hook::copy_instructions(const void *address, std::uint8_t &copied_bytes) noexcept {
+    void Hook::copy_instructions(const void *address, std::uint8_t &copied_bytes) {
         auto *instruction = reinterpret_cast<const std::uint8_t *>(address);
-        std::size_t instruction_size = 0;
-
         copied_bytes = 0;
+        std::size_t instruction_size = 0;
 
         while(copied_bytes < 5) {
             instruction += instruction_size;
@@ -132,8 +138,7 @@ namespace Harmony::Memory {
                         instruction_size = 5;
                     }
                     else {
-                        message_box("Unsupported mov instruction.");
-                        std::terminate();
+                        throw Hook::Exception("Unsupported mov instruction.");
                     }
                     break;
                 }
@@ -148,8 +153,7 @@ namespace Harmony::Memory {
                         }
 
                         default: {
-                            message_box("Unsupported mov instruction.");
-                            std::terminate();
+                            throw Hook::Exception("Unsupported mov instruction.");
                         }
                     }
                     break;
@@ -192,8 +196,7 @@ namespace Harmony::Memory {
                         break;
                     }
                     else {
-                        message_box("Unsupported call instruction.");
-                        std::terminate();
+                        throw Hook::Exception("Unsupported call instruction.");
                     }
                 }
 
@@ -205,8 +208,7 @@ namespace Harmony::Memory {
                         instruction_size = 2;
                     }
                     else {
-                        message_box("Unsupported test instruction.");
-                        std::terminate();
+                        throw Hook::Exception("Unsupported test instruction.");
                     }
                     break;
                 }
@@ -222,8 +224,7 @@ namespace Harmony::Memory {
                         instruction_size = 3;
                     }
                     else {
-                        message_box("Unsupported movzx instruction.");
-                        std::terminate();
+                        throw Hook::Exception("Unsupported movzx instruction.");
                     }
                     break;
                 }
@@ -235,8 +236,7 @@ namespace Harmony::Memory {
                         instruction_size = 4;
                     }
                     else {
-                        message_box("Unsupported cmp instruction.");
-                        std::terminate();
+                        throw Hook::Exception("Unsupported cmp instruction.");
                     }
                     break;
                 }
@@ -262,8 +262,7 @@ namespace Harmony::Memory {
                         instruction_size = 3;
                     }
                     else {
-                        message_box("Unsupported cmp instruction.");
-                        std::terminate();
+                        throw Hook::Exception("Unsupported cmp instruction.");
                     }
                     break;
                 }
@@ -276,8 +275,9 @@ namespace Harmony::Memory {
                 }
 
                 default: {
-                    message_box("Unable to build cave: unsupported instruction. \nOpcode: 0x%.2X at 0x%.8X", instruction[0], instruction);
-                    std::terminate();
+                    char message[256];
+                    snprintf(message, sizeof(message), "Unable to build cave: unsupported instruction. \nOpcode: 0x%.2X at 0x%.8X", instruction[0], instruction);
+                    throw Hook::Exception(message);
                 }
             }
 
@@ -289,9 +289,14 @@ namespace Harmony::Memory {
         }
     }
 
-    void Hook::copy_instructions(const void *address) noexcept {
-        std::uint8_t no = 0;
-        this->copy_instructions(address, no);
+    void Hook::copy_instructions(const void *address) {
+        try {
+            std::uint8_t no = 0;
+            this->copy_instructions(address, no);
+        }
+        catch(Hook::Exception &e) {
+            throw;
+        }
     }
 
     void Hook::write_cave_return_jmp() noexcept {
@@ -303,11 +308,23 @@ namespace Harmony::Memory {
         this->cave.insert_address(offset);
     }
 
+    const char *Hook::Exception::what() const noexcept {
+        return this->message.c_str();
+    }
+
+    Hook::Exception::Exception(std::string message) noexcept {
+        this->message = message;
+
+        #ifdef DEBUG
+        message_box(message.c_str());
+        #endif
+    }
+
     void SwitchHook::execute_original_code(bool setting) noexcept {
         *this->execute_original_code_flag = setting;
     }
 
-    void SwitchHook::initialize(void *instruction, const void *function, bool pushad) noexcept {
+    void SwitchHook::initialize(void *instruction, const void *function, bool pushad) {
         if(this->hooked) {
             return;
         }
@@ -335,7 +352,13 @@ namespace Harmony::Memory {
 
         // Copy instruction code into cave
         std::uint8_t instruction_size;
-        this->copy_instructions(instruction, instruction_size);
+        try {
+            // Copy instructions
+            this->copy_instructions(instruction);
+        }
+        catch(Hook::Exception &e) {
+            throw;
+        }
 
         // Update jump offset
         jmp_offset += instruction_size;
@@ -348,7 +371,7 @@ namespace Harmony::Memory {
         this->release();
     }
 
-    void FunctionOverride::initialize(void *instruction, const void *function, bool pushad) noexcept {
+    void FunctionOverride::initialize(void *instruction, const void *function, bool pushad) {
         if(this->hooked) {
             return;
         }
@@ -376,7 +399,13 @@ namespace Harmony::Memory {
 
         // Copy instruction code into cave
         std::uint8_t instruction_size;
-        this->copy_instructions(instruction, instruction_size);
+        try {
+            // Copy instructions
+            this->copy_instructions(instruction);
+        }
+        catch(Hook::Exception &e) {
+            throw;
+        }
         jmp_offset += instruction_size;
 
         // Write return to original code
@@ -391,7 +420,7 @@ namespace Harmony::Memory {
         this->release();
     }
 
-    void ChimeraFunctionOverride::initialize(void *cave, const void *function, const void **cave_return) noexcept {
+    void ChimeraFunctionOverride::initialize(void *cave, const void *function, const void **cave_return) {
         if(this->hooked) {
             return;
         }
@@ -413,9 +442,14 @@ namespace Harmony::Memory {
 
         // Get original code from Chimera cave
         auto *chimera_cave = reinterpret_cast<std::byte *>(this->follow_jump(cave));
-        std::uint8_t intruction_size = 0;
-        this->copy_instructions(reinterpret_cast<void *>(chimera_cave), intruction_size);
-        this->copy_instructions(reinterpret_cast<void *>(chimera_cave + 5), intruction_size);
+        try {
+            // Copy instructions
+            this->copy_instructions(reinterpret_cast<void *>(chimera_cave));
+            this->copy_instructions(reinterpret_cast<void *>(chimera_cave + 5));
+        }
+        catch(Hook::Exception &e) {
+            throw;
+        }
 
         // Save Chimera override jump
         this->original_code = original_override_jmp;

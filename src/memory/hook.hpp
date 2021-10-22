@@ -3,14 +3,19 @@
 #ifndef HARMONY_MEMORY_HOOK_HPP
 #define HARMONY_MEMORY_HOOK_HPP
 
+#include <string>
 #include <vector>
 #include <memory>
+#include <exception>
 #include <cstdint>
 #include "codecave.hpp"
 
 namespace Harmony::Memory {
     class Hook {
     public:
+        /** Hook exception class */
+        class Exception;
+
         /**
          * Hook it!
          */
@@ -28,7 +33,7 @@ namespace Harmony::Memory {
          * @param function_after        Function to be called after original code.
          * @param pushad                Insert pushad and pushfd instructions.
          */
-        void initialize(void *instruction, const void *function_before, const void *function_after = nullptr, bool pushad = true) noexcept;
+        void initialize(void *instruction, const void *function_before, const void *function_after = nullptr, bool pushad = true);
 
         /**
          * Basic hook constructor.
@@ -37,7 +42,7 @@ namespace Harmony::Memory {
          * @param function_after        Function to be called after original code.
          * @param pushad                Insert pushad and pushfd instructions.
          */
-        Hook(void *instruction, const void *function_before, const void *function_after = nullptr, bool pushad = true) noexcept {
+        Hook(void *instruction, const void *function_before, const void *function_after = nullptr, bool pushad = true) {
             initialize(instruction, function_before, function_after, pushad);
         }
 
@@ -95,20 +100,39 @@ namespace Harmony::Memory {
          * Copy assembly instructions into cave.
          * @param address           Address where the code to copy is.
          * @param instruction_size  Size of the copied instruction(s) in cave.
+         * @throw                   Hook exception on unknown instruction.
          */
-        void copy_instructions(const void *address, std::uint8_t &instructions_size) noexcept;
+        void copy_instructions(const void *address, std::uint8_t &instructions_size);
 
         /**
          * Copy assembly instructions into cave.
          * @param address           Address where the code to copy is.
+         * @throw                   Hook exception on unknown instruction.
          */
-        void copy_instructions(const void *address) noexcept;
+        void copy_instructions(const void *address);
 
         /**
          * Write cave return.
          * @param bytes     The amount of bytes to jump
          */
         void write_cave_return_jmp() noexcept;
+    };
+
+    class Hook::Exception : public std::exception {
+    public:
+        /**
+         * Return the error message
+         */
+        const char *what() const noexcept;
+
+        /**
+         * Constructor for Hook exception
+         */
+        Exception(std::string message) noexcept;
+
+    private:
+        /** Error message */
+        std::string message;
     };
 
     class SwitchHook : public Hook {
@@ -124,7 +148,7 @@ namespace Harmony::Memory {
          * @param function      Function to be called in the hook.
          * @param pushad        Insert pushad and pushfd instructions.
          */
-        void initialize(void *instruction, const void *function, bool pushad = true) noexcept;
+        void initialize(void *instruction, const void *function, bool pushad = true);
 
         /**
          * Switch hook constructor.
@@ -132,7 +156,7 @@ namespace Harmony::Memory {
          * @param function      Function to be called in the hook.
          * @param pushad        Insert pushad and pushfd instructions.
          */
-        SwitchHook(void *instruction, const void *function, bool pushad = true) noexcept {
+        SwitchHook(void *instruction, const void *function, bool pushad = true) {
             initialize(instruction, function, pushad);
         }
 
@@ -159,7 +183,7 @@ namespace Harmony::Memory {
          * @param function      Function to be called in the hook.
          * @param pushad        Insert pushad and pushfd instructions.
          */
-        void initialize(void *instruction, const void *function, bool pushad = true) noexcept;
+        void initialize(void *instruction, const void *function, bool pushad = true);
 
         /**
          * Function override hook constructor.
@@ -167,7 +191,7 @@ namespace Harmony::Memory {
          * @param function      Function to be called in the hook.
          * @param pushad        Insert pushad and pushfd instructions.
          */
-        FunctionOverride(void *instruction, const void *function, bool pushad = true) noexcept {
+        FunctionOverride(void *instruction, const void *function, bool pushad = true) {
             initialize(instruction, function, pushad);
         }
 
@@ -190,7 +214,7 @@ namespace Harmony::Memory {
          * @param function      Function to be called in the hook.
          * @param cave_return   Return address for function.
          */
-        void initialize(void *cave, const void *function, const void **cave_return) noexcept;
+        void initialize(void *cave, const void *function, const void **cave_return);
 
         /**
          * Constructor for Chimera's function-override override
@@ -198,7 +222,7 @@ namespace Harmony::Memory {
          * @param function      Function to be called in the hook.
          * @param cave_return   Return address for function.
          */
-        ChimeraFunctionOverride(void *cave, const void *function, const void **cave_return) noexcept {
+        ChimeraFunctionOverride(void *cave, const void *function, const void **cave_return) {
             initialize(cave, function, cave_return);
         }
 
