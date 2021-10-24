@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef HARMONY_OPTIC_RENDER_GROUP_HPP
-#define HARMONY_OPTIC_RENDER_GROUP_HPP
+#ifndef HARMONY_OPTIC_RENDER_HPP
+#define HARMONY_OPTIC_RENDER_HPP
 
 #include <string>
 #include <vector>
@@ -72,17 +72,29 @@ namespace Harmony::Optic {
         std::chrono::steady_clock::time_point timestamp;
     };
 
-    class RenderGroup {
+    class RenderQueue {
+    friend class Handler;
     public:
+        /**
+         * Get queue name
+         */
+        std::string get_name() const noexcept;
+
+        /**
+         * Set queue name
+         * @param name  New name for queue
+         */
+        void set_name(std::string name) noexcept;
+
         /**
          * Get sprite default state
          */
         Sprite::State get_sprite_initial_state() noexcept;
 
         /**
-         * Get queue align
+         * Get sprites rotation
          */
-        float get_direction() const noexcept;
+        float get_rotation() const noexcept;
 
         /**
          * Get maximum number of renders
@@ -136,7 +148,12 @@ namespace Harmony::Optic {
         /**
          * Get renders
          */
-        std::deque<Render> &get_renders() noexcept;
+        std::deque<Render> const &get_renders() noexcept;
+
+        /** 
+         * Clear enqueued sprites and active renders
+         */
+        void clear() noexcept;
 
         /**
          * Get sprites queue
@@ -150,45 +167,35 @@ namespace Harmony::Optic {
         void enqueue_sprite(Sprite *sprite) noexcept;
 
         /**
-         * Render a sprite from queue
+         * Get if is a temp queue
          */
-        Render &render_sprite_from_queue() noexcept;
+        bool temporal() noexcept;
 
         /**
-         * Pop a render from render deque
+         * Constructor for render queue
+         * @param name                      Name of the queue
+         * @param initial_render_state      Initial state for rendered sprites
+         * @param rotation                  Rotation of sprites in degrees
+         * @param maximum_renders           Number of simultaneous renderings
+         * @param render_duration           Duration of the renders
+         * @param temporal                  If true, the queue will be removed after last render timelife ends
          */
-        void pop_render() noexcept;
-
-        /**
-         * Get group playback
-         */
-        AudioEngine *get_audio_engine() const noexcept;
-
-        /**
-         * Get if is a temp group
-         */
-        bool single_render() noexcept;
-
-        /**
-         * Constructor for RenderGroup
-         * @param position
-         * @param opacity
-         * @param rotation
-         * @param align
-         */
-        RenderGroup(Sprite::State initial_render_state, float direction, std::size_t maximum_renders, long render_duration, bool single_render = false) noexcept;
+        RenderQueue(std::string name, Sprite::State initial_render_state, float rotation, std::size_t maximum_renders, long render_duration, bool temporal = false) noexcept;
 
         /**
          * Void constructor
          */
-        RenderGroup() {}
+        RenderQueue() {}
 
     private:
+        /** Name of the queue */
+        std::string name;
+
         /** Initial state for sprites */
         Sprite::State initial_render_state;
 
         /** Queue align */
-        float direction;
+        float rotation;
 
         /** Maximum active renders */
         std::size_t max_renders;
@@ -208,17 +215,21 @@ namespace Harmony::Optic {
         /** Renders */
         std::deque<Render> renders;
 
-        /** Render queue */
-        std::queue<Sprite *> queue;
+        /** Sprites queue */
+        std::queue<Sprite *> sprites_queue;
 
-        /** Playback */
-        std::unique_ptr<AudioEngine> audio_engine;
+        /** If this is set, the queue will be removed after last render timelife ends */
+        bool temporal_flag;
 
         /**
-         * If this is set, the group will be removed after the render timelife ends
-         * @todo Find a better way to do this
+         * Render a sprite from queue
          */
-        bool single_render_group;
+        Render &render_sprite_from_queue() noexcept;
+
+        /**
+         * Pop a render from render deque
+         */
+        void pop_render() noexcept;
     };
 }
 

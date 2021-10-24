@@ -37,6 +37,17 @@ namespace Harmony::Optic {
         };
 
         /**
+         * Get sprite name
+         */
+        std::string get_name() const noexcept;
+
+        /**
+         * Set sprite name
+         * @param name  New name for sprite
+         */
+        void set_name(std::string name) noexcept;
+
+        /**
          * Get sprite width
          */
         int get_width() const noexcept;
@@ -47,27 +58,10 @@ namespace Harmony::Optic {
         int get_height() const noexcept;
 
         /**
-         * Get sprite sound
-         */
-        Sound *get_sound() const noexcept;
-
-        /**
-         * Set sprite sound
-         * @param sound     The sound itself
-         */
-        void set_sound(Sound &sound) noexcept;
-
-        /**
-         * Set sprite sound
-         * @param sound     Pointer to sound
-         */
-        void set_sound(Sound *sound) noexcept;
-
-        /**
          * Load sprite into device
          * @param device    Direct3D 9 device
          */
-        void load(LPDIRECT3DDEVICE9 device) noexcept;
+        void load(LPDIRECT3DDEVICE9 device);
 
         /**
          * Release sprite
@@ -82,10 +76,13 @@ namespace Harmony::Optic {
 
         /**
          * Default constructor for sprite
-         * @param texture   Path of the texture
-         * @param size      Texture dimentions
+         * @param name      Name of the sprite
+         * @param texture   Texture path
+         * @param width     Width of the sprite
+         * @param height    Height of the sprite
+         * @exception       If texture file does not exists
          */
-        Sprite(const char *texture, int width, int height) noexcept;
+        Sprite(std::string name, std::string texture, int width, int height);
 
         /**
          * Default constructor
@@ -98,6 +95,9 @@ namespace Harmony::Optic {
         ~Sprite() noexcept;
 
     private:
+        /** Sprite name */
+        std::string name;
+
         /** Path of texture sprite */
         std::filesystem::path texture_path;
 
@@ -107,9 +107,6 @@ namespace Harmony::Optic {
         /** Sprite height */
         int height = 0;
 
-        /** Sprite sound */
-        Sound *sound = nullptr;
-
         /** D3D9 texture of sprite */
         LPDIRECT3DTEXTURE9 texture;
 
@@ -117,7 +114,7 @@ namespace Harmony::Optic {
         LPD3DXSPRITE sprite;
 
         /** Is the sprite loaded? */
-        bool loaded = false;
+        bool loaded_flag = false;
     };
 }
 

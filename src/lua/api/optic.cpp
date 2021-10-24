@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <filesystem>
-#include "../../halo_data/resolution.hpp"
 #include "../../math/geometry.hpp"
 #include "../../optic/animation.hpp"
 #include "../../optic/handler.hpp"
@@ -15,43 +14,36 @@ namespace Harmony::Lua {
     static Library *library = nullptr;
     static Optic::Handler *optic_handler = nullptr;
 
-    /**
-     * Get a prefix for each optics based on the script name
-     * @return  Optic name prefix
-     */
-    static std::string get_optic_prefix(lua_State *state) noexcept {
-        auto prefix = Script::get_global_from_state(state, "script_name") + "_";
-        return prefix;
-    }
+    static int lua_create_animation(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
 
-    static int lua_register_animation(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 2) {
-            auto *script = library->get_script(state);
-            auto &store = script->get_optic_store();
-            
+            // Arguments
             const char *name = luaL_checkstring(state, 1);
             long duration = luaL_checknumber(state, 2);
-            if(!store.get_animation(name)) {
-                store.add_animation(name, Optic::Animation(Optic::Animation::StateTransform(), duration));
+
+            try {
+                optic->create_animation(name, duration);
             }
-            else {
-                luaL_error(state, "invalid animation name. Animation already exists!");
+            catch(...) {
+                luaL_error(state, "invalid animation name in create_animation function");
             }
         }
         else {
-            luaL_error(state, "invalid number of arguments in harmony register_animation function");
+            luaL_error(state, "invalid number of arguments in harmony create_animation function");
         }
         return 0;
     }
 
-    static int lua_add_animation_target(lua_State *state) noexcept {
+    static int lua_set_animation_property(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
+
         int args = lua_gettop(state);
         if(args == 4 || args == 7) {
-            auto *script = library->get_script(state);
-            auto &store = script->get_optic_store();
-
-            auto *anim = store.get_animation(luaL_checkstring(state, 1));
+            auto *anim = optic->get_animation(luaL_checkstring(state, 1));
             if(anim) {
                 Math::QuadraticBezier curve;
                 if(args == 4) {
@@ -69,7 +61,7 @@ namespace Harmony::Lua {
                         curve = Optic::Animation::linear();
                     }
                     else {
-                        luaL_error(state, "invalid curve preset name in harmony add_animation_curve function");
+                        luaL_error(state, "invalid curve preset name in harmony set_animation_property function");
                     }
                 }
                 else {
@@ -108,195 +100,179 @@ namespace Harmony::Lua {
                     anim->set_transform(transform);
                 }
                 else {
-                    luaL_error(state, "invalid render property in harmony add_animation_curve function");
+                    luaL_error(state, "invalid render property in harmony set_animation_property function");
                 }
             }
             else {
-                luaL_error(state, "invalid animation name in harmony add_animation_curve function");
+                luaL_error(state, "invalid animation name in harmony set_animation_property function");
             }
         }
         else {
-            luaL_error(state, "invalid number of arguments in harmony add_animation_curve function");
+            luaL_error(state, "invalid number of arguments in harmony set_animation_property function");
         }
         return 0;
     }
 
-    static int lua_register_sprite(lua_State *state) noexcept {
-        int args = lua_gettop(state);
-        if(args == 4 || args == 5) {
-            auto *script = library->get_script(state);
-            auto &store = script->get_optic_store();
+    static int lua_create_sprite(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
 
+        int args = lua_gettop(state);
+        if(args == 4) {
+            // Arguments
             const char *name = luaL_checkstring(state, 1);
             std::string texture_path = std::string(script->get_data_path()) + "\\" + luaL_checkstring(state, 2);
             int width = luaL_checknumber(state, 3);
             int height = luaL_checknumber(state, 4);
 
-            if(!store.get_sprite(name)) {
-                // check if the texture file exists
-                if(script->path_is_valid(texture_path)) {
-                    if(std::filesystem::exists(texture_path)) {
-                        if(args == 5){
-                            std::string sound_path = std::string(script->get_data_path()) + "\\" + luaL_checkstring(state, 5);
-                            if(script->path_is_valid(sound_path)) {
-                                if(std::filesystem::exists(sound_path)) {
-                                    store.add_sprite(name, Optic::Sprite(texture_path.c_str(), width, height), sound_path);
-                                }
-                                else {
-                                    luaL_error(state, "sound file does not exists in harmony register_sprite function");
-                                }
-                            }
-                        }
-                        else {
-                            store.add_sprite(name, Optic::Sprite(texture_path.c_str(), width, height));
-                        }
+            if(script->path_is_valid(texture_path)) {
+                if(std::filesystem::exists(texture_path)) {
+                    try {
+                        optic->create_sprite(name, texture_path, width, height);
                     }
-                    else {
-                        luaL_error(state, "texture does not exists in harmony register_sprite function");
+                    catch(...) {
+                        luaL_error(state, "invalid name for sprite in harmony create_sprite function");
                     }
                 }
                 else {
-                    luaL_error(state, "invalid texture path in harmony register_sprite function");
+                    luaL_error(state, "texture does not exists in harmony create_sprite function");
                 }
             }
             else {
-                luaL_error(state, "invalid name for sprite in harmony register_sprite function");
+                luaL_error(state, "invalid texture path in harmony create_sprite function");
             }
         }
         else {
-            luaL_error(state, "invalid number of arguments in harmony register_sprite function");
+            luaL_error(state, "invalid number of arguments in harmony create_sprite function");
         }
         return 0;
     }
 
-    static int lua_create_group(lua_State *state) noexcept {
+    static int lua_create_render_queue(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
+
         int args = lua_gettop(state);
         if(args >= 7 && args <= 10) {
-            auto name = get_optic_prefix(state) + luaL_checkstring(state, 1);
-            if(!optic_handler->get_render_group(name.c_str())) {
-                auto *script = library->get_script(state);
-                auto &store = script->get_optic_store();
+            // Arguments
+            auto name = luaL_checkstring(state, 1);
+            float pos_x = luaL_checknumber(state, 2);
+            float pos_y = luaL_checknumber(state, 3);
+            int opacity = luaL_checknumber(state, 4);
+            float rotation = luaL_checknumber(state, 5);
+            long duration = luaL_checknumber(state, 6);
+            int max_renders = luaL_checknumber(state, 7);
 
-                float pos_x = luaL_checknumber(state, 2);
-                float pos_y = luaL_checknumber(state, 3);
-                int opacity = luaL_checknumber(state, 4);
-                float rotation = luaL_checknumber(state, 5);
-                long duration = luaL_checknumber(state, 6);
-                int max_renders = luaL_checknumber(state, 7);
+            // Set up initial sprite state
+            Optic::Sprite::State initial_state;
+            initial_state.position = {pos_x, pos_y};
+            initial_state.color.a = opacity;
+            initial_state.rotation = rotation;
 
-                // Set up initial sprite state
-                Optic::Sprite::State initial_state;
-                initial_state.position = {pos_x, pos_y};
-                initial_state.color.a = opacity;
-                initial_state.rotation = rotation;
+            try {
+                optic->create_render_queue(name, initial_state, rotation, max_renders, duration);
+            }
+            catch(...) {
+                luaL_error(state, "invalid name for render queue in harmony create_render_queue function");
+            }
 
-                // Create group
-                auto &group = optic_handler->add_render_group(name.c_str(), initial_state, 0, max_renders, duration, false);
+            auto *queue = optic->get_render_queue(name);
 
-                // Register group
-                store.register_group(name);
-
-                if(args >= 8) {
-                    auto *fade_in = store.get_animation(luaL_checkstring(state, 8));
-                    if(fade_in) {
-                        group.set_fade_in_anim(*fade_in);
-                    }
-                    else {
-                        luaL_error(state, "invalid fade-in animation name is harmony add_animation_curve function");
-                    }
+            if(args >= 8) {
+                auto *fade_in = optic->get_animation(luaL_checkstring(state, 8));
+                if(fade_in) {
+                    queue->set_fade_in_anim(*fade_in);
                 }
-
-                if(args >= 9) {
-                    auto *fade_out = store.get_animation(luaL_checkstring(state, 9));
-                    if(fade_out) {
-                        group.set_fade_out_anim(*fade_out);
-                    }
-                    else {
-                        luaL_error(state, "invalid fade-out animation name is harmony add_animation_curve function");
-                    }
+                else {
+                    luaL_error(state, "invalid fade-in animation name is harmony create_render_queue function");
                 }
+            }
 
-                if(args == 10) {
-                    auto *slide = store.get_animation(luaL_checkstring(state, 10));
-                    if(slide) {
-                        group.set_slide_anim(*slide);
-                    }
-                    else {
-                        luaL_error(state, "invalid slide animation name is harmony add_animation_curve function");
-                    }
+            if(args >= 9) {
+                auto *fade_out = optic->get_animation(luaL_checkstring(state, 9));
+                if(fade_out) {
+                    queue->set_fade_out_anim(*fade_out);
+                }
+                else {
+                    luaL_error(state, "invalid fade-out animation name is harmony create_render_queue function");
+                }
+            }
+
+            if(args == 10) {
+                auto *slide = optic->get_animation(luaL_checkstring(state, 10));
+                if(slide) {
+                    queue->set_slide_anim(*slide);
+                }
+                else {
+                    luaL_error(state, "invalid slide animation name is harmony create_render_queue function");
                 }
             }
         }
         else {
-            luaL_error(state, "invalid number of arguments in harmony add_group function");
+            luaL_error(state, "invalid number of arguments in harmony create_render_queue function");
         }
         return 0;
     }
 
     static int lua_render_sprite(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
+
         int args = lua_gettop(state);
         if(args == 2) {
-            auto group_name = get_optic_prefix(state) + luaL_checkstring(state, 1);
-            if(optic_handler->get_render_group(group_name.c_str())) {
-                auto *script = library->get_script(state);
-                auto &store = script->get_optic_store();
+            // Arguments
+            auto sprite_name = luaL_checkstring(state, 1);
+            auto queue_name = luaL_checkstring(state, 2);
 
-                auto *sprite = store.get_sprite(luaL_checkstring(state, 2));
-                if(sprite) {
-                    optic_handler->render_sprite(sprite, group_name.c_str());
-                }
-                else {
-                    luaL_error(state, "invalid sprite in harmony render_sprite function");
-                }
+            try {
+                optic->render_sprite(sprite_name, queue_name);
             }
-            else {
-                luaL_error(state, "invalid group in harmony render_sprite function");
+            catch(...) {
+                luaL_error(state, "invalid arguments in harmony render_sprite function");
             }
         }
         else if(args == 6 || args == 7 || args == 8) {
-            auto *script = library->get_script(state);
-            auto &store = script->get_optic_store();
-
-            auto *sprite = store.get_sprite(luaL_checkstring(state, 1));
-            if(sprite) {
-                float pos_x = luaL_checknumber(state, 2);
-                float pos_y = luaL_checknumber(state, 3);
-                int opacity = luaL_checknumber(state, 4);
-                float rotation = RADIAN(luaL_checknumber(state, 5));
-                long duration = luaL_checknumber(state, 6);
-                
-                Optic::Animation fade_in;
-                if(args >= 7) {
-                    auto *anim = store.get_animation(luaL_checkstring(state, 7));
-                    if(anim) {
-                        fade_in = *anim;
-                    }
-                    else {
-                        luaL_error(state, "invalid fade-in animation in harmony render_sprite function");
-                    }
+            // Arguments
+            auto sprite_name = luaL_checkstring(state, 1);
+            float pos_x = luaL_checknumber(state, 2);
+            float pos_y = luaL_checknumber(state, 3);
+            int opacity = luaL_checknumber(state, 4);
+            float rotation = RADIAN(luaL_checknumber(state, 5));
+            long duration = luaL_checknumber(state, 6);
+            
+            Optic::Animation fade_in;
+            if(args >= 7) {
+                auto *anim = optic->get_animation(luaL_checkstring(state, 7));
+                if(anim) {
+                    fade_in = *anim;
                 }
-
-                Optic::Animation fade_out;
-                if(args == 8) {
-                    auto *anim = store.get_animation(luaL_checkstring(state, 8));
-                    if(anim) {
-                        fade_out = *anim;
-                    }
-                    else {
-                        luaL_error(state, "invalid fade-out animation in harmony render_sprite function");
-                    }
+                else {
+                    luaL_error(state, "invalid fade-in animation in harmony render_sprite function");
                 }
-
-                // Set initial state of sprite
-                Optic::Sprite::State initial_state;
-                initial_state.position = {pos_x, pos_y};
-                initial_state.color.a = opacity;
-                initial_state.rotation = rotation;
-
-                // Render it!
-                optic_handler->render_sprite(sprite, initial_state, duration, fade_in, fade_out);
             }
-            else {
+
+            Optic::Animation fade_out;
+            if(args == 8) {
+                auto *anim = optic->get_animation(luaL_checkstring(state, 8));
+                if(anim) {
+                    fade_out = *anim;
+                }
+                else {
+                    luaL_error(state, "invalid fade-out animation in harmony render_sprite function");
+                }
+            }
+
+            // Set initial state of sprite
+            Optic::Sprite::State initial_state;
+            initial_state.position = {pos_x, pos_y};
+            initial_state.color.a = opacity;
+            initial_state.rotation = rotation;
+
+            try {
+                // Render it!
+                optic->render_sprite(sprite_name, initial_state, duration, fade_in, fade_out);
+            }
+            catch(...) {
                 luaL_error(state, "invalid sprite in harmony render_sprite function");
             }
         }
@@ -306,31 +282,174 @@ namespace Harmony::Lua {
         return 0;
     }
 
-    static int lua_clear_renders(lua_State *state) noexcept {
+    static int lua_clear_render_queue(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
+
         int args = lua_gettop(state);
         if(args == 1) {
-            auto name = get_optic_prefix(state) + luaL_checkstring(state, 1);
-            auto *group = optic_handler->get_render_group(name.c_str());
-            if(group) {
-                group->get_renders().clear();
+            // Arguments
+            auto name = luaL_checkstring(state, 1);
+
+            auto *queue = optic->get_render_queue(name);
+            if(queue) {
+                queue->clear();
             }
             else {
-                luaL_error(state, "invalid group name in harmony clear_renders function");
+                luaL_error(state, "invalid queue name in harmony clear_queue_renders function");
             }
         }
         else {
-            luaL_error(state, "invalid number of arguments in harmony clear_renders function");
+            luaL_error(state, "invalid number of arguments in harmony clear_queue_renders function");
+        }
+        return 0;
+    }
+
+        static int lua_create_sound(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
+
+        int args = lua_gettop(state);
+        if(args == 2) {
+            // Arguments
+            const char *name = luaL_checkstring(state, 1);
+            std::string sound_path = std::string(script->get_data_path()) + "\\" + luaL_checkstring(state, 2);
+
+            if(script->path_is_valid(sound_path)) {
+                if(std::filesystem::exists(sound_path)) {
+                    try {
+                        optic->create_sound(name, sound_path);
+                    }
+                    catch(...) {
+                        luaL_error(state, "invalid name for sprite in harmony create_sound function");
+                    }
+                }
+                else {
+                    luaL_error(state, "sound file does not exists in harmony create_sound function");
+                }
+            }
+            else {
+                luaL_error(state, "invalid sound path in harmony create_sound function");
+            }
+        }
+        else {
+            luaL_error(state, "invalid number of arguments in harmony create_sound function");
+        }
+        return 0;
+    }
+
+    static int lua_create_playback_queue(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
+
+        int args = lua_gettop(state);
+        if(args == 1) {    
+            // Arguments
+            const char *name = luaL_checkstring(state, 1);
+
+            try {
+                optic->create_audio_queue(name);
+            }
+            catch(...) {
+                luaL_error(state, "invalid queue name in create_playback_queue function");
+            }
+        }
+        else {
+            luaL_error(state, "invalid number of arguments in harmony create_playback_queue function");
+        }
+        return 0;
+    }
+    
+    static int lua_play_sound(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
+
+        int args = lua_gettop(state);
+        if(args == 2) {    
+            // Arguments
+            auto sound_name = luaL_checkstring(state, 1);
+            auto playback_queue_name = luaL_checkstring(state, 2);
+
+            auto *sound = optic->get_sound(sound_name);
+            if(sound) {
+                auto *playback_queue = optic->get_audio_queue(playback_queue_name);
+                if(playback_queue) {
+                    auto handle = playback_queue->play(*sound);
+                    lua_pushnumber(state, handle);
+                }
+                else {
+                    luaL_error(state, "invalid playback queue name in play_sound function");
+                }
+            }
+            else {
+                luaL_error(state, "invalid sound name in play_sound function");
+            }
+        }
+        else {
+            luaL_error(state, "invalid number of arguments in harmony play_sound function");
+        }
+        return 1;
+    }
+
+    static int lua_stop_sound(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
+
+        int args = lua_gettop(state);
+        if(args == 2) {    
+            // Arguments
+            auto playback_queue_name = luaL_checkstring(state, 1);
+            auto sound_handle = luaL_checknumber(state, 2);
+
+            auto *playback_queue = optic->get_audio_queue(playback_queue_name);
+            if(playback_queue) {
+                playback_queue->stop(sound_handle);
+            }
+            else {
+                luaL_error(state, "invalid playback queue name in stop_sound function");
+            }
+        }
+        else {
+            luaL_error(state, "invalid number of arguments in harmony stop_sound function");
+        }
+        return 0;
+    }
+
+    static int lua_clear_playback_queue(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
+
+        int args = lua_gettop(state);
+        if(args == 1) {    
+            // Arguments
+            auto playback_queue_name = luaL_checkstring(state, 1);
+
+            auto *playback_queue = optic->get_audio_queue(playback_queue_name);
+            if(playback_queue) {
+                playback_queue->stopAll();
+            }
+            else {
+                luaL_error(state, "invalid playback queue name in stop_sound function");
+            }
+        }
+        else {
+            luaL_error(state, "invalid number of arguments in harmony stop_sound function");
         }
         return 0;
     }
 
     static const struct luaL_Reg optic[] = {
-        {"register_animation", lua_register_animation},
-        {"add_animation_target", lua_add_animation_target},
-        {"register_sprite", lua_register_sprite},
-        {"create_group", lua_create_group},
+        {"create_animation", lua_create_animation},
+        {"set_animation_property", lua_set_animation_property},
+        {"create_sprite", lua_create_sprite},
+        {"create_render_queue", lua_create_render_queue},
         {"render_sprite", lua_render_sprite},
-        {"clear_group_renders", lua_clear_renders},
+        {"clear_render_queue", lua_clear_render_queue},
+        {"create_sound", lua_create_sound},
+        {"create_playback_queue", lua_create_playback_queue},
+        {"play_sound", lua_play_sound},
+        {"stop_sound", lua_stop_sound},
+        {"clear_playback_queue", lua_clear_playback_queue},
         {NULL, NULL}
     };
 

@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include <string>
-#include "../messaging/console_output.hpp"
 #include "animation.hpp"
 
 namespace Harmony::Optic {
+    std::string Animation::get_name() const noexcept {
+        return this->name;
+    }
+
+    void Animation::set_name(std::string name) noexcept {
+        this->name = name;
+    }
+
     long Animation::get_duration() const noexcept {
         return this->duration;
     }
@@ -101,16 +107,15 @@ namespace Harmony::Optic {
         return timeleft;
     }
 
-    const char *Animation::get_name() const noexcept {
-        return this->name.c_str();
-    }
-
-    void Animation::set_name(const char *name) noexcept {
+    Animation::Animation(std::string name, StateTransform transformation, long duration) noexcept {
         this->name = name;
+        this->render_state_transform = transformation;
+        this->duration = duration;
+        this->set_up_default_animation();
     }
 
-    Animation::Animation(StateTransform transformation, long duration) noexcept {
-        this->render_state_transform = transformation;
+    Animation::Animation(std::string name, long duration) noexcept {
+        this->name = name;
         this->duration = duration;
         this->set_up_default_animation();
     }

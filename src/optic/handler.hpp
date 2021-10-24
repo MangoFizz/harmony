@@ -4,68 +4,41 @@
 #define HARMONY_OPTIC_HANDLER_HPP
 
 #include <string>
-#include <vector>
 #include <map>
 #include <d3dx9.h>
-#include "sprite.hpp"
 #include "animation.hpp"
+#include "container.hpp"
+#include "sprite.hpp"
 #include "render.hpp"
 
 namespace Harmony::Optic {
     class Handler {
     public:
         /**
-         * Get optic groups
-         * @return  A read-only reference to the groups array
-         */
-        std::map<std::string, RenderGroup> &get_render_groups() noexcept;
-
-        /**
          * Get a render queue
-         * @param name  Name/ID of the group
+         * @param name  Name of the group
          * @return      Pointer to the group if exists, nullptr if not
          */
-        RenderGroup *get_render_group(const char *name) noexcept;
+        Container *get_optic(std::string name) noexcept;
 
         /**
-         * Add a new render group
-         * @param name              Name/ID of the group
-         * @param position          Position of the group
-         * @param opacity           Opacity of the elements
-         * @param rotation          Rotation angle of the queue
-         * @param align             Align of the queue
-         * @param render_duration   Duration of the medals in milliseconds
-         * @return                  True on success, false if the group already exists
+         * Create container for optic
+         * @param name  Name for the container
+         * @exception   If optic container already exists
          */
-        RenderGroup &add_render_group(std::string name, Sprite::State initial_state, float direction, std::size_t maximum_renders, long render_duration, bool single_render) noexcept;
+        Container *create_optic(std::string name);
 
         /**
-         * Remove an existing optic group
-         * @param name  Name of the group
+         * Remove optic container
+         * @param name  Name of the container
+         * @exception   If the optic container does not exists
          */
-        void remove_render_group(std::string name) noexcept;
-
-        /**
-         * Render a sprite
-         * @param sprite        Sprite to render
-         * @param group_name    Render group when the sprite will be rendered
-         */
-        void render_sprite(Sprite *sprite, const char *group_name) noexcept;
-
-        /**
-         * Render a sprite
-         * @param sprite    Sprite to render
-         * @param position  Position of the render
-         * @param rotation  Render rotation in degrees
-         * @param fade_in   Fade-in animation
-         * @param fade_out  Fade-out animation
-         */
-        void render_sprite(Sprite *sprite, Sprite::State initial_state, long duration, Animation fade_in, Animation fade_out) noexcept;
+        void remove_optic(std::string name);
 
         /**
          * Default constructor
          */
-        Handler() noexcept;
+        Handler();
 
         /**
          * Default destructor
@@ -73,13 +46,14 @@ namespace Harmony::Optic {
         ~Handler() noexcept;
 
         /**
-         * D3D9 end scene callback
+         * D3D9 callbacks
          */
         static void on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept;
+        static void on_d3d9_reset(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS *) noexcept;
 
     private:
         /** Render group */
-        std::map<std::string, RenderGroup> groups;
+        std::map<std::string, std::unique_ptr<Container>> optics;
     };
 }
 

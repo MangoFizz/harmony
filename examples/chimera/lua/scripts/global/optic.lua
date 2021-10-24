@@ -4,35 +4,47 @@ local harmony = require "mods.harmony"
 
 local optic = harmony.optic
 
+-- Screen size
+local screen_width = read_word(0x637CF2)
+local screen_height = read_word(0x637CF0)
+
 -- Fade in animation
-optic.register_animation("fade in", 200)
-optic.add_animation_target("fade in", "ease in", "position y", -60)
-optic.add_animation_target("fade in", "ease in", "opacity", 255)
+optic.create_animation("fade in", 200)
+optic.set_animation_property("fade in", "ease in", "position x", 60)
+optic.set_animation_property("fade in", "ease in", "opacity", 255)
 
 -- Fade out animation
-optic.register_animation("fade out", 200)
-optic.add_animation_target("fade out", "ease out", "opacity", -255)
+optic.create_animation("fade out", 200)
+optic.set_animation_property("fade out", "ease out", "opacity", -255)
 
 -- Slide animation
-optic.register_animation("slide", 300)
-optic.add_animation_target("slide", 0.4, 0.0, 0.6, 1.0, "position x", 60)
+optic.create_animation("slide", 300)
+optic.set_animation_property("slide", 0.4, 0.0, 0.6, 1.0, "position x", 60)
+optic.set_animation_property("slide", 0.4, 0.0, 0.6, 1.0, "position y", 2)
 
 -- Add demo render group
-optic.create_group("demo", 50, 400, 255, math.random(0, 360), 4000, 0, "fade in", "fade out", "slide")
+optic.create_render_queue("demo", 50, 400, 255, math.random(0, 360), 4000, 6, "fade in", "fade out", "slide")
 
--- Add sprite
-optic.register_sprite("sandia", "images/sandia.jpg", 50, 50)
-optic.register_sprite("hitmarker", "images/hitmarker.png", 35, 35, "sounds/hit.wav")
+-- Add demo sprites
+optic.create_sprite("sandia", "images/sandia.jpg", 50, 50)
+optic.create_sprite("hitmarker", "images/hitmarker.png", 35, 35)
+
+-- Add hit sound
+optic.create_sound("hit", "sounds/hit.wav")
+
+-- Create hitmarker playback queue
+optic.create_playback_queue("audio queue");
 
 function on_multiplayer_sound(sound)
 	if(sound == "ting") then
-		-- Sandia sprite
-		optic.render_sprite("demo", "sandia")
+		-- Render sandia sprite
+		optic.render_sprite("sandia", "demo")
 
-		-- Hitmarker sprite
-		local screen_width = read_word(0x637CF2)
-		local screen_height = read_word(0x637CF0)
+		-- Render hitmarker sprite
 		optic.render_sprite("hitmarker", (screen_width - 35) / 2, (screen_height - 35) / 2, 255, 0, 200)
+
+		-- Play custom hit sound
+		optic.play_sound("hit", "audio queue")
 		
 		return false
 	end
@@ -40,10 +52,4 @@ function on_multiplayer_sound(sound)
 	return true
 end
 
-function OnUnload()
-    harmony.unload()
-end
-
 harmony.set_callback("multiplayer sound", "on_multiplayer_sound")
-
-set_callback("unload", "OnUnload")

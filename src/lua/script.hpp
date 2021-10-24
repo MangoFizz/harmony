@@ -7,25 +7,26 @@
 #include <vector>
 #include <map>
 #include <lua.hpp>
-#include "optic_store.hpp"
+#include "../optic/container.hpp"
 
 namespace Harmony::Lua {
     class Script {
+    friend class Library;
     public:
         /**
          * Get script name
          */
-        const char *get_name() const noexcept;
+        std::string get_name() const noexcept;
 
         /**
          * Get script type
          */
-        const char *get_type() const noexcept;
+        std::string get_type() const noexcept;
 
         /**
          * Get data path
          */
-        const char *get_data_path() const noexcept;
+        std::string get_data_path() const noexcept;
 
         /**
          * Check if the path is inside of the script data directory
@@ -37,12 +38,22 @@ namespace Harmony::Lua {
         /**
          * Get callbacks
          */
-        std::vector<std::string> &get_callbacks(const char *callback) noexcept;
+        std::vector<std::string> &get_callbacks(std::string callback) noexcept;
+        
+        /**
+         * Register a callback
+         */
+        void add_callback(std::string callback, std::string function) noexcept;
 
         /**
-         * Get optic store
+         * Get optic container
          */
-        OpticStore &get_optic_store() noexcept;
+        Optic::Container *get_optic_container() noexcept;
+
+        /**
+         * Get require count
+         */
+        std::size_t get_require_count() const noexcept;
 
         /**
          * Get script state
@@ -52,12 +63,8 @@ namespace Harmony::Lua {
         /**
          * Get global from script
          */
-        const char *get_global(std::string name) const noexcept;
+        std::string get_global(std::string name) const noexcept;
 
-        /**
-         * Register a callback
-         */
-        void add_callback(const char *callback, const char *function) noexcept;
 
         /**
          * Print last error of script state
@@ -69,6 +76,11 @@ namespace Harmony::Lua {
          * @param state     Pointer to Lua script state
          */
         Script(lua_State *state) noexcept;
+
+        /**
+         * Destructor for script
+         */
+        ~Script() noexcept;
 
         /**
          * Equals operator for std::find function
@@ -104,8 +116,11 @@ namespace Harmony::Lua {
         /** Script callbacks */
         std::map<std::string, std::vector<std::string>> callbacks;
 
-        /** Optic stores */
-        OpticStore optic_store;
+        /** Optic container */
+        Optic::Container *optic_container;
+
+        /** Number of times this script required harmony */
+        std::size_t require_count;
 
         /** The script itself */
         lua_State *script;

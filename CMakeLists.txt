@@ -61,6 +61,7 @@ add_library(harmony-core STATIC
     src/memory/signatures/client.cpp
     src/messaging/console_output.cpp
     src/messaging/console_output.S
+    src/messaging/exception.cpp
     src/messaging/message_box.cpp
 )
 
@@ -68,14 +69,15 @@ add_library(harmony MODULE
     src/lua/api/callback.cpp
     src/lua/api/optic.cpp
     src/lua/api/menu.cpp
-    src/lua/api/unload.cpp
     src/lua/library.cpp
-    src/lua/optic_store.cpp
     src/lua/script.cpp
     src/optic/animation.cpp
+    src/optic/container.cpp
     src/optic/d3dx9.cpp
+    src/optic/exception.cpp
     src/optic/handler.cpp
     src/optic/render.cpp
+    src/optic/sound.cpp
     src/optic/sprite.cpp
     src/menu/widescreen_element_reposition_menu.S
     src/menu/widescreen_mouse.S

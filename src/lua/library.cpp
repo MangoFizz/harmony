@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <algorithm>
-#include "../messaging/console_output.hpp"
-#include "../messaging/message_box.hpp"
 #include "../events/d3d9_end_scene.hpp"
 #include "../events/d3d9_reset.hpp"
 #include "../events/map_load.hpp"
 #include "../events/multiplayer_sound.hpp"
 #include "../events/menu_back.hpp"
+#include "../menu/widescreen_override.hpp"
 #include "../harmony.hpp"
 #include "api/callback.hpp"
 #include "api/optic.hpp"
 #include "api/menu.hpp"
-#include "api/unload.hpp"
 #include "script.hpp"
 #include "library.hpp"
 
@@ -44,7 +42,13 @@ namespace Harmony::Lua {
     }
 
     void Library::load_script(lua_State *state) noexcept {
-        this->scripts.push_back(std::make_unique<Script>(state));
+        auto *script = this->get_script(state);
+        if(script) {
+            script->require_count++;
+        }
+        else {
+            this->scripts.push_back(std::make_unique<Script>(state));
+        }
     }
 
     void Library::unload_script(lua_State *state) noexcept {
@@ -52,38 +56,25 @@ namespace Harmony::Lua {
         while(it != this->scripts.end()) {
             auto *script = it->get();
             if(script->get_state() == state) {
-                this->scripts.erase(it);
-                break;
-            }
-            it++;
-        }
-    }
+                // Look for require count
+                if(script->get_require_count() == 1) {
+                    /**
+                     * Restore UI frame aspect ratio before unload map script.
+                     * We can't put this in a map load callback because our event
+                     * is executed after Chimera's map load event, so next map 
+                     * script will load BEFORE we can restore the aspect ratio.
+                     */
+                    if(script->get_type() == "map") {
+                        Harmony::get().get_widescreen_override_handle().reset_frame_aspect_ratio();
+                    }
 
-    void Library::unload_all_scripts() noexcept {
-        this->scripts.clear();
-    }
+                    // Unload script
+                    this->scripts.erase(it);
+                }
+                else {
+                    script->require_count--;
+                }
 
-    void Library::unload_global_scripts() noexcept {
-        auto it = this->scripts.begin();
-        while(it != this->scripts.end()) {
-            auto *script = it->get();
-            std::string script_type = script->get_type();
-            if(script_type == "global") {
-                it = this->scripts.erase(it);
-            }
-            else {
-                it++;
-            }
-        }
-    }
-
-    void Library::unload_map_script() noexcept {
-        auto it = this->scripts.begin();
-        while(it != this->scripts.end()) {
-            auto *script = it->get();
-            std::string script_type = script->get_type();
-            if(script_type == "map") {
-                this->scripts.erase(it);
                 break;
             }
             it++;
@@ -93,10 +84,6 @@ namespace Harmony::Lua {
     Library::Library() noexcept {
         library = this;
 
-        // Set up library events
-        add_d3d9_end_scene_event(Library::on_d3d9_end_scene);
-        add_d3d9_reset_event(Library::on_d3d9_reset);
-
         // Set up Lua script events
         add_multiplayer_sound_event(Library::multiplayer_sound_event);
         add_multiplayer_event(Library::multiplayer_event);
@@ -105,20 +92,6 @@ namespace Harmony::Lua {
         add_menu_mouse_button_press_event(Library::menu_mouse_button_press);
         add_menu_list_tab_event(Library::menu_list_tab);
         add_menu_sound_event(Library::menu_sound);
-    }
-
-    void Library::on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {
-        for(auto &script : library->get_scripts()) {
-            auto &store = script.get()->get_optic_store();
-            store.load_sprites(device);
-        }
-    }
-
-    void Library::on_d3d9_reset(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS *) noexcept {
-        for(auto &script : library->get_scripts()) {
-            auto &store = script.get()->get_optic_store();
-            store.release_sprites();
-        }
     }
 
     bool Library::multiplayer_event(HaloData::MultiplayerEvent type, HaloData::PlayerID local, HaloData::PlayerID killer, HaloData::PlayerID victim) noexcept {
@@ -303,6 +276,15 @@ namespace Harmony::Lua {
         return allow;
     }
 
+    int lua_unload_harmony(lua_State *state) noexcept {
+        library->unload_script(state);
+        return 0;
+    }
+
+    int lua_old_unload_harmony(lua_State *state) noexcept {
+        return 0;
+    }
+
     int luaopen_mods_harmony(lua_State *state) noexcept {
         // Create Harmony library table
         lua_newtable(state);
@@ -313,13 +295,25 @@ namespace Harmony::Lua {
         // Set optic functions
         set_optic_functions(state);
 
-        // Set UI functions only if script is NOT global
+        // Load this only if it's a map script
         if(Script::get_global_from_state(state, "script_type") == "map") {
+            // Load UI functions
             set_menu_functions(state);
         }
 
-        // Set unload global funcion
-        set_unload_functions(state);
+        /**
+         * Set __gc metamethod
+         * The garbage collector will call the unload function before collect the library table.
+         */
+        lua_createtable(state, 0, 1);
+        lua_pushcfunction(state, lua_unload_harmony);
+        lua_setfield(state, -2, "__gc");
+        lua_setmetatable(state, -2);
+
+        // Do not break scripts that uses old unload method
+        lua_pushstring(state, "unload");
+        lua_pushcfunction(state, lua_old_unload_harmony);
+        lua_settable(state, -3);
 
         // Load it!!
         library->load_script(state);

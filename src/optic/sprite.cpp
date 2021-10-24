@@ -1,10 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <d3dx9math.h>
-#include "../messaging/message_box.hpp"
+#include "../messaging/exception.hpp"
+#include "exception.hpp"
 #include "sprite.hpp"
 
 namespace Harmony::Optic {
+    std::string Sprite::get_name() const noexcept {
+        return this->name;
+    }
+
+    void Sprite::set_name(std::string name) noexcept {
+        this->name = name;
+    }
+
     int Sprite::get_width() const noexcept {
         return this->width;
     }
@@ -13,20 +22,8 @@ namespace Harmony::Optic {
         return this->height;
     }
 
-    Sound *Sprite::get_sound() const noexcept {
-        return this->sound;
-    }
-
-    void Sprite::set_sound(Sound &sound) noexcept {
-        this->sound = &sound;
-    }
-
-    void Sprite::set_sound(Sound *sound) noexcept {
-        this->sound = sound;
-    }
-
-    void Sprite::load(LPDIRECT3DDEVICE9 device) noexcept {
-        if(this->loaded) {
+    void Sprite::load(LPDIRECT3DDEVICE9 device) {
+        if(this->loaded_flag) {
             return;
         }
 
@@ -39,31 +36,29 @@ namespace Harmony::Optic {
         if(D3DXCreateTextureFromFileExA(device, file.c_str(), width, height, mip_levels, 0, 
                                         D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT_NONPOW2,
                                         color_key, NULL, NULL, &this->texture) != D3D_OK) {
-            message_box("Failed to create texture");
-            std::terminate();
+            throw ExceptionBox("Failed to create texture.");
         }
 
         if(D3DXCreateSprite(device, &this->sprite) != D3D_OK) {
-            message_box("Failed to create sprite");
-            std::terminate();
+            throw ExceptionBox("Failed to create sprite.");
         }
 
-        this->loaded = true;
+        this->loaded_flag = true;
     }
     
     void Sprite::unload() noexcept {
-        if(!this->loaded) {
+        if(!this->loaded_flag) {
             return;
         }
 
         this->sprite->Release();
         this->texture->Release();
 
-        this->loaded = false;
+        this->loaded_flag = false;
     }
 
     void Sprite::draw(Sprite::State const &state) const noexcept {
-        if(this->loaded) {
+        if(this->loaded_flag) {
             D3DXVECTOR3 position;
             position.x = state.position.x;
             position.y = state.position.y;
@@ -97,12 +92,12 @@ namespace Harmony::Optic {
         }
     }
 
-    Sprite::Sprite(const char *texture, int width, int height) noexcept {
+    Sprite::Sprite(std::string name, std::string texture, int width, int height) {
         if(!std::filesystem::exists(texture)) {
-            message_box("Texture \"%s\" not found!", texture);
-            std::terminate();
+            throw Exception("Texture file for sprite '" + name + "' does not exists!");
         }
 
+        this->name = name;
         this->texture_path = texture;
         this->width = width;
         this->height = height;

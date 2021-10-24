@@ -31,7 +31,7 @@ namespace Harmony::Lua {
                 auto &harmony = Harmony::get();
                 auto &handler = harmony.get_lua_library_handler();
                 auto *script  = handler.get_script(state);
-                script->add_callback(callback_name.c_str(), function.c_str());
+                script->add_callback(callback_name, function);
             }
             else {
                 luaL_error(state, "invalid callback in harmony set_callback function");

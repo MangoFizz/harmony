@@ -40,6 +40,17 @@ namespace Harmony::Optic {
         };
 
         /**
+         * Get animation name
+         */
+        std::string get_name() const noexcept;
+
+        /**
+         * Set animation name
+         * @param name  New name for animation
+         */
+        void set_name(std::string name) noexcept;
+
+        /**
          * Get the duration of the animation
          */
         long get_duration() const noexcept;
@@ -96,22 +107,19 @@ namespace Harmony::Optic {
         long get_time_left() noexcept;
 
         /**
-         * Get animation name
-         */
-        const char *get_name() const noexcept;
-
-        /**
-         * Set animation name or ID
-         * @param name  New name for animation
-         */
-        void set_name(const char *name) noexcept;
-
-        /**
          * Constructor for animation
+         * @param name              Name of the animation
          * @param transformation    Transformation for render state
          * @param duration          Duration of the animation in milliseconds
          */
-        Animation(StateTransform transformation, long duration) noexcept;
+        Animation(std::string name, StateTransform transformation, long duration) noexcept;
+
+        /**
+         * Constructor for animation with default transformation
+         * @param name              Name of the animation
+         * @param duration          Duration of the animation in milliseconds
+         */
+        Animation(std::string name, long duration) noexcept;
 
         /**
          * Void constructor for animation
@@ -147,6 +155,9 @@ namespace Harmony::Optic {
         static Math::QuadraticBezier ease_in_out() noexcept;
 
     private:
+        /** Name of the animation */
+        std::string name;
+
         /** Curves of the animation */
         std::map<RenderProperty, Math::QuadraticBezier> curves;
 
@@ -161,9 +172,6 @@ namespace Harmony::Optic {
 
         /** Animation start time */
         std::chrono::steady_clock::time_point start_time;
-
-        /** Tag or ID of the animation. This is useful when we need a way to identify this animation. */
-        std::string name;
 
         /**
          * Set up default animation

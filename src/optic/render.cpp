@@ -41,63 +41,90 @@ namespace Harmony::Optic {
         this->timestamp = std::chrono::steady_clock::now();
     }
 
-    Sprite::State RenderGroup::get_sprite_initial_state() noexcept {
+    std::string RenderQueue::get_name() const noexcept {
+        return this->name;
+    }
+
+    void RenderQueue::set_name(std::string name) noexcept {
+        this->name = name;
+    }
+
+    Sprite::State RenderQueue::get_sprite_initial_state() noexcept {
         return this->initial_render_state;
     }
 
-    float RenderGroup::get_direction() const noexcept {
-        return this->direction;
+    float RenderQueue::get_rotation() const noexcept {
+        return this->rotation;
     }
 
-    std::size_t RenderGroup::get_maximum_renders() const noexcept {
+    std::size_t RenderQueue::get_maximum_renders() const noexcept {
         return this->max_renders;
     }
 
-    long RenderGroup::get_render_duration() const noexcept {
+    long RenderQueue::get_render_duration() const noexcept {
         return this->render_duration;
     }
 
-    void RenderGroup::set_render_duration(long duration) noexcept {
+    void RenderQueue::set_render_duration(long duration) noexcept {
         this->render_duration = duration;
     }
 
-    Animation RenderGroup::get_fade_in_anim() const noexcept {
+    Animation RenderQueue::get_fade_in_anim() const noexcept {
         return this->fade_in_anim;
     }
 
-    void RenderGroup::set_fade_in_anim(Animation anim) noexcept {
+    void RenderQueue::set_fade_in_anim(Animation anim) noexcept {
         this->fade_in_anim = anim;
     }
 
-    Animation RenderGroup::get_fade_out_anim() const noexcept {
+    Animation RenderQueue::get_fade_out_anim() const noexcept {
         return this->fade_out_anim;
     }
 
-    void RenderGroup::set_fade_out_anim(Animation anim) noexcept {
+    void RenderQueue::set_fade_out_anim(Animation anim) noexcept {
         this->fade_out_anim = anim;
     }
 
-    Animation &RenderGroup::get_slide_anim() noexcept {
+    Animation &RenderQueue::get_slide_anim() noexcept {
         return this->slide_anim;
     }
 
-    void RenderGroup::set_slide_anim(Animation anim) noexcept {
+    void RenderQueue::set_slide_anim(Animation anim) noexcept {
         this->slide_anim = anim;
     }
 
-    std::deque<Render> &RenderGroup::get_renders() noexcept {
+    std::deque<Render> const &RenderQueue::get_renders() noexcept {
         return this->renders;
     }
 
-    std::queue<Sprite *> const &RenderGroup::get_sprites_queue() const noexcept {
-        return this->queue;
+    void RenderQueue::clear() noexcept {
+        std::queue<Sprite *> empty_queue;
+        std::swap(this->sprites_queue, empty_queue); // uh
+        this->renders.clear();
     }
 
-    void RenderGroup::enqueue_sprite(Sprite *sprite) noexcept {
-        this->queue.push(sprite);
+    std::queue<Sprite *> const &RenderQueue::get_sprites_queue() const noexcept {
+        return this->sprites_queue;
     }
 
-    Render &RenderGroup::render_sprite_from_queue() noexcept {
+    void RenderQueue::enqueue_sprite(Sprite *sprite) noexcept {
+        this->sprites_queue.push(sprite);
+    }
+
+    bool RenderQueue::temporal() noexcept {
+        return this->temporal_flag;
+    }
+
+    RenderQueue::RenderQueue(std::string name, Sprite::State initial_render_state, float rotation, std::size_t maximum_renders, long render_duration, bool temporal) noexcept {
+        this->name = name;
+        this->initial_render_state = initial_render_state;
+        this->rotation = rotation;
+        this->max_renders = maximum_renders;
+        this->render_duration = render_duration;
+        this->temporal_flag = temporal;
+    }
+
+    Render &RenderQueue::render_sprite_from_queue() noexcept {
         auto initial_state = this->get_sprite_initial_state();
         auto transform = this->fade_in_anim.get_transform();
         initial_state.position.x -= transform.position.x;
@@ -105,35 +132,13 @@ namespace Harmony::Optic {
         initial_state.color.a -= transform.opacity;
         initial_state.rotation -= transform.rotation;
 
-        this->renders.push_back({this->queue.front(), initial_state});
-        this->queue.pop();
+        this->renders.push_back({this->sprites_queue.front(), initial_state});
+        this->sprites_queue.pop();
 
         return this->renders.back();
     }
 
-    void RenderGroup::pop_render() noexcept {
+    void RenderQueue::pop_render() noexcept {
         this->renders.pop_front();
-    }
-
-    AudioEngine *RenderGroup::get_audio_engine() const noexcept {
-        return this->audio_engine.get();
-    }
-
-    bool RenderGroup::single_render() noexcept {
-        return this->single_render_group;
-    }
-
-    RenderGroup::RenderGroup(Sprite::State initial_render_state, float direction, std::size_t maximum_renders, long render_duration, bool single_render) noexcept {
-        this->initial_render_state = initial_render_state;
-        this->direction = direction;
-        this->max_renders = maximum_renders;
-        this->render_duration = render_duration;
-        this->single_render_group = single_render;
-
-        // Initialize SoLoud engine
-        this->audio_engine = std::make_unique<AudioEngine>();
-        auto *engine = this->audio_engine.get();
-        engine->init();
-        engine->setGlobalVolume(static_cast<float>(HaloData::get_master_volume()) / 10);
     }
 }

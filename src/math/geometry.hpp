@@ -10,13 +10,13 @@ namespace Harmony::Math {
     #define PI 3.14159265359
     #define RADIAN(degree) degree * PI / 180.0f
 
-    typedef float Point;
+    using Point = float;
 
     struct Point2D {
         Point x = 0.0f;
         Point y = 0.0f;
 
-        inline Point2D operator+(Point2D &point) {
+        inline Point2D operator+(Point2D const &point) {
             return {
                 this->x + point.x,
                 this->y + point.y
@@ -32,7 +32,7 @@ namespace Harmony::Math {
         }
     };
 
-    typedef std::vector<Point2D> Curve;
+    using Curve = std::vector<Point2D>;
 
     struct Rectangle2D {
         int left;

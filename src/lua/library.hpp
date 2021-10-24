@@ -47,31 +47,9 @@ namespace Harmony::Lua {
         void unload_script(lua_State *state) noexcept;
 
         /**
-         * Unload all script
-         */
-        void unload_all_scripts() noexcept;
-
-        /**
-         * Unload global scripts
-         */
-        void unload_global_scripts() noexcept;
-
-        /**
-         * Unload map scripts
-         */
-        void unload_map_script() noexcept;
-
-        /**
          * Constructor for Lua library
          */
         Library() noexcept;
-
-        /** 
-         * Sprite management stuff
-         * These events are in charge of loading/unloading the sprites from all scripts
-         */
-        static void on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept;
-        static void on_d3d9_reset(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS *) noexcept;
 
         /** 
          * Script events dispatchers

@@ -3,19 +3,21 @@
 #include <filesystem>
 #include "../halo_data/path.hpp"
 #include "../messaging/console_output.hpp"
+#include "../optic/handler.hpp"
+#include "../harmony.hpp"
 #include "script.hpp"
 
 namespace Harmony::Lua {
-    const char *Script::get_name() const noexcept {
-        return this->name.c_str();
+    std::string Script::get_name() const noexcept {
+        return this->name;
     }
 
-    const char *Script::get_type() const noexcept {
-        return this->type.c_str();
+    std::string Script::get_type() const noexcept {
+        return this->type;
     }
 
-    const char *Script::get_data_path() const noexcept {
-        return this->data_path.c_str();
+    std::string Script::get_data_path() const noexcept {
+        return this->data_path;
     }
 
     bool Script::path_is_valid(std::string path) noexcept {
@@ -27,7 +29,7 @@ namespace Harmony::Lua {
         return false;
     }
 
-    std::vector<std::string> &Script::get_callbacks(const char *callback) noexcept {
+    std::vector<std::string> &Script::get_callbacks(std::string callback) noexcept {
         if(this->callbacks.find(callback) != this->callbacks.end()) {
             return this->callbacks[callback];
         }
@@ -37,16 +39,20 @@ namespace Harmony::Lua {
         return this->callbacks["invalid"];
     }
 
-    OpticStore &Script::get_optic_store() noexcept {
-        return this->optic_store;
+    void Script::add_callback(std::string callback, std::string function) noexcept {
+        this->callbacks[callback].emplace_back(function);
+    }
+
+    std::size_t Script::get_require_count() const noexcept {
+        return this->require_count;
+    }
+
+    Optic::Container *Script::get_optic_container() noexcept {
+        return this->optic_container;
     }
 
     lua_State *Script::get_state() noexcept {
         return this->script;
-    }
-
-    void Script::add_callback(const char *callback, const char *function) noexcept {
-        this->callbacks[callback].emplace_back(function);
     }
 
     void Script::print_last_error() noexcept {
@@ -84,5 +90,16 @@ namespace Harmony::Lua {
         this->name = get_global_from_state(state, "script_name");
         this->type = get_global_from_state(state, "script_type");
         this->data_path = this->get_script_data_path();
+        this->require_count = 1;
+
+        // Create a new optic container
+        auto &optic_handler = Harmony::get().get_optic_handler();
+        this->optic_container = optic_handler.create_optic(this->type + this->name);
+    }
+
+    Script::~Script() noexcept {
+        // Remove optic cointainer
+        auto &optic_handler = Harmony::get().get_optic_handler();
+        optic_handler.remove_optic(this->type + this->name);
     }
 }
