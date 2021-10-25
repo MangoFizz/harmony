@@ -33,7 +33,7 @@ optic.create_sprite("hitmarker", "images/hitmarker.png", 35, 35)
 optic.create_sound("hit", "sounds/hit.wav")
 
 -- Create hitmarker playback queue
-optic.create_playback_queue("audio queue");
+optic.create_playback_queue("audio queue")
 
 function on_multiplayer_sound(sound)
 	if(sound == "ting") then
