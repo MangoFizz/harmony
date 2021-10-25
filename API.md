@@ -1,4 +1,4 @@
-# Harmony Lua API
+# Harmony Lua API v1.0.0
 
 Harmony can be used directly on Chimera scripts, it can be required like any other Lua
 C module in your script:
