@@ -31,7 +31,7 @@ namespace Harmony::HaloData {
                 return "local running riot";
             case HaloData::MultiplayerEvent::GAME_TIME_LEFT:
                 return "game time left";
-            case HaloData::LOCAL_CTF_SCORE:
+            case HaloData::MultiplayerEvent::LOCAL_CTF_SCORE:
                 return "local ctf score";
             case HaloData::MultiplayerEvent::CTF_ENEMY_SCORE:
                 return "ctf enemy score";
