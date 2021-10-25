@@ -78,6 +78,10 @@ namespace Harmony::UserInterface {
             }
             catch(Memory::Hook::Exception &e) {
                 console_error("Failed to enable widescreen override: Chimera's widescreen fix is disabled!");
+                if(widescreen_mouse_x) {
+                    *widescreen_fix_mouse_x_ptr = widescreen_mouse_x;
+                    widescreen_mouse_x = nullptr;
+                }
                 this->overrides.clear();
                 return;
             }
@@ -98,6 +102,7 @@ namespace Harmony::UserInterface {
 
             // Restore widescreen fix mouse x pointer
             *widescreen_fix_mouse_x_ptr = widescreen_mouse_x;
+            widescreen_mouse_x = nullptr;
 
             // Destroy all caves
             this->overrides.clear();
