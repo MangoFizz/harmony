@@ -301,7 +301,7 @@ This is called when a multiplayer sound is played. E.g. announcer voice, ting, e
 - `countdown timer end`
 - `ting`
 
-**Note:** This event will be cancelled if the function return `false`.
+**Note:** This event will be cancelled if the function returns `false`.
 
 Example:
 ```lua
@@ -323,7 +323,7 @@ is pressed.
 
 **Takes:** `number` button_widget_id
 
-**Note:** This event will be cancelled if the function return `false`.
+**Note:** This event will be cancelled if the function returns `false`.
 
 Example:
 ```lua
@@ -344,7 +344,7 @@ This is called when returning to the previous menu.
 
 **Takes:** `number` menu_widget_id
 
-**Note:** This event will be cancelled if the function return `false`.
+**Note:** This event will be cancelled if the function returns `false`.
 
 Example:
 ```lua
@@ -371,7 +371,7 @@ This is called when navigating in a menu list using arrow keys.
 - `left`
 - `right`
 
-**Note:** This event will be cancelled if the function return `false`.
+**Note:** This event will be cancelled if the function returns `false`.
 
 Example:
 ```lua
@@ -398,7 +398,7 @@ This is called when a menu button is pressed with a mouse button.
 - `right button`
 - `double left button`
 
-**Note:** This event will be cancelled if the function return `false`.
+**Note:** This event will be cancelled if the function returns `false`.
 
 Example:
 ```lua
@@ -425,7 +425,7 @@ This is called when a menu sound is played.
 - `back`
 - `flag failure`
 
-**Note:** This event will be cancelled if the function return `false`.
+**Note:** This event will be cancelled if the function returns `false`.
 
 Example:
 ```lua
