@@ -20,7 +20,7 @@ version of the API, but it no longer works.
 ### Library table
 - [Optic functions](#optic)
 - [Menu functions](#menu)
-- [Event callbacks](#Callback)
+- [Event callbacks](#callbacks)
 
 ## Optic
 
