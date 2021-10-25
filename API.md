@@ -17,10 +17,30 @@ the Lua garbage collector do it automaticly when the script is unloaded by Chime
 Note that for compatibility reasons, the unload function still exists in the latest 
 version of the API, but it no longer works.
 
-### Library table
-- [Optic functions](#optic)
-- [Menu functions](#menu)
-- [Event callbacks](#callbacks)
+### Library index
+- [Optic](#optic)
+    - [Create animation](#create_animation)
+    - [Set animation property](#set_animation_property)
+    - [Create sprite](#create_sprite)
+    - [Create render queue](#create_render_queue)
+    - [Render sprite](#render_sprite)
+    - [Clear render queue](#clear_render_queue)
+    - [Cleate sound](#create_sound)
+    - [Create playback queue](#create_playback_queue)
+    - [Play sound](#play_sound)
+    - [Stop sound](#stop_sound)
+    - [Clear playback queue](#clear_playback_queue)
+- [Menu](#menu)
+    - [Set aspect ratio](#set_aspect_ratio)
+    - [Play sound](#play_sound)
+- [Events](#events)
+    - [Multiplayer event](#multiplayer-event)
+    - [Multiplayer sound](#multiplayer-sound)
+    - [Menu accept](#menu-accept)
+    - [Menu back](#menu-back)
+    - [Menu list tab](#menu-list-tab)
+    - [Menu mouse button press](#menu-mouse-button-press)
+    - [Menu sound](#menu-sound)
 
 ## Optic
 
@@ -199,7 +219,7 @@ Example:
 harmony.ui.play_sound(sound_tag_id)
 ```
 
-## Callbacks
+## Events
 These functions are called when specific events occur. They have to be assigned manually
 using the **set_callback** function. Only one function is allowed per callback per 
 script. *(Description from Chimera docs)*
