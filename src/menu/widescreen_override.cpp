@@ -77,7 +77,7 @@ namespace Harmony::UserInterface {
                 static_cast<Memory::SwitchHook *>(widescreen_mouse_cave)->execute_original_code(false);
             }
             catch(Memory::Hook::Exception &e) {
-                console_error("Failed to enable widescreen override: Chimera's widescreen fix is disabled!");
+                console_error("%s", "Failed to enable widescreen override: Chimera's widescreen fix is disabled!");
                 if(widescreen_mouse_x) {
                     *widescreen_fix_mouse_x_ptr = widescreen_mouse_x;
                     widescreen_mouse_x = nullptr;

@@ -57,7 +57,7 @@ namespace Harmony::Lua {
 
     void Script::print_last_error() noexcept {
         const char *err = lua_tostring(script, -1);
-        console_error(err);
+        console_error("%s", err);
         lua_pop(script, 1);
     }
 
