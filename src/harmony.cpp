@@ -129,7 +129,6 @@ namespace Harmony {
       if(command == "harmony") {
          ConsoleColor blue = {1, 0.1, 0.8, 0.9};
          console_output(blue, "Harmony version %s", HARMONY_VERSION);
-         console_output(blue, "LUA API v%s", LUA_API_VERSION);
          return false;
       }
       return true;
