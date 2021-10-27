@@ -50,6 +50,7 @@ namespace Harmony::Optic {
          */
         static void on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept;
         static void on_d3d9_reset(LPDIRECT3DDEVICE9, D3DPRESENT_PARAMETERS *) noexcept;
+        static void on_tick() noexcept;
 
     private:
         /** Render group */

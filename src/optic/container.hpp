@@ -141,30 +141,40 @@ namespace Harmony::Optic {
         void render_sprite(std::string sprite_name, Sprite::State initial_state, long duration, Animation fade_in, Animation fade_out);
 
         /**
-         * Get audio playback queue
-         * @param name  Name of the queue
-         * @return  Pointer to audio engine, null if does not exist
+         * Get audio engine instance
+         * @param name  Name of the instance
+         * @return      Pointer to audio engine instance, null if does not exist
          */
-        AudioEngine *get_audio_queue(std::string name) noexcept;
+        AudioEngine *get_audio_engine(std::string name) noexcept;
 
         /**
-         * Create audio playback queue
-         * @param name  Name of the queue
-         * @exception   If audio queue already exists
+         * Create audio engine instance
+         * @param name  Name of the instance
+         * @exception   If instance already exists
          */
-        void create_audio_queue(std::string name);
+        void create_audio_engine(std::string name);
 
         /**
-         * Remove audio playback queue
-         * @param name  Name of the queue
-         * @exception   If the queue does not exists
+         * Remove audio engine instance
+         * @param name  Name of the instance
+         * @exception   If the instance does not exists
          */
-        void remove_audio_queue(std::string name);
+        void remove_audio_engine(std::string name);
+
+        /**
+         * Play sound
+         * @param sound_name        Name of the sound
+         * @param instance_name     Name of playback queue
+         * @param no_enqueue        Play sound immediately
+         * @exception               If sound does not exists
+         * @exception               If playback queue does not exists
+         */
+        void play_sound(std::string sound_name, std::string instance_name, bool no_enqueue);
 
         /**
          * Void constructor
          */
-        Container() {}
+        Container() {};
 
         /**
          * Destructor
@@ -178,17 +188,17 @@ namespace Harmony::Optic {
         /** Sprites */
         std::vector<Sprite> sprites;
 
-        /** Sprite playbacks */
-        std::vector<Sound> sounds;
-
-        /** Audio queues */
-        std::vector<std::unique_ptr<AudioEngine>> playback_queues;
+        /** Are sprites loaded? */
+        bool sprites_loaded = false;
 
         /** Render queue */
         std::vector<RenderQueue> render_queues;
 
-        /** Are sprites loaded? */
-        bool loaded = false;
+        /** Sounds */
+        std::vector<Sound> sounds;
+
+        /** Audio engine instances */
+        std::vector<std::unique_ptr<AudioEngine>> audio_engines;
     };
 }
 

@@ -28,7 +28,6 @@ version of the API, but it no longer works.
     - [Cleate sound](#create_sound)
     - [Create playback queue](#create_playback_queue)
     - [Play sound](#play_sound)
-    - [Stop sound](#stop_sound)
     - [Clear playback queue](#clear_playback_queue)
 - [Menu](#menu)
     - [Set aspect ratio](#set_aspect_ratio)
@@ -148,35 +147,23 @@ harmony.optic.create_sound("hit", "sounds/hit.wav")
 ```
 
 ### create_playback_queue
-Create an audio playback queue.
+Create an audio engine instance.
 
-**Takes:** `string` playback_queue_name
+**Takes:** `string` instance_name
 
 Example:
 ```lua
-harmony.optic.create_playback_queue("audio queue")
+harmony.optic.create_audio_engine("audio queue")
 ```
 
 ### play_sound
 Play a sound in a playback queue.
 
-**Takes:** `string` sound_name, `string` playback_queue_name
-
-**Returns:** `number` sound_handle
+**Takes:** `string` sound_name, `string` playback_queue_name, [`boolean` no_enqueue]
 
 Example:
 ```lua
 harmony.optic.play_sound("hit", "audio queue")
-```
-
-### stop_sound
-Stop or remove a sound from playback queue.
-
-**Takes:** `string` playback_queue_name, `string` sound_handle
-
-Example:
-```lua
-harmony.optic.stop_sound("audio queue", sound_handle)
 ```
 
 ### clear_playback_queue

@@ -176,36 +176,57 @@ namespace Harmony::Optic {
         tmp_queue.enqueue_sprite(sprite);
     }
 
-    AudioEngine *Container::get_audio_queue(std::string name) noexcept {
-        for(auto &queue_ptr : this->playback_queues) {
-            auto *queue = queue_ptr.get();
-            if(queue->get_name() == name) {
-                return queue;
+    AudioEngine *Container::get_audio_engine(std::string name) noexcept {
+        for(auto &instance : this->audio_engines) {
+            if(instance->get_name() == name) {
+                return instance.get();
             }
         }
         return nullptr;
     }
 
-    void Container::create_audio_queue(std::string name) {
-        if(this->get_audio_queue(name)) {
-            throw Exception("Audio playback queue '" + name + "' already exists!");
+    void Container::create_audio_engine(std::string name) {
+        if(this->get_audio_engine(name)) {
+            throw Exception("Audio engine instance '" + name + "' already exists!");
         }
-        
-        auto *queue = this->playback_queues.emplace_back(std::make_unique<AudioEngine>(name)).get();
-        queue->init();
-        queue->setGlobalVolume(static_cast<float>(HaloData::get_master_volume()) / 10);
+        auto instance = std::make_unique<AudioEngine>(name);
+        instance->init();
+        instance->setGlobalVolume(static_cast<float>(HaloData::get_master_volume()) / 10);
+        this->audio_engines.push_back(std::move(instance));
     }
 
-    void Container::remove_audio_queue(std::string name) {
-        auto it = this->playback_queues.begin();
-        while(it != this->playback_queues.end()) {
+    void Container::remove_audio_engine(std::string name) {
+        auto it = this->audio_engines.begin();
+        while(it != this->audio_engines.end()) {
             if(it->get()->get_name() == name) {
-                this->playback_queues.erase(it);
+                this->audio_engines.erase(it);
                 return;
             }
             it++;
         }
-        throw Exception("Audio playback queue '" + name + "' does not exists!");
+        throw Exception("Audio engine instance '" + name + "' does not exists!");
+    }
+
+    void Container::play_sound(std::string sound_name, std::string instance_name, bool no_enqueue) {
+        auto *instance = this->get_audio_engine(instance_name);
+        auto *sound = this->get_sound(sound_name);
+
+        if(sound) {
+            if(instance) {
+                if(no_enqueue) {
+                    instance->play(*sound);
+                }
+                else {
+                    instance->enqueue(sound);
+                }
+            }
+            else {
+                throw Exception("Audio engine instance '" + instance_name + "' does not exists!");
+            }
+        }
+        else {
+            throw Exception("Sound '" + sound_name + "' does not exists!");
+        }
     }
 
     Container::~Container() {

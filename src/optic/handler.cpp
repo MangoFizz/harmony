@@ -2,6 +2,7 @@
 
 #include "../events/d3d9_end_scene.hpp"
 #include "../events/d3d9_reset.hpp"
+#include "../events/tick.hpp"
 #include "../messaging/exception.hpp"
 #include "../harmony.hpp"
 #include "exception.hpp"
@@ -43,16 +44,35 @@ namespace Harmony::Optic {
         // Register end scene event
         add_d3d9_end_scene_event(on_d3d9_end_scene, EVENT_PRIORITY_BEFORE);
         add_d3d9_reset_event(on_d3d9_reset, EVENT_PRIORITY_BEFORE);
+        add_tick_event(on_tick);
     }
 
     Handler::~Handler() noexcept {
         // Remove handler events
         remove_d3d9_end_scene_event(Handler::on_d3d9_end_scene);
         remove_d3d9_reset_event(on_d3d9_reset);
+        remove_tick_event(on_tick);
 
         this->optics.clear();
 
         handler = nullptr;
+    }
+
+    void Handler::on_tick() noexcept {
+        for(auto &optic : handler->optics) {
+            auto &container = *optic.second;
+
+            auto &audio_engines = container.audio_engines;
+            auto it = audio_engines.begin();
+            while(it != audio_engines.end()) {
+                auto *instance = it->get();
+                if(instance->getActiveVoiceCount() == 0 && !instance->queue.empty()) {
+                    instance->play(*instance->queue.front());
+                    instance->queue.pop();
+                }
+                it++;
+            }
+        }
     }
 
     void Handler::on_d3d9_end_scene(LPDIRECT3DDEVICE9 device) noexcept {
@@ -60,37 +80,36 @@ namespace Harmony::Optic {
             auto &container = *optic.second;
 
             // Load sprites
-            if(!container.loaded) {
+            if(!container.sprites_loaded) {
                 for(auto &sprite : container.sprites) {
                     sprite.load(device);
                 }
-                container.loaded = true;
+                container.sprites_loaded = true;
             }
 
             // Handle render queues
             auto &queues = container.render_queues;
-            auto it = queues.begin();
-            while(it != queues.end()) {
-                auto &queue = *it;
-                auto &renders = queue.renders;
-                auto &sprites_queue = queue.sprites_queue;
-                auto max_renders = queue.max_renders;
+            auto queue = queues.begin();
+            while(queue != queues.end()) {
+                auto &renders = queue->renders;
+                auto &sprites_queue = queue->sprites_queue;
+                auto max_renders = queue->max_renders;
 
                 // Remove if is a temporal queue
-                if(queue.temporal() && sprites_queue.empty() && renders.empty()) {
-                    it = queues.erase(it);
+                if(queue->temporal() && sprites_queue.empty() && renders.empty()) {
+                    queue = queues.erase(queue);
                     continue;
                 }
 
                 // Get queue animations
-                auto fade_in_anim = queue.get_fade_in_anim();
-                auto fade_out_anim = queue.get_fade_out_anim();
-                auto &slide_anim = queue.get_slide_anim();
+                auto fade_in_anim = queue->get_fade_in_anim();
+                auto fade_out_anim = queue->get_fade_out_anim();
+                auto &slide_anim = queue->get_slide_anim();
 
                 // Render sprite from queue
                 if(!slide_anim.is_playing()) {
                     if(!sprites_queue.empty() && (max_renders == 0 || renders.size() < max_renders)) {
-                        auto &render = queue.render_sprite_from_queue();
+                        auto &render = queue->render_sprite_from_queue();
 
                         // Play fade-in animation in the new render
                         render.play_animation(fade_in_anim);
@@ -103,7 +122,7 @@ namespace Harmony::Optic {
                 }
 
                 // Remove expired renders
-                if(!renders.empty() && renders.front().get_timelife() > queue.get_render_duration()) {
+                if(!renders.empty() && renders.front().get_timelife() > queue->get_render_duration()) {
                     renders.pop_front();
                 }
 
@@ -135,7 +154,7 @@ namespace Harmony::Optic {
                     }
 
                     // Play fade out animation
-                    if(queue.get_render_duration() - render.get_timelife() < fade_out_anim.get_duration()) {
+                    if(queue->get_render_duration() - render.get_timelife() < fade_out_anim.get_duration()) {
                         if(std::find(active_animations.begin(), active_animations.end(), fade_out_anim) == active_animations.end()) {
                             render.play_animation(fade_out_anim);
                         }
@@ -151,7 +170,7 @@ namespace Harmony::Optic {
                 }
 
                 // bump up iterator
-                it++;
+                queue++;
             }
         }
     }
@@ -162,7 +181,7 @@ namespace Harmony::Optic {
             for(auto &sprite : container.sprites) {
                 sprite.unload();
             }
-            container.loaded = false;
+            container.sprites_loaded = false;
         }
     }
 }

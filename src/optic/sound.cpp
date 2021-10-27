@@ -4,18 +4,6 @@
 #include "sound.hpp"
 
 namespace Harmony::Optic {
-    std::string AudioEngine::get_name() const noexcept {
-        return this->name;
-    }
-
-    void AudioEngine::set_name(std::string name) noexcept {
-        this->name = name;
-    }
-
-    AudioEngine::AudioEngine(std::string name) noexcept {
-        this->name = name;
-    }
-
     std::string Sound::get_name() const noexcept {
         return this->name;
     }
@@ -36,5 +24,21 @@ namespace Harmony::Optic {
 
     Sound::~Sound() noexcept {
         this->mSoloud = nullptr;
+    }
+
+    std::string AudioEngine::get_name() const noexcept {
+        return this->name;
+    }
+
+    void AudioEngine::set_name(std::string name) noexcept {
+        this->name = name;
+    }
+
+	void AudioEngine::enqueue(Sound *sound) noexcept {
+        this->queue.push(sound);
+    }
+
+    AudioEngine::AudioEngine(std::string name) noexcept {
+        this->name = name;
     }
 }

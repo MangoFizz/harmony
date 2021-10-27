@@ -338,7 +338,7 @@ namespace Harmony::Lua {
         return 0;
     }
 
-    static int lua_create_playback_queue(lua_State *state) noexcept {
+    static int lua_create_audio_engine(lua_State *state) noexcept {
         auto *script = library->get_script(state);
         auto *optic = script->get_optic_container();
 
@@ -348,14 +348,14 @@ namespace Harmony::Lua {
             const char *name = luaL_checkstring(state, 1);
 
             try {
-                optic->create_audio_queue(name);
+                optic->create_audio_engine(name);
             }
             catch(...) {
-                luaL_error(state, "invalid queue name in create_playback_queue function");
+                luaL_error(state, "invalid name for audio engine instance in harmony create_audio_engine function");
             }
         }
         else {
-            luaL_error(state, "invalid number of arguments in harmony create_playback_queue function");
+            luaL_error(state, "invalid number of arguments in harmony create_audio_engine function");
         }
         return 0;
     }
@@ -365,24 +365,21 @@ namespace Harmony::Lua {
         auto *optic = script->get_optic_container();
 
         int args = lua_gettop(state);
-        if(args == 2) {    
+        if(args == 2 || args == 3) {    
             // Arguments
             auto sound_name = luaL_checkstring(state, 1);
-            auto playback_queue_name = luaL_checkstring(state, 2);
-
-            auto *sound = optic->get_sound(sound_name);
-            if(sound) {
-                auto *playback_queue = optic->get_audio_queue(playback_queue_name);
-                if(playback_queue) {
-                    auto handle = playback_queue->play(*sound);
-                    lua_pushnumber(state, handle);
-                }
-                else {
-                    luaL_error(state, "invalid playback queue name in play_sound function");
-                }
+            auto audio_engine_name = luaL_checkstring(state, 2);
+            bool no_enqueue = false;
+            
+            if(args == 3) {
+                no_enqueue = lua_toboolean(state, 3);
             }
-            else {
-                luaL_error(state, "invalid sound name in play_sound function");
+
+            try {
+                optic->play_sound(sound_name, audio_engine_name, no_enqueue);
+            }
+            catch(...) {
+                luaL_error(state, "invalid argument(s) in play_sound function");
             }
         }
         else {
@@ -391,31 +388,7 @@ namespace Harmony::Lua {
         return 1;
     }
 
-    static int lua_stop_sound(lua_State *state) noexcept {
-        auto *script = library->get_script(state);
-        auto *optic = script->get_optic_container();
-
-        int args = lua_gettop(state);
-        if(args == 2) {    
-            // Arguments
-            auto playback_queue_name = luaL_checkstring(state, 1);
-            auto sound_handle = luaL_checknumber(state, 2);
-
-            auto *playback_queue = optic->get_audio_queue(playback_queue_name);
-            if(playback_queue) {
-                playback_queue->stop(sound_handle);
-            }
-            else {
-                luaL_error(state, "invalid playback queue name in stop_sound function");
-            }
-        }
-        else {
-            luaL_error(state, "invalid number of arguments in harmony stop_sound function");
-        }
-        return 0;
-    }
-
-    static int lua_clear_playback_queue(lua_State *state) noexcept {
+    static int lua_clear_audio_engine(lua_State *state) noexcept {
         auto *script = library->get_script(state);
         auto *optic = script->get_optic_container();
 
@@ -424,12 +397,12 @@ namespace Harmony::Lua {
             // Arguments
             auto playback_queue_name = luaL_checkstring(state, 1);
 
-            auto *playback_queue = optic->get_audio_queue(playback_queue_name);
+            auto *playback_queue = optic->get_audio_engine(playback_queue_name);
             if(playback_queue) {
                 playback_queue->stopAll();
             }
             else {
-                luaL_error(state, "invalid playback queue name in stop_sound function");
+                luaL_error(state, "invalid audio engine instance in harmony clear_audio_engine function");
             }
         }
         else {
@@ -446,10 +419,9 @@ namespace Harmony::Lua {
         {"render_sprite", lua_render_sprite},
         {"clear_render_queue", lua_clear_render_queue},
         {"create_sound", lua_create_sound},
-        {"create_playback_queue", lua_create_playback_queue},
+        {"create_audio_engine", lua_create_audio_engine},
         {"play_sound", lua_play_sound},
-        {"stop_sound", lua_stop_sound},
-        {"clear_playback_queue", lua_clear_playback_queue},
+        {"clear_audio_engine", lua_clear_audio_engine},
         {NULL, NULL}
     };
 
