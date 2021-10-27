@@ -146,7 +146,7 @@ Example:
 harmony.optic.create_sound("hit", "sounds/hit.wav")
 ```
 
-### create_playback_queue
+### create_audio_engine
 Create an audio engine instance.
 
 **Takes:** `string` instance_name
@@ -157,23 +157,23 @@ harmony.optic.create_audio_engine("audio queue")
 ```
 
 ### play_sound
-Play a sound in a playback queue.
+Play a sound in an audio engine instance.
 
-**Takes:** `string` sound_name, `string` playback_queue_name, [`boolean` no_enqueue]
+**Takes:** `string` sound_name, `string` audio_engine_instance_name, [`boolean` no_enqueue]
 
 Example:
 ```lua
 harmony.optic.play_sound("hit", "audio queue")
 ```
 
-### clear_playback_queue
-Stop and remove all sounds in a playback queue.
+### clear_audio_engine
+Stop and remove all sounds in an audio engine instance.
 
-**Takes:** `string` playback_queue
+**Takes:** `string` audio_engine_instance_name
 
 Example:
 ```lua
-harmony.optic.clear_playback_queue("audio queue")
+harmony.optic.clear_audio_engine("audio queue")
 ```
 
 ## Menu
