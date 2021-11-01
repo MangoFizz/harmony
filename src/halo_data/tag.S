@@ -33,7 +33,7 @@ _get_tag_id:
 
     ;# Play it
     push eax
-    mov edi, 0x736E6421
+    mov edi, ebx
     call dword ptr get_tag_address
     add esp, 4
     mov tag_id, eax

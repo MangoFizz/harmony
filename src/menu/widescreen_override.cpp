@@ -94,6 +94,11 @@ namespace Harmony::UserInterface {
             // Register events
             add_tick_event(this->on_tick);
             add_map_load_event(this->on_map_load);
+
+            /**
+             * @todo    Fix map load event not being executed on first map load
+             */
+            this->on_map_load();
         }
         else {
             // Remove events
@@ -147,13 +152,14 @@ namespace Harmony::UserInterface {
         std::int16_t &bounds_bottom = *reinterpret_cast<std::int16_t *>(tag->data + 0x28);
         std::int16_t &bounds_right = *reinterpret_cast<std::int16_t *>(tag->data + 0x2A);
 
-        if(bounds_left <= 1.0f && bounds_right >= 639.0f) {
-            bounds_right = 638.9f;
+        if(bounds_left == 0.0f && bounds_right == 640.0f) {
+            bounds_right = 639.0f;
         }
     }
 
     void WidescreenOverride::on_map_load() noexcept {
         // Do not stretch this
+        instance->jason_jones_menu_widget("ui\\shell\\main_menu\\halo_logo");
         instance->jason_jones_menu_widget("ui\\shell\\main_menu\\multiplayer_type_select\\join_game\\join_game_items_list");
         instance->jason_jones_menu_widget("ui\\shell\\main_menu\\settings_select\\player_setup\\player_profile_edit\\controls_setup\\controls_options_menu");
         instance->jason_jones_menu_widget("ui\\shell\\main_menu\\settings_select\\player_setup\\player_profile_edit\\gamepad_setup\\gamepad_setup_options");
