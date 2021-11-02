@@ -3,9 +3,6 @@
 # We need C99 to build Lua
 set(CMAKE_C_STANDARD 99)
 
-# C compiler flags
-set(CMAKE_C_FLAGS "-Wall -Wextra")
-
 # Source path
 set(LUA53_SRC ext/lua53)
 
