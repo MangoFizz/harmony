@@ -10,13 +10,13 @@
 namespace Harmony::HaloData {
     enum MenuNavigationKeyCode {
         MENU_NAVIGATION_KEY_ENTER = 0,
-        MENU_NAVIGATION_KEY_SUPR = 0x2,
-        MENU_NAVIGATION_KEY_INSERT = 0x3,
-        MENU_NAVIGATION_KEY_UP = '\b',
-        MENU_NAVIGATION_KEY_DOWN = '\t',
-        MENU_NAVIGATION_KEY_LEFT = '\n',
-        MENU_NAVIGATION_KEY_RIGHT = '\v',
-        MENU_NAVIGATION_KEY_ESCAPE = '\r'
+        MENU_NAVIGATION_KEY_SUPR = 0x02,
+        MENU_NAVIGATION_KEY_INSERT,
+        MENU_NAVIGATION_KEY_UP = 0x08,
+        MENU_NAVIGATION_KEY_DOWN,
+        MENU_NAVIGATION_KEY_LEFT,
+        MENU_NAVIGATION_KEY_RIGHT,
+        MENU_NAVIGATION_KEY_ESCAPE = 0x0D
     };
     std::string string_from_menu_key_code(MenuNavigationKeyCode key) noexcept;
 
