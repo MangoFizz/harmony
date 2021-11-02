@@ -276,7 +276,7 @@ namespace Harmony::Memory {
 
                 default: {
                     char message[256];
-                    snprintf(message, sizeof(message), "Unable to build cave: unsupported instruction. \nOpcode: 0x%.2X at 0x%.8X", instruction[0], instruction);
+                    snprintf(message, sizeof(message), "Unable to build cave: unsupported instruction. \nOpcode: 0x%.2X at 0x%p", instruction[0], instruction);
                     throw Hook::Exception(message);
                 }
             }
