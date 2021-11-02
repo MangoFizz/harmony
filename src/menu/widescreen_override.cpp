@@ -184,7 +184,13 @@ namespace Harmony::UserInterface {
             std::int32_t mouse_increase = static_cast<std::int32_t>(width_480p - menu_frame_width) / 2;
             widescreen_mouse_left_bounds = -mouse_increase;
             widescreen_mouse_right_bounds = menu_frame_width + mouse_increase;
-            *widescreen_mouse_x = widescreen_mouse_left_bounds;
+
+            if(*widescreen_mouse_x > menu_frame_width + mouse_increase) {
+                *widescreen_mouse_x = widescreen_mouse_right_bounds;
+            }
+            if(*widescreen_mouse_x < -mouse_increase) {
+                *widescreen_mouse_x = -mouse_increase;
+            }
         }
     }
     
