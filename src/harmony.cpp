@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <cstring>
 #include <lua.hpp>
+#include "events/console_command.hpp"
 #include "events/d3d9_end_scene.hpp"
 #include "events/d3d9_reset.hpp"
 #include "events/menu_accept.hpp"
@@ -120,6 +121,12 @@ namespace Harmony {
       set_up_menu_mouse_button_press_event();
       set_up_menu_list_tab_event();
       set_up_menu_sound_event();
+
+      // Set up console commands
+      set_up_console_command_event();
+
+      // Add info command
+      add_console_command_event(info_command);
 
       // Override Chimera's widescreen fix
       Harmony::get().get_widescreen_override_handle().enable(true);

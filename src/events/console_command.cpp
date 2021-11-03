@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include "../memory/codecave.hpp"
+#include "../memory/hook.hpp"
 #include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "console_command.hpp"
 
 namespace Harmony {
-    static Codecave on_console_command_cave;
-    static Signature *console_output_sig;
+    static Memory::SwitchHook console_command_hook;
     static std::vector<Event<ConsoleCommandEvent_t>> events;
 
     void add_console_command_event(const ConsoleCommandEvent_t function, EventPriority priority) noexcept {
@@ -31,14 +30,7 @@ namespace Harmony {
     static void do_on_console_command(const char *command) noexcept {
         bool allow = true;
         call_in_order_allow(events, allow, command);
-
-        if(!allow) {
-            Memory::nuke_function(console_output_sig->get_data());
-        }
-    }
-
-    static void restore_console_output() noexcept {
-        console_output_sig->restore();
+        console_command_hook.execute_original_code(allow);
     }
 
     void set_up_console_command_event() {
@@ -50,13 +42,10 @@ namespace Harmony {
         enabled = true;
 
         // Get signatures
-        static auto &on_console_command_sig = Harmony::get().get_signature("console_call");
-        console_output_sig = &Harmony::get().get_signature("console_out");
+        static auto &console_unknown_command_message_call_sig = Harmony::get().get_signature("console_call");
         
         // Write hacks
-        on_console_command_cave.hack_chimera_function_call(on_console_command_sig.get_data(), reinterpret_cast<void *>(do_on_console_command), reinterpret_cast<void *>(restore_console_output));
-
-        // Hook map load call
-        on_console_command_cave.hook();
+        console_command_hook.initialize(console_unknown_command_message_call_sig.get_data(), reinterpret_cast<void *>(do_on_console_command), true);
+        console_command_hook.hook();
     }
 }
