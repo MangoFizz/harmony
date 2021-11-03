@@ -43,7 +43,7 @@ namespace Harmony {
         enabled = true;
 
         // Get signature
-        static auto &d3d9_call_reset_sig = Harmony::get().get_signature("d3d9_call_reset");
+        static auto &d3d9_call_reset_sig = Harmony::get().get_signature("d3d9_reset_call");
         
         // Write hacks
         d3d9_reset_hook.initialize(d3d9_call_reset_sig.get_data(), reinterpret_cast<void *>(on_d3d9_reset_asm), nullptr, false);
