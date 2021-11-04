@@ -115,6 +115,22 @@ namespace Harmony::UserInterface {
         this->enabled = setting;
     }
 
+    float WidescreenOverride::get_screen_480p_width() noexcept {
+        return this->screen_width_480p;
+    }
+
+    float WidescreenOverride::get_menu_extra_width() noexcept {
+        return this->menu_extra_width;
+    }
+
+    float WidescreenOverride::get_menu_displacement() const noexcept {
+        return this->menu_displacement;
+    }
+
+    float WidescreenOverride::get_widescreen_fix_menu_displacement() const noexcept {
+        return this->widescreen_fix_menu_displacement;
+    }
+
     void WidescreenOverride::set_aspect_ratio(std::uint16_t x, std::uint16_t y) noexcept {
         this->menu_aspect_ratio = static_cast<float>(x) / static_cast<float>(y);
 
@@ -124,14 +140,6 @@ namespace Harmony::UserInterface {
 
     void WidescreenOverride::reset_frame_aspect_ratio() noexcept {
         this->set_aspect_ratio(4, 3);
-    }
-
-    float WidescreenOverride::get_menu_extra_width() noexcept {
-        return this->menu_extra_width;
-    }
-
-    float WidescreenOverride::get_menu_displacement() const noexcept {
-        return this->menu_displacement;
     }
 
     WidescreenOverride::WidescreenOverride() noexcept {
@@ -167,21 +175,21 @@ namespace Harmony::UserInterface {
 
     void WidescreenOverride::on_tick() noexcept {
         static auto &resolution = HaloData::get_resolution();
-        float aspect_ratio = static_cast<float>(resolution.width) / static_cast<float>(resolution.height);
-        float width_480p = aspect_ratio * 480.000f;
+        float current_aspect_ratio = static_cast<float>(resolution.width) / static_cast<float>(resolution.height);
+        float current_screen_width = current_aspect_ratio * 480.000f;
 
-        if(static_cast<std::uint16_t>(instance->screen_width_480p) != static_cast<std::uint16_t>(width_480p)) {
+        if(static_cast<std::uint16_t>(instance->screen_width_480p) != static_cast<std::uint16_t>(current_screen_width)) {
             // Re-calculate widescreen values
             float menu_frame_width = instance->menu_aspect_ratio * 480.000f;
-            instance->screen_width_480p = width_480p;
-            instance->menu_extra_width = width_480p - 640.000f;
-            instance->menu_displacement = (width_480p - menu_frame_width) / 2.0f;
+            instance->screen_width_480p = current_screen_width;
+            instance->menu_extra_width = current_screen_width - 640.000f;
+            instance->menu_displacement = (current_screen_width - menu_frame_width) / 2.0f;
 
-            // Revert widescreen fix displacement
-            instance->menu_displacement -= instance->menu_extra_width / 2.0f;
+            // We need to calculate this to reverse the widescreen fix displacement
+            instance->widescreen_fix_menu_displacement = instance->menu_displacement - instance->menu_extra_width / 2.0f;
 
             // Calculate mouse cursor bounds
-            std::int32_t mouse_increase = static_cast<std::int32_t>(width_480p - menu_frame_width) / 2;
+            std::int32_t mouse_increase = static_cast<std::int32_t>(current_screen_width - menu_frame_width) / 2;
             widescreen_mouse_left_bounds = -mouse_increase;
             widescreen_mouse_right_bounds = menu_frame_width + mouse_increase;
 
@@ -222,7 +230,7 @@ namespace Harmony::UserInterface {
         }
 
         float menu_extra_width = instance->get_menu_extra_width();
-        float displacement = instance->get_menu_displacement();
+        float displacement = instance->get_widescreen_fix_menu_displacement();
 
         if(min_x == 0.0f && max_x == 640.0f) {
             // Revert widescreen fix displacement
@@ -244,20 +252,20 @@ namespace Harmony::UserInterface {
     }
 
     extern "C" void reposition_menu_text_element(std::int16_t *element) noexcept {
-        auto displacement = instance->get_menu_displacement();
+        auto displacement = instance->get_widescreen_fix_menu_displacement();
 
         element[1] += displacement;
         element[3] += displacement;
     }
 
     extern "C" void reposition_menu_text_input() noexcept {
-        auto displacement = instance->get_menu_displacement();
+        auto displacement = instance->get_widescreen_fix_menu_displacement();
         widescreen_text_input_element[1] -= displacement;
         widescreen_text_input_element[3] -= displacement;
     }
 
     extern "C" void unreposition_menu_text_input(std::int16_t *element) noexcept {
-        auto displacement = instance->get_menu_displacement();
+        auto displacement = instance->get_widescreen_fix_menu_displacement();
         widescreen_text_input_element[1] += displacement;
         widescreen_text_input_element[3] += displacement;
     }

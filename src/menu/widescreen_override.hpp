@@ -18,16 +18,9 @@ namespace Harmony::UserInterface {
         void enable(bool setting) noexcept;
 
         /**
-         * Set widescreen frame aspect ratio
-         * @param x     Width of the menu frame
-         * @param y     Height of the menu frame
+         * Get screen width (in 480p scale)
          */
-        void set_aspect_ratio(std::uint16_t x, std::uint16_t y) noexcept;
-
-        /**
-         * Reset widescreen aspect ratio
-         */
-        void reset_frame_aspect_ratio() noexcept;
+        float get_screen_480p_width() noexcept;
 
         /**
          * Get widescreen fix displacement
@@ -38,6 +31,23 @@ namespace Harmony::UserInterface {
          * Get menu displacement
          */
         float get_menu_displacement() const noexcept;
+
+        /**
+         * Get widescreen fix menu displacement
+         */
+        float get_widescreen_fix_menu_displacement() const noexcept;
+
+        /**
+         * Set widescreen frame aspect ratio
+         * @param x     Width of the menu frame
+         * @param y     Height of the menu frame
+         */
+        void set_aspect_ratio(std::uint16_t x, std::uint16_t y) noexcept;
+
+        /**
+         * Reset widescreen aspect ratio
+         */
+        void reset_frame_aspect_ratio() noexcept;
 
         /**
          * Default constructor
@@ -60,8 +70,11 @@ namespace Harmony::UserInterface {
         /** Extra space */
         float menu_extra_width = 0;
 
-        /** Menu frame left displacement */
+        /** Menu frame displacement */
         float menu_displacement = 0;
+
+        /** Widescreen fix menu frame displacement */
+        float widescreen_fix_menu_displacement = 0;
 
         /** Menu text tabs */
         std::uint16_t *tabs;
