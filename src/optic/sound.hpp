@@ -32,6 +32,12 @@ namespace Harmony::Optic {
 		Sound(std::string name, std::filesystem::path path);
 
 		/**
+		 * Deleted copy constructor
+		 * Copying a sound makes it sound weird and glitchy
+		 */
+		Sound(const Sound &) = delete;
+
+		/**
 		 * Destructor for sound
 		 */
 		~Sound() noexcept;

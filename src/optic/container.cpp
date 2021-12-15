@@ -39,20 +39,20 @@ namespace Harmony::Optic {
 
     Sound *Container::get_sound(std::string name) noexcept {
         for(auto &sound : this->sounds) {
-            if(sound.get_name() == name) {
-                return &sound;
+            if(sound->get_name() == name) {
+                return sound.get();
             }
         }
         return nullptr;
     }
 
-    void Container::create_sound(std::string name, std::filesystem::path sound_poth) {
+    void Container::create_sound(std::string name, std::filesystem::path sound_path) {
         if(this->get_sound(name)) {
             throw Exception("Sound '" + name + "' already exists!");
         }
 
         try {
-            this->sounds.emplace_back(name, sound_poth);
+            this->sounds.emplace_back(std::make_unique<Sound>(name, sound_path));
         }
         catch(...) {
             throw;
@@ -62,7 +62,7 @@ namespace Harmony::Optic {
     void Container::remove_sound(std::string name) {
         auto it = this->sounds.begin();
         while(it != this->sounds.end()) {
-            if(it->get_name() == name) {
+            if(it->get()->get_name() == name) {
                 this->sounds.erase(it);
                 return;
             }
@@ -189,10 +189,9 @@ namespace Harmony::Optic {
         if(this->get_audio_engine(name)) {
             throw Exception("Audio engine instance '" + name + "' already exists!");
         }
-        auto instance = std::make_unique<AudioEngine>(name);
+        auto &instance = this->audio_engines.emplace_back(std::make_unique<AudioEngine>(name));
         instance->init();
         instance->setGlobalVolume(static_cast<float>(HaloData::get_master_volume()) / 10);
-        this->audio_engines.push_back(std::move(instance));
     }
 
     void Container::remove_audio_engine(std::string name) {

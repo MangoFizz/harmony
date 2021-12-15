@@ -195,7 +195,7 @@ namespace Harmony::Optic {
         std::vector<RenderQueue> render_queues;
 
         /** Sounds */
-        std::vector<Sound> sounds;
+        std::vector<std::unique_ptr<Sound>> sounds;
 
         /** Audio engine instances */
         std::vector<std::unique_ptr<AudioEngine>> audio_engines;
