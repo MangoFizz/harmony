@@ -4,11 +4,12 @@
 #include "../script.hpp"
 #include "../library.hpp"
 #include "../../halo_data/sound.hpp"
+#include "../../halo_data/widget.hpp"
 #include "../../menu/widescreen_override.hpp"
 #include "menu.hpp"
 
 namespace Harmony::Lua {
-    static int set_widescreen_aspect_ratio(lua_State *state) noexcept {
+    static int lua_set_widescreen_aspect_ratio(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 2) {
             static auto &harmony = Harmony::get();
@@ -25,7 +26,7 @@ namespace Harmony::Lua {
         return 0;
     }
 
-    static int play_sound(lua_State *state) noexcept {
+    static int lua_play_sound(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 1) {
             if(lua_type(state, 1) == LUA_TSTRING) {
@@ -54,9 +55,40 @@ namespace Harmony::Lua {
         return 0;
     }
 
+    static int lua_open_widget(lua_State *state) noexcept {
+        int args = lua_gettop(state);
+        if(args == 2) {
+            // Get widget tag ID
+            auto widget_id = HaloData::TagID::null_id();
+            if(lua_type(state, 1) == LUA_TSTRING) {
+                const char *tag_path = luaL_checkstring(state, 1);
+                widget_id = HaloData::get_tag_id(tag_path, HaloData::TAG_CLASS_UI_WIDGET_DEFINITION);
+                if(widget_id.is_null()) {
+                    luaL_error(state, "invalid widget tag path in harmony open_widget function");
+                }
+            }
+            else {
+                widget_id = luaL_checkinteger(state, 1);
+                if(!HaloData::get_tag(widget_id)) {
+                    luaL_error(state, "invalid tag ID in harmony open_widget function");
+                }
+            }
+
+            // Get history flag
+            bool dont_push_history = lua_toboolean(state, 1);
+
+            HaloData::open_widget(widget_id, dont_push_history);
+        }
+        else {
+            luaL_error(state, "invalid number of arguments in harmony play_sound function");
+        }
+        return 0;
+    }
+
     static const struct luaL_Reg menu[] = {
-        {"set_aspect_ratio", set_widescreen_aspect_ratio},
-        {"play_sound", play_sound},
+        {"set_aspect_ratio", lua_set_widescreen_aspect_ratio},
+        {"play_sound", lua_play_sound},
+        {"open_widget", lua_open_widget},
         {NULL, NULL}
     };
 
