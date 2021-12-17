@@ -7,9 +7,38 @@
 
 namespace Harmony::HaloData {
     /**
-     * Get the window handle
+     * Basic application window information.
+     * Struct from: https://github.com/surrealwaffle/chimera/tree/dearimgui_integration
      */
-    HWND *get_window_handle() noexcept;
+    struct WindowGlobals {
+        /** A handle to the application instance. */
+        HINSTANCE hInstance;
+
+        /** Halo's main window handle. */
+        HWND hWnd;
+
+        /** possibly used for error dialog menus? */
+        HWND hWndUnknown;
+
+        /** 
+         * wShow from GetStartupInfo(), if the STARTF_USESHOWWINDOW flag is set. 
+         * Otherwise, takes on the value `SW_SHOWDEFAULT`.
+         */ 
+        int nCmdShow;
+
+        /** The WindowProc callback function as registered with the window class. */
+        WNDPROC lpfnWndProc;
+        
+        /** Halo's small icon resource. */
+        HICON hIconSm;
+        
+        /**
+         * Get the window globals.
+         * @return reference to the window globals.
+         */
+        static WindowGlobals &get();
+    };
+    static_assert(sizeof(WindowGlobals) == 0x18);
 }
 
 #endif

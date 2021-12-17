@@ -23,7 +23,7 @@ namespace Harmony::UserInterface {
         float get_screen_480p_width() noexcept;
 
         /**
-         * Get widescreen fix displacement
+         * Get widescreen displacement
          */
         float get_menu_extra_width() noexcept;
 
@@ -36,6 +36,11 @@ namespace Harmony::UserInterface {
          * Get widescreen fix menu displacement
          */
         float get_widescreen_fix_menu_displacement() const noexcept;
+
+        /**
+         * Get widescreen frame aspect ratio
+         */
+        float get_aspect_ratio() const noexcept;
 
         /**
          * Set widescreen frame aspect ratio

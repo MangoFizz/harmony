@@ -31,7 +31,7 @@ _get_tag_id:
     ;# Get tag class
     mov ebx, [esp + 0x2C]
 
-    ;# Play it
+    ;# Find it!
     push eax
     mov edi, ebx
     call dword ptr get_tag_address

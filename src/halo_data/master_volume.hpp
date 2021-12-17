@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef CHIMERA_PATH_HPP
-#define CHIMERA_PATH_HPP
+#ifndef HARMONY_HALO_DATA_MASTER_VOLUME_HPP
+#define HARMONY_HALO_DATA_MASTER_VOLUME_HPP
 
 #include <cstdint>
 

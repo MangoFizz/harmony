@@ -6,7 +6,7 @@
 
 namespace Harmony {
     void message_box(const char *message) noexcept {
-        auto *window_handle = HaloData::get_window_handle();
-        MessageBoxA(*window_handle, message, "Harmony", MB_OK);
+        auto *window_handle = HaloData::WindowGlobals::get().hWnd;
+        MessageBoxA(window_handle, message, "Harmony", MB_OK);
     }
 }

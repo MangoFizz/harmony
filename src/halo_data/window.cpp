@@ -5,10 +5,9 @@
 #include "window.hpp"
 
 namespace Harmony::HaloData {
-    HWND *get_window_handle() noexcept {
-        static auto &window_handle_sig = Harmony::get().get_signature("window_handle");
-        static auto *window_handle = *reinterpret_cast<HWND **>(window_handle_sig.get_data());
-
-        return window_handle;
+    WindowGlobals &WindowGlobals::get() {
+        static auto &windows_global_sig = Harmony::get().get_signature("window_globals");
+        WindowGlobals *window_globals = *reinterpret_cast<WindowGlobals **>(windows_global_sig.get_data());
+        return *window_globals;
     }
 }

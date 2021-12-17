@@ -131,6 +131,10 @@ namespace Harmony::UserInterface {
         return this->widescreen_fix_menu_displacement;
     }
 
+    float WidescreenOverride::get_aspect_ratio() const noexcept {
+        return this->menu_aspect_ratio;
+    }
+
     void WidescreenOverride::set_aspect_ratio(std::uint16_t x, std::uint16_t y) noexcept {
         this->menu_aspect_ratio = static_cast<float>(x) / static_cast<float>(y);
 

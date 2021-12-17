@@ -45,6 +45,7 @@ add_library(harmony-core STATIC
     src/halo_data/master_volume.cpp
     src/halo_data/menu.cpp
     src/halo_data/game_engine.cpp
+    src/halo_data/input_devices.cpp
     src/halo_data/multiplayer_events.cpp
     src/halo_data/multiplayer_sounds.cpp
     src/halo_data/path.cpp
@@ -52,6 +53,7 @@ add_library(harmony-core STATIC
     src/halo_data/sound.S
     src/halo_data/tag.cpp
     src/halo_data/tag.S
+    src/halo_data/widget.cpp
     src/halo_data/window.cpp
     src/math/geometry.cpp
     src/memory/codecave.cpp
