@@ -9,6 +9,7 @@
 #include <utility>
 #include "../math/geometry.hpp"
 #include "../memory/struct.hpp"
+#include "tag.hpp"
 
 namespace Harmony::HaloData {
     /**
@@ -101,6 +102,13 @@ namespace Harmony::HaloData {
          * This must be `1`, otherwise the event gets dropped during processing.
          */
         std::uint8_t duration;
+        
+        /**
+         * Get string for a gamepad button
+         * @param btn   Gamepad button code
+         * @return      Stringified button
+         */
+        static std::string string_for_button(Button btn) noexcept;
     };
     
     /**
@@ -122,6 +130,13 @@ namespace Harmony::HaloData {
 
         /** The duration #button was held for, up to #duration_max. */
         std::uint8_t duration;
+
+        /**
+         * Get string for a mouse button
+         * @param btn   Mouse button code
+         * @return      Stringified button
+         */
+        static std::string string_for_button(Button btn) noexcept;
     };
     
     /** 
@@ -255,6 +270,104 @@ namespace Harmony::HaloData {
         static WidgetCursorGlobals &get();
     };
     static_assert(sizeof(WidgetCursorGlobals) == 0x0C);
+
+    struct WidgetInstance {
+        enum Type : std::uint16_t {
+            WIDGET_TYPE_CONTAINER = 0,
+            WIDGET_TYPE_TEXT_BOX,
+            WIDGET_TYPE_SPINNER_LIST,
+            WIDGET_TYPE_COLUMN_LIST,
+            WIDGET_TYPE_GAME_MODEL,
+            WIDGET_TYPE_MOVIE,
+            WIDGET_TYPE_CUSTOM
+        };
+
+        /** ID of the widget tag */
+        TagID tag_id;
+
+        /** Name of the widget */
+        const char *name;
+
+        /** Sets if the widget is hidden */
+        std::uint16_t hidden;
+
+        /** Widget frame left bound */
+        std::int16_t left_bound;
+
+        /** Widget frame top bound */
+        std::int16_t top_bound;
+
+        /** Widget type */
+        Type type;
+
+        /** Unknown flags related to the widget history */
+        std::uint16_t visible;
+        PADDING(0x2);
+        PADDING(0x4);
+
+        /** A widget instance related to the history */
+        WidgetInstance *unknown_history_thing_1;
+
+        /** Milliseconds to close widgets */
+        std::uint32_t ms_to_close;
+
+        /** Widget close fade time in milliseconds */
+        std::uint32_t ms_to_close_fade_time;
+        
+        /** Widget opacity (from 0 to 1) */
+        float opacity;
+
+        /** Previous widget of the list. Null in the first list item. */
+        WidgetInstance *previous_widget;
+
+        /** Next widget of the list. Null in the last list item. */
+        WidgetInstance *next_widget;
+
+        /** Parent widget. Null in the root widget. */
+        WidgetInstance *parent;
+
+        /** Child widget. */
+        WidgetInstance *child;
+
+        /** Focussed child widget. Null in non-list widgets. */
+        WidgetInstance *focused_child;
+
+        /** Text box content. Null in non-text box widgets. */
+        const wchar_t *text;
+
+        /** Last widget list element focussed by cursor */
+        std::uint16_t cursor_index;
+        PADDING(0x2);
+
+        PADDING(0x4);
+        PADDING(0x4);
+        PADDING(0x4);
+
+        PADDING(0x4);
+        PADDING(0x4);
+
+        /** Currently focussed */
+        std::uint32_t focused;
+
+        PADDING(0x4);
+    }; 
+    static_assert(sizeof(WidgetInstance) == 0x60);
+
+    struct WidgetHistoryEntry {
+        /** Previous menu root widget */
+        WidgetInstance *previous_menu;
+
+        /** Previous menu list widget */
+        WidgetInstance *previous_menu_list;
+
+        /** Unknown flags */
+        PADDING(0x2);
+        PADDING(0x2);
+
+        /** Previous history entry */
+        WidgetHistoryEntry *previous;
+    };
+    static_assert(sizeof(WidgetHistoryEntry) == 0x10);
     
     /**
      * Describes the general state of widgets and widget display.
@@ -290,10 +403,10 @@ namespace Harmony::HaloData {
         static_assert(sizeof(DeferredErrorDescriptor) == 0x04);
 
         /** The root widget instance for current menu. */
-        void *root_widget_instance;
+        WidgetInstance *root_widget_instance;
 
         /** Last widget history entry */
-        PADDING(0x4);
+        WidgetHistoryEntry *history_top_entry;
 
         /** Current time in milliseconds */
         std::int32_t current_time;
@@ -341,6 +454,13 @@ namespace Harmony::HaloData {
         static WidgetGlobals &get();
     };
     static_assert(sizeof(WidgetGlobals) == 0x34);
+
+    /**
+     * Open a UI widget
+     * @param widget_id         Tag ID of the widget that will be opened.
+     * @param push_history      Do not create an entry in the history, just override the current widget.
+     */
+    void open_widget(TagID widget_id, bool push_history = true) noexcept;
 }
 
 #endif

@@ -54,6 +54,7 @@ add_library(harmony-core STATIC
     src/halo_data/tag.cpp
     src/halo_data/tag.S
     src/halo_data/widget.cpp
+    src/halo_data/widget.S
     src/halo_data/window.cpp
     src/math/geometry.cpp
     src/memory/codecave.cpp
