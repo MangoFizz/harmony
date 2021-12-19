@@ -206,6 +206,24 @@ Example:
 harmony.ui.play_sound(sound_tag_id)
 ```
 
+### open_widget
+
+Open an UI widget.
+
+**Takes: (a)** `string` widget_tag_path, `boolean` push_history
+
+```lua
+harmony.ui.open_widget("ui\\shell\\main_menu\\main_menu", true)
+```
+
+**Takes: (b)** `number` widget_tag_id, `boolean` push_history
+
+Example:
+
+```lua
+harmony.ui.open_widget(widget_tag_id, true)
+```
+
 ## Events
 These functions are called when specific events occur. They have to be assigned manually
 using the **set_callback** function. Only one function is allowed per callback per 
