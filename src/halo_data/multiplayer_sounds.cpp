@@ -5,125 +5,125 @@
 namespace Harmony::HaloData {
     std::string string_from_multiplayer_sound(MultiplayerSound sound) noexcept {
         switch(sound) {
-            case HaloData::MultiplayerSound::PLAYBALL:
+            case MULTIPLAYER_SOUND_PLAYBALL:
                 return "playball";
-            case HaloData::MultiplayerSound::GAME_OVER:
+            case MULTIPLAYER_SOUND_GAME_OVER:
                 return "game over";
-            case HaloData::MultiplayerSound::ONE_MINUTE_TO_WIN:
+            case MULTIPLAYER_SOUND_ONE_MINUTE_TO_WIN:
                 return "one minute to win";
-            case HaloData::MultiplayerSound::THIRTY_SECONDS_TO_WIN:
+            case MULTIPLAYER_SOUND_THIRTY_SECONDS_TO_WIN:
                 return "thirty seconds to win";
-            case HaloData::MultiplayerSound::RED_TEAM_ONE_MINUTE_TO_WIN:
+            case MULTIPLAYER_SOUND_RED_TEAM_ONE_MINUTE_TO_WIN:
                 return "red team one minute to win";
-            case HaloData::MultiplayerSound::RED_TEAM_THIRTY_SECONDS_TO_WIN:
+            case MULTIPLAYER_SOUND_RED_TEAM_THIRTY_SECONDS_TO_WIN:
                 return "red team thirty seconds to win";
-            case HaloData::MultiplayerSound::BLUE_TEAM_ONE_MINUTE_TO_WIN:
+            case MULTIPLAYER_SOUND_BLUE_TEAM_ONE_MINUTE_TO_WIN:
                 return "blue team one minute to win";
-            case HaloData::MultiplayerSound::BLUE_TEAM_THIRTY_SECONDS_TO_WIN:
+            case MULTIPLAYER_SOUND_BLUE_TEAM_THIRTY_SECONDS_TO_WIN:
                 return "red team thirty seconds to win";
-            case HaloData::MultiplayerSound::RED_TEAM_FLAG_TAKEN:
+            case MULTIPLAYER_SOUND_RED_TEAM_FLAG_TAKEN:
                 return "red team flag taken";
-            case HaloData::MultiplayerSound::RED_TEAM_FLAG_RETURNED:
+            case MULTIPLAYER_SOUND_RED_TEAM_FLAG_RETURNED:
                 return "red team flag returned";
-            case HaloData::MultiplayerSound::RED_TEAM_FLAG_CAPTURED:
+            case MULTIPLAYER_SOUND_RED_TEAM_FLAG_CAPTURED:
                 return "red team flag captured";
-            case HaloData::MultiplayerSound::BLUE_TEAM_FLAG_TAKEN:
+            case MULTIPLAYER_SOUND_BLUE_TEAM_FLAG_TAKEN:
                 return "blue team flag taken";
-            case HaloData::MultiplayerSound::BLUE_TEAM_FLAG_RETURNED:
+            case MULTIPLAYER_SOUND_BLUE_TEAM_FLAG_RETURNED:
                 return "blue team flag returned";
-            case HaloData::MultiplayerSound::BLUE_TEAM_FLAG_CAPTURED:
+            case MULTIPLAYER_SOUND_BLUE_TEAM_FLAG_CAPTURED:
                 return "blue team flag captured";
-            case HaloData::MultiplayerSound::DOUBLE_KILL:
+            case MULTIPLAYER_SOUND_DOUBLE_KILL:
                 return "double kill";
-            case HaloData::MultiplayerSound::TRIPLE_KILL:
+            case MULTIPLAYER_SOUND_TRIPLE_KILL:
                 return "triple kill";
-            case HaloData::MultiplayerSound::KILLTACULAR:
+            case MULTIPLAYER_SOUND_KILLTACULAR:
                 return "killtacular";
-            case HaloData::MultiplayerSound::RUNNING_RIOT:
+            case MULTIPLAYER_SOUND_RUNNING_RIOT:
                 return "running riot";
-            case HaloData::MultiplayerSound::KILLING_SPREE:
+            case MULTIPLAYER_SOUND_KILLING_SPREE:
                 return "killing spree";
-            case HaloData::MultiplayerSound::ODDBALL:
+            case MULTIPLAYER_SOUND_ODDBALL:
                 return "oddball";
-            case HaloData::MultiplayerSound::RACE:
+            case MULTIPLAYER_SOUND_RACE:
                 return "race";
-            case HaloData::MultiplayerSound::SLAYER:
+            case MULTIPLAYER_SOUND_SLAYER:
                 return "slayer";
-            case HaloData::MultiplayerSound::CAPTURE_THE_FLAG:
+            case MULTIPLAYER_SOUND_CAPTURE_THE_FLAG:
                 return "capture the flag";
-            case HaloData::MultiplayerSound::WARTHOG:
+            case MULTIPLAYER_SOUND_WARTHOG:
                 return "warthog";
-            case HaloData::MultiplayerSound::GHOST:
+            case MULTIPLAYER_SOUND_GHOST:
                 return "ghost";
-            case HaloData::MultiplayerSound::SCORPION:
+            case MULTIPLAYER_SOUND_SCORPION:
                 return "scorpion";
-            case HaloData::MultiplayerSound::COUNTDOWN_TIMER:
+            case MULTIPLAYER_SOUND_COUNTDOWN_TIMER:
                 return "countdown timer";
-            case HaloData::MultiplayerSound::TELEPORTER_ACTIVATE:
+            case MULTIPLAYER_SOUND_TELEPORTER_ACTIVATE:
                 return "teleporter activate";
-            case HaloData::MultiplayerSound::FLAG_FAILURE:
+            case MULTIPLAYER_SOUND_FLAG_FAILURE:
                 return "flag failure";
-            case HaloData::MultiplayerSound::COUNTDOWN_FOR_RESPAWN:
+            case MULTIPLAYER_SOUND_COUNTDOWN_FOR_RESPAWN:
                 return "countdown for respawn";
-            case HaloData::MultiplayerSound::HILL_MOVE:
+            case MULTIPLAYER_SOUND_HILL_MOVE:
                 return "hill move";
-            case HaloData::MultiplayerSound::PLAYER_RESPAWN:
+            case MULTIPLAYER_SOUND_PLAYER_RESPAWN:
                 return "player respawn";
-            case HaloData::MultiplayerSound::KING_OF_THE_HILL:
+            case MULTIPLAYER_SOUND_KING_OF_THE_HILL:
                 return "king of the hill";
-            case HaloData::MultiplayerSound::ODD_BALL:
+            case MULTIPLAYER_SOUND_ODD_BALL:
                 return "odd ball";
-            case HaloData::MultiplayerSound::TEAM_RACE:
+            case MULTIPLAYER_SOUND_TEAM_RACE:
                 return "team race";
-            case HaloData::MultiplayerSound::TEAM_SLAYER:
+            case MULTIPLAYER_SOUND_TEAM_SLAYER:
                 return "team slayer";
-            case HaloData::MultiplayerSound::TEAM_KING_OF_THE_HILL:
+            case MULTIPLAYER_SOUND_TEAM_KING_OF_THE_HILL:
                 return "team king of the hill";
-            case HaloData::MultiplayerSound::BLUE_TEAM_CAPTURE_THE_FLAG:
+            case MULTIPLAYER_SOUND_BLUE_TEAM_CAPTURE_THE_FLAG:
                 return "blue team capture the flag";
-            case HaloData::MultiplayerSound::RED_TEAM_CAPTURE_THE_FLAG:
+            case MULTIPLAYER_SOUND_RED_TEAM_CAPTURE_THE_FLAG:
                 return "red team capture the flag";
-            case HaloData::MultiplayerSound::CONTEST:
+            case MULTIPLAYER_SOUND_CONTEST:
                 return "contest";
-            case HaloData::MultiplayerSound::CONTROL:
+            case MULTIPLAYER_SOUND_CONTROL:
                 return "control";
-            case HaloData::MultiplayerSound::HILL_OCCUPIED:
+            case MULTIPLAYER_SOUND_HILL_OCCUPIED:
                 return "hill occupied";
-            case HaloData::MultiplayerSound::COUNTDOWN_TIMER_END:
+            case MULTIPLAYER_SOUND_COUNTDOWN_TIMER_END:
                 return "countdown timer end";
-            case HaloData::MultiplayerSound::TING:
+            case MULTIPLAYER_SOUND_TING:
                 return "ting";
-            case HaloData::MultiplayerSound::CUSTOM_1:
+            case MULTIPLAYER_SOUND_CUSTOM_1:
                 return "custom 1";
-            case HaloData::MultiplayerSound::CUSTOM_2:
+            case MULTIPLAYER_SOUND_CUSTOM_2:
                 return "custom 2";
-            case HaloData::MultiplayerSound::CUSTOM_3:
+            case MULTIPLAYER_SOUND_CUSTOM_3:
                 return "custom 3";
-            case HaloData::MultiplayerSound::CUSTOM_4:
+            case MULTIPLAYER_SOUND_CUSTOM_4:
                 return "custom 4";
-            case HaloData::MultiplayerSound::CUSTOM_5:
+            case MULTIPLAYER_SOUND_CUSTOM_5:
                 return "custom 5";
-            case HaloData::MultiplayerSound::CUSTOM_6:
+            case MULTIPLAYER_SOUND_CUSTOM_6:
                 return "custom 6";
-            case HaloData::MultiplayerSound::CUSTOM_7:
+            case MULTIPLAYER_SOUND_CUSTOM_7:
                 return "custom 7";
-            case HaloData::MultiplayerSound::CUSTOM_8:
+            case MULTIPLAYER_SOUND_CUSTOM_8:
                 return "custom 8";
-            case HaloData::MultiplayerSound::CUSTOM_9:
+            case MULTIPLAYER_SOUND_CUSTOM_9:
                 return "custom 9";
-            case HaloData::MultiplayerSound::CUSTOM_10:
+            case MULTIPLAYER_SOUND_CUSTOM_10:
                 return "custom 10";
-            case HaloData::MultiplayerSound::CUSTOM_11:
+            case MULTIPLAYER_SOUND_CUSTOM_11:
                 return "custom 11";
-            case HaloData::MultiplayerSound::CUSTOM_12:
+            case MULTIPLAYER_SOUND_CUSTOM_12:
                 return "custom 12";
-            case HaloData::MultiplayerSound::CUSTOM_13:
+            case MULTIPLAYER_SOUND_CUSTOM_13:
                 return "custom 13";
-            case HaloData::MultiplayerSound::CUSTOM_14:
+            case MULTIPLAYER_SOUND_CUSTOM_14:
                 return "custom 14";
-            case HaloData::MultiplayerSound::CUSTOM_15:
+            case MULTIPLAYER_SOUND_CUSTOM_15:
                 return "custom 15";
-            case HaloData::MultiplayerSound::CUSTOM_16:
+            case MULTIPLAYER_SOUND_CUSTOM_16:
                 return "custom 16";
             default:
                 return "invalid sound";

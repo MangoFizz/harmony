@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <windows.h>
-#include <cstring>
-#include <lua.hpp>
 #include "events/console_command.hpp"
 #include "events/d3d9_end_scene.hpp"
 #include "events/d3d9_reset.hpp"
@@ -33,21 +31,19 @@ namespace Harmony {
 
    Signature &Harmony::get_signature(const char *name) noexcept {
       for(auto &signature : this->signatures) {
-         if(std::strcmp(signature.get_name(), name) == 0) {
+         if(signature.get_name() == name) {
             return signature;
          }
       }
 
-      // What the heck are you looking for?
-      char message[256];
-      std::sprintf(message, "Invalid %s signature. This may be a bug.", name);
-      MessageBoxA(NULL, message, "Harmony: missing signature", MB_OK);
+      // oops
+      message_box("Signature %s does not exists. This may be a bug.", name);
       std::terminate();
    }
 
    bool Harmony::signature_exists(const char *name) noexcept {
       for(auto &signature : this->signatures) {
-         if(std::strcmp(signature.get_name(), name) == 0) {
+         if(signature.get_name() == name) {
             return true;
          }
       }
@@ -55,15 +51,15 @@ namespace Harmony {
    }
 
    Lua::Library &Harmony::get_lua_library_handler() noexcept{
-      return *(this->lua_handler.get());
+      return *this->lua_handler;
    }
 
    Optic::Handler &Harmony::get_optic_handler() noexcept {
-      return *(this->optic_handler.get());
+      return *this->optic_handler;
    }
 
    UserInterface::WidescreenOverride &Harmony::get_widescreen_override_handle() noexcept {
-      return *(this->widescreen_fix_override.get());
+      return *this->widescreen_fix_override;
    }
 
    Harmony::Harmony() : signatures(Signature::find_signatures()) {
@@ -100,7 +96,7 @@ namespace Harmony {
       return Harmony::get().get_signature(name).get_data();
    }
 
-   static void first_tick() noexcept {      
+   static void first_tick() noexcept {
       // remove this event, we only need to run it once
       remove_tick_event(first_tick);
 
@@ -149,13 +145,12 @@ namespace Harmony {
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
    switch(fdwReason) {
-      case DLL_PROCESS_ATTACH: {
+      case DLL_PROCESS_ATTACH:
          new Harmony::Harmony();
          break;
-      }
-      case DLL_PROCESS_DETACH: {
+
+      default:
          break;
-      }
    }
    return TRUE;
 }

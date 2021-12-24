@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <cstring>
+#include "../messaging/message_box.hpp"
 #include "codefinder.hpp"
 #include "memory.hpp"
 #include "signatures/client.hpp"
@@ -9,8 +10,8 @@
 namespace Harmony {
     using namespace Memory;
 
-    const char *Signature::get_name() const noexcept {
-        return this->name.c_str();
+    std::string Signature::get_name() const noexcept {
+        return this->name;
     }
 
     std::byte *Signature::get_data() const noexcept {
@@ -31,9 +32,7 @@ namespace Harmony {
             this->original_data.insert(this->original_data.begin(), this->data, this->data + lenght - offset);
         }
         else {
-            char message[256] = {};
-            std::sprintf(message, "Could not find %s signature.", name);
-            MessageBoxA(NULL, message, "Harmony: missing signature", MB_OK);
+            message_box("Could not find %s signature.", name);
             std::terminate();
         }
     }

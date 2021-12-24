@@ -23,7 +23,7 @@ namespace Harmony {
         /**
          * Get the signature name
          */
-        const char *get_name() const noexcept;
+        std::string get_name() const noexcept;
 
         /**
          * Get the signature data

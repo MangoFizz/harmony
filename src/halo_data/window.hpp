@@ -34,7 +34,8 @@ namespace Harmony::HaloData {
         
         /**
          * Get the window globals.
-         * @return reference to the window globals.
+         * @return      Reference to the window globals.
+         * @exception   If window globals signature was not found... yet
          */
         static WindowGlobals &get();
     };
