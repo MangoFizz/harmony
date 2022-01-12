@@ -14,12 +14,20 @@ namespace Harmony::Optic {
         this->name = name;
     }
 
+    std::size_t Sprite::get_frame_count() const noexcept {
+        return this->frame_count;
+    }
+
     int Sprite::get_width() const noexcept {
-        return this->width;
+        return this->frame_width;
     }
 
     int Sprite::get_height() const noexcept {
-        return this->height;
+        return this->frame_height;
+    }
+
+    std::size_t Sprite::get_frames_per_second() const noexcept {
+        return this->fps;
     }
 
     void Sprite::load(LPDIRECT3DDEVICE9 device) {
@@ -27,13 +35,12 @@ namespace Harmony::Optic {
             return;
         }
 
-        auto file = this->texture_path.string();
-        int width = this->width;
-        int height = this->height;
+        int width = this->texture_width;
+        int height = this->texture_height;
         int mip_levels = 0;
         int color_key = 0;
 
-        if(D3DXCreateTextureFromFileExA(device, file.c_str(), width, height, mip_levels, 0, 
+        if(D3DXCreateTextureFromFileExW(device, this->texture_path.c_str(), width, height, mip_levels, 0, 
                                         D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT_NONPOW2,
                                         color_key, NULL, NULL, &this->texture) != D3D_OK) {
             throw ExceptionBox("Failed to create texture.");
@@ -73,8 +80,8 @@ namespace Harmony::Optic {
             scale.y = state.scale.y;
 
             D3DXVECTOR2 rotation_center;
-            rotation_center.x = state.position.x + this->width / 2;
-            rotation_center.y = state.position.y + this->height / 2;
+            rotation_center.x = state.position.x + this->frame_width / 2;
+            rotation_center.y = state.position.y + this->frame_height / 2;
 
             auto &rotation = state.rotation;
 
@@ -85,9 +92,15 @@ namespace Harmony::Optic {
 
             // Update transform
             this->sprite->SetTransform(&new_transform);
+
+            // Texture region to draw
+            const RECT *frame_offset = nullptr;
+            if(this->frame_count > 1) {
+                frame_offset = &this->frames_offets[state.current_frame];
+            }
             
             this->sprite->Begin(D3DXSPRITE_ALPHABLEND);
-            this->sprite->Draw(this->texture, NULL, NULL, &position, D3DCOLOR_RGBA(color.r, color.g, color.b, color.a));
+            this->sprite->Draw(this->texture, frame_offset, NULL, &position, D3DCOLOR_RGBA(color.r, color.g, color.b, color.a));
             this->sprite->End();
         }
     }
@@ -99,8 +112,37 @@ namespace Harmony::Optic {
 
         this->name = name;
         this->texture_path = texture;
-        this->width = width;
-        this->height = height;
+        this->texture_width = width;
+        this->texture_height = height;
+        this->frame_width = width;
+        this->frame_height = height;
+    }
+
+    Sprite::Sprite(std::string name, std::string texture, std::size_t sheet_rows, std::size_t sheet_columns, std::size_t sheet_frames, std::size_t frames_per_second, int frame_width, int frame_height) {
+        if(!std::filesystem::exists(texture)) {
+            throw Exception("Texture file for sprite '" + name + "' does not exists!");
+        }
+
+        this->name = name;
+        this->texture_path = texture;
+        this->texture_width = frame_width * sheet_columns;
+        this->texture_height = frame_height * sheet_rows;
+        this->frame_width = frame_width;
+        this->frame_height = frame_height;
+        this->frame_count = sheet_frames;
+        this->fps = frames_per_second;
+
+        for(std::size_t frame = 0, row = 0, column = 0; frame < sheet_frames; frame++) {
+            int offset_x = 1 + column * frame_width;
+            int offset_y = 1 + row * frame_height;
+            this->frames_offets.push_back({offset_x, offset_y, offset_x + this->frame_width, offset_y + this->frame_height});
+            
+            column++;
+            if(column == sheet_columns) {
+                column = 0;
+                row++;
+            }
+        }
     }
 
     Sprite::~Sprite() noexcept {

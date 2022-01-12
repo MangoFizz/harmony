@@ -93,6 +93,19 @@ namespace Harmony::Optic {
         }
     }
 
+    void Container::create_sprite(std::string name, std::string texture, std::size_t sheet_rows, std::size_t sheet_columns, std::size_t sheet_frames, std::size_t frames_per_second, int frame_width, int frame_height) {
+        if(this->get_sprite(name)) {
+            throw Exception("Sprite '" + name + "' already exists!");
+        }
+
+        try {
+            this->sprites.emplace_back(name, texture, sheet_rows, sheet_columns, sheet_frames, frames_per_second, frame_width, frame_height);
+        }
+        catch(...) {
+            throw;
+        }
+    }
+
     void Container::remove_sprite(std::string name) {
         auto it = this->sprites.begin();
         while(it != this->sprites.end()) {

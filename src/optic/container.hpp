@@ -66,7 +66,7 @@ namespace Harmony::Optic {
         Sprite *get_sprite(std::string name) noexcept;
 
         /**
-         * Add a sprite
+         * Add a single-frame sprite
          * @param name      Name or the sprite
          * @param texture   Texture path
          * @param width     Width of the sprite
@@ -75,6 +75,21 @@ namespace Harmony::Optic {
          * @exception       If texture file does not exists
          */
         void create_sprite(std::string name, std::string texture, int width, int height);
+
+        /**
+         * Add a sprite
+         * @param name                  Name or the sprite
+         * @param texture               Texture path
+         * @param sheet_rows            Number of rows in the sheet
+         * @param sheet_columns         Number of columns in the sheet
+         * @param sheet_frames          Number of frames in the sheet
+         * @param frames_per_second     Amount of frames per second
+         * @param frame_width           Width of the sprite
+         * @param frame_height          Height of the sprite
+         * @exception                   If sprite already exists
+         * @exception                   If texture file does not exists
+         */
+        void create_sprite(std::string name, std::string texture, std::size_t sheet_rows, std::size_t sheet_columns, std::size_t sheet_frames, std::size_t frames_per_second, int frame_width, int frame_height);
 
         /**
          * Remove a sprite

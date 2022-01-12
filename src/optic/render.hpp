@@ -102,7 +102,7 @@ namespace Harmony::Optic {
         std::size_t get_maximum_renders() const noexcept;
 
         /**
-         * Get render duration
+         * Get render duration in milliseconds
          */
         long get_render_duration() const noexcept;
 

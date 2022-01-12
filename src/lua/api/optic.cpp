@@ -118,17 +118,27 @@ namespace Harmony::Lua {
         auto *optic = script->get_optic_container();
 
         int args = lua_gettop(state);
-        if(args == 4) {
+        if(args == 4 || args == 8) {
             // Arguments
             const char *name = luaL_checkstring(state, 1);
             std::string texture_path = std::string(script->get_data_path()) + "\\" + luaL_checkstring(state, 2);
-            int width = luaL_checknumber(state, 3);
-            int height = luaL_checknumber(state, 4);
+            int frame_width = luaL_checknumber(state, 3);
+            int frame_height = luaL_checknumber(state, 4);
 
             if(script->path_is_valid(texture_path)) {
                 if(std::filesystem::exists(texture_path)) {
                     try {
-                        optic->create_sprite(name, texture_path, width, height);
+                        if(args == 4) {
+                            optic->create_sprite(name, texture_path, frame_width, frame_height);
+                        }
+                        else {
+                            auto rows = luaL_checkinteger(state, 5);
+                            auto columns = luaL_checkinteger(state, 6);
+                            auto frames = luaL_checkinteger(state, 7);
+                            auto fps = luaL_checkinteger(state, 8);
+
+                            optic->create_sprite(name, texture_path, rows, columns, frames, fps, frame_width, frame_height);
+                        }
                     }
                     catch(...) {
                         luaL_error(state, "invalid name for sprite in harmony create_sprite function");

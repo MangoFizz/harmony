@@ -4,6 +4,7 @@
 #include "../events/d3d9_reset.hpp"
 #include "../events/tick.hpp"
 #include "../messaging/exception.hpp"
+#include "../messaging/console_output.hpp"
 #include "../harmony.hpp"
 #include "exception.hpp"
 #include "handler.hpp"
@@ -158,6 +159,17 @@ namespace Harmony::Optic {
                         if(std::find(active_animations.begin(), active_animations.end(), fade_out_anim) == active_animations.end()) {
                             render.play_animation(fade_out_anim);
                         }
+                    }
+
+                    // Refresh frame
+                    if(sprite->get_frame_count() > 1) {
+                        float render_timelife_seconds = static_cast<float>(render.get_timelife()) / 1000;
+                        float time_per_frame = 1.0f / sprite->get_frames_per_second();
+                        int frame_count = floor(render_timelife_seconds / time_per_frame);
+                        int current_frame = frame_count % sprite->get_frame_count();
+
+                        render_state.current_frame = current_frame;
+                        current_render_state.current_frame = current_frame;
                     }
 
                     // Draw it!

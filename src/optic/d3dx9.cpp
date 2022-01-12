@@ -31,9 +31,9 @@ static void load_d3dx9() noexcept {
     }
 }
 
-HRESULT WINAPI D3DXCreateTextureFromFileExA(IDirect3DDevice9 *device, const char *srcfile, UINT width, UINT height, UINT miplevels, DWORD usage, D3DFORMAT format, D3DPOOL pool, DWORD filter, DWORD mipfilter, D3DCOLOR colorkey, D3DXIMAGE_INFO *srcinfo, PALETTEENTRY *palette, struct IDirect3DTexture9 **texture) {
+HRESULT WINAPI D3DXCreateTextureFromFileExW(IDirect3DDevice9 *device, const wchar_t *srcfile, UINT width, UINT height, UINT miplevels, DWORD usage, D3DFORMAT format, D3DPOOL pool, DWORD filter, DWORD mipfilter, D3DCOLOR colorkey, D3DXIMAGE_INFO *srcinfo, PALETTEENTRY *palette, struct IDirect3DTexture9 **texture) {
     load_d3dx9();
-    return CALLPROC(d3dx9_43, D3DXCreateTextureFromFileExA, device, srcfile, width, height, miplevels, usage, format, pool, filter, mipfilter, colorkey, srcinfo, palette, texture);
+    return CALLPROC(d3dx9_43, D3DXCreateTextureFromFileExW, device, srcfile, width, height, miplevels, usage, format, pool, filter, mipfilter, colorkey, srcinfo, palette, texture);
 }
 
 HRESULT WINAPI D3DXCreateSprite(struct IDirect3DDevice9 *device, struct ID3DXSprite **sprite) {
