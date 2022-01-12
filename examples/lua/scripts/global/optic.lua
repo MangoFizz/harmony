@@ -31,12 +31,12 @@ optic.create_render_queue("demo", 50, 400, 255, math.random(0, 360), 4000, 6, "f
 optic.create_sprite("sandia", "images/sandia.jpg", 50, 50)
 
 function on_multiplayer_sound(sound)
-	if(sound == "ting") then
-		-- Render sandia sprite
-		optic.render_sprite("sandia", "demo")
-	end
+    if(sound == "ting") then
+        -- Render sandia sprite
+        optic.render_sprite("sandia", "demo")
+    end
 
-	return true
+    return true
 end
 
 harmony.set_callback("multiplayer sound", "on_multiplayer_sound")

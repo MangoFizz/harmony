@@ -48,25 +48,25 @@ optic.create_sound("hit", "sounds/hit.wav")
 optic.create_audio_engine("default")
 
 function on_multiplayer_sound(sound)
-	if(sound == "ting") then
-		-- Render hitmarker
+    if(sound == "ting") then
+        -- Render hitmarker
         local pos_x = (screen_width - corner_size) / 2
         local pos_y = (screen_height - corner_size) / 2
         local disp = corner_size * 1.5
         local opacity = 255
         local duration = 150
-		optic.render_sprite("corner", pos_x - disp, pos_y - disp, opacity, 180, duration, "top left in", "out")
-		optic.render_sprite("corner", pos_x + disp, pos_y - disp, opacity, -90, duration, "top right in", "out")
-		optic.render_sprite("corner", pos_x - disp, pos_y + disp, opacity, 90, duration, "bottom left in", "out")
-		optic.render_sprite("corner", pos_x + disp, pos_y + disp, opacity, 0, duration, "bottom right in", "out")
+        optic.render_sprite("corner", pos_x - disp, pos_y - disp, opacity, 180, duration, "top left in", "out")
+        optic.render_sprite("corner", pos_x + disp, pos_y - disp, opacity, -90, duration, "top right in", "out")
+        optic.render_sprite("corner", pos_x - disp, pos_y + disp, opacity, 90, duration, "bottom left in", "out")
+        optic.render_sprite("corner", pos_x + disp, pos_y + disp, opacity, 0, duration, "bottom right in", "out")
 
         -- Play hit sound
         optic.play_sound("hit", "default", true)
         
         return false
-	end
+    end
 
-	return true
+    return true
 end
 
 harmony.set_callback("multiplayer sound", "on_multiplayer_sound")
