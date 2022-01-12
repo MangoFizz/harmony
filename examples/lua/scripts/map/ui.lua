@@ -1,3 +1,5 @@
+-- SPDX-License-Identifier: GPL-3.0-only
+
 clua_version = 2.056
 
 local harmony = require "mods.harmony"
