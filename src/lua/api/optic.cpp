@@ -315,7 +315,7 @@ namespace Harmony::Lua {
         return 0;
     }
 
-        static int lua_create_sound(lua_State *state) noexcept {
+    static int lua_create_sound(lua_State *state) noexcept {
         auto *script = library->get_script(state);
         auto *optic = script->get_optic_container();
 

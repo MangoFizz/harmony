@@ -14,7 +14,7 @@ local corner_size = screen_width * (18 / 1280)
 optic.create_sprite("corner", "images/hitmarker_corn.png", corner_size, corner_size)
 
 -- Animation params
-local anim_duration = 150
+local anim_duration = 140
 local anim_disp = corner_size
 
 -- Top left corner fade in
@@ -38,7 +38,7 @@ optic.set_animation_property("bottom right in", "ease in out", "position x", ani
 optic.set_animation_property("bottom right in", "ease in out", "position y", anim_disp)
 
 -- Fade out
-optic.create_animation("out", anim_duration / 3)
+optic.create_animation("out", anim_duration / 2)
 optic.set_animation_property("out", "linear", "opacity", -255)
 
 -- Add hit sound
@@ -54,7 +54,7 @@ function on_multiplayer_sound(sound)
         local pos_y = (screen_height - corner_size) / 2
         local disp = corner_size * 1.5
         local opacity = 255
-        local duration = 150
+        local duration = 140
         optic.render_sprite("corner", pos_x - disp, pos_y - disp, opacity, 180, duration, "top left in", "out")
         optic.render_sprite("corner", pos_x + disp, pos_y - disp, opacity, -90, duration, "top right in", "out")
         optic.render_sprite("corner", pos_x - disp, pos_y + disp, opacity, 90, duration, "bottom left in", "out")
