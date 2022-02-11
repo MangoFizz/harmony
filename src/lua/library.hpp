@@ -12,6 +12,7 @@
 #include "../events/menu_list_tab.hpp"
 #include "../events/menu_mouse_button_press.hpp"
 #include "../events/menu_sound.hpp"
+#include "../halo_data/script.hpp"
 #include "script.hpp"
 
 namespace Harmony::Lua {
@@ -61,6 +62,7 @@ namespace Harmony::Lua {
         static bool menu_mouse_button_press(HaloData::TagID tag_id, HaloData::MenuMouseButtonCode button_code) noexcept;
         static bool menu_list_tab(HaloData::MenuNavigationKeyCode key, HaloData::TagID list_id, HaloData::TagID button_id) noexcept;
         static bool menu_sound(HaloData::TagID button_id, HaloData::MenuSound sound) noexcept;
+        static void script_function(const char *name, HaloData::ScriptFunction *function, const std::uint32_t *params) noexcept;
 
         /** 
          * Unload script callback

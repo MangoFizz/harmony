@@ -175,24 +175,24 @@ namespace Harmony::Memory {
         std::unique_ptr<bool> execute_original_code_flag;
     };
 
-    class FunctionOverride : public SwitchHook {
+    class FunctionOverride : public Hook {
     public:
         /**
          * Initialize function override hook.
          * @param instruction   Pointer to instruction to hook.
          * @param function      Function to be called in the hook.
-         * @param pushad        Insert pushad and pushfd instructions.
+         * @param cave_return   Return address for function.
          */
-        void initialize(void *instruction, const void *function, bool pushad = true);
+        void initialize(void *instruction, const void *function, const void **cave_return);
 
         /**
          * Function override hook constructor.
          * @param instruction   Pointer to instruction to hook.
          * @param function      Function to be called in the hook.
-         * @param pushad        Insert pushad and pushfd instructions.
+         * @param cave_return   Return address for function.
          */
-        FunctionOverride(void *instruction, const void *function, bool pushad = true) {
-            initialize(instruction, function, pushad);
+        FunctionOverride(void *instruction, const void *function, const void **cave_return) {
+            initialize(instruction, function, cave_return);
         }
 
         /**

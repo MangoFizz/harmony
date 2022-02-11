@@ -25,6 +25,8 @@ add_library(harmony-core STATIC
     src/events/d3d9_end_scene.S
     src/events/d3d9_reset.cpp
     src/events/d3d9_reset.S
+    src/events/hs_function.cpp
+    src/events/hs_function.S
     src/events/map_load.cpp
     src/events/menu_accept.cpp
     src/events/menu_accept.S

@@ -255,14 +255,18 @@ namespace Harmony::Memory {
                     break;
                 }
 
-                // cmp
+                // cmp / add
                 case 0x83: {
                     if(instruction[1] == 0xF8) { // eax, imm8
                         this->cave.insert(&instruction[0], 3);
                         instruction_size = 3;
                     }
+                    else if(instruction[1] == 0xC4) {
+                        this->cave.insert(&instruction[0], 3);
+                        instruction_size = 3;
+                    }
                     else {
-                        throw Hook::Exception("Unsupported cmp instruction.");
+                        throw Hook::Exception("Unsupported cmp/add instruction.");
                     }
                     break;
                 }
@@ -270,6 +274,43 @@ namespace Harmony::Memory {
                 // nop
                 case 0x90: {
                     this->cave.insert(0x90);
+                    instruction_size = 1;
+                    break;
+                }
+
+                // push ecx
+                case 0x51: {
+                    this->cave.insert(0x51);
+                    instruction_size = 1;
+                    break;
+                }
+
+                // push edi
+                case 0x57: {
+                    this->cave.insert(0x57);
+                    instruction_size = 1;
+                    break;
+                }
+
+                // push eax
+                case 0x50: {
+                    this->cave.insert(0x50);
+                    instruction_size = 1;
+                    break;
+                }
+
+                // mov
+                case 0x8B: {
+                    if(instruction[1] == 0x4C && instruction[2] == 0x24) {
+                        this->cave.insert(&instruction[0], 4);
+                        instruction_size = 4;
+                    }
+                    break;
+                }
+
+                // push ebx
+                case 0x53: {
+                    this->cave.insert(0x53);
                     instruction_size = 1;
                     break;
                 }
@@ -371,31 +412,19 @@ namespace Harmony::Memory {
         this->release();
     }
 
-    void FunctionOverride::initialize(void *instruction, const void *function, bool pushad) {
+    void FunctionOverride::initialize(void *instruction, const void *function, const void **cave_return) {
         if(this->hooked) {
             return;
         }
 
         // Set instruction
         this->instruction = reinterpret_cast<std::byte *>(instruction);
+    
+        this->cave.insert(0xE9);
+        this->cave.insert_address(this->calculate_32bit_offset(&this->cave.get_top(), function));
 
-        // Initialize execute original code flag
-        this->execute_original_code_flag = std::make_unique<bool>(true);
-
-        // write function call
-        this->write_function_call(function, pushad);
-
-        // cmp byte ptr [flag], 0
-        this->cave.insert(0x80);
-        this->cave.insert(0x3D);
-        auto flag_address = reinterpret_cast<std::uint32_t>(this->execute_original_code_flag.get());
-        this->cave.insert_address(flag_address);
-        this->cave.insert(0); // false
-
-        // je return
-        this->cave.insert(0x74);
-        this->cave.insert(0x0);
-        std::uint8_t &jmp_offset = *reinterpret_cast<std::uint8_t *>(&this->cave.get_top());
+        // Set override return
+        *cave_return = &this->cave.get_top() + 1;
 
         // Copy instruction code into cave
         std::uint8_t instruction_size;
@@ -406,14 +435,9 @@ namespace Harmony::Memory {
         catch(Hook::Exception &e) {
             throw;
         }
-        jmp_offset += instruction_size;
 
-        // Write return to original code
+        // Return
         this->write_cave_return_jmp();
-        jmp_offset += 5;
-
-        // Write function return
-        this->cave.insert(0xC3);
     }
 
     FunctionOverride::~FunctionOverride() noexcept {

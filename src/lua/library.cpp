@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "../events/d3d9_end_scene.hpp"
 #include "../events/d3d9_reset.hpp"
+#include "../events/hs_function.hpp"
 #include "../events/map_load.hpp"
 #include "../events/multiplayer_sound.hpp"
 #include "../events/menu_back.hpp"
@@ -92,6 +93,7 @@ namespace Harmony::Lua {
         add_menu_mouse_button_press_event(Library::menu_mouse_button_press);
         add_menu_list_tab_event(Library::menu_list_tab);
         add_menu_sound_event(Library::menu_sound);
+        add_hs_function_event(Library::script_function);
     }
 
     bool Library::multiplayer_event(HaloData::MultiplayerEvent type, HaloData::PlayerID local, HaloData::PlayerID killer, HaloData::PlayerID victim) noexcept {
@@ -274,6 +276,64 @@ namespace Harmony::Lua {
             it++;
         }
         return allow;
+    }
+
+    void Library::script_function(const char *name, HaloData::ScriptFunction *function, const std::uint32_t *params) noexcept {
+        auto &scripts = library->get_scripts();
+        bool allow = true;
+        auto it = scripts.begin();
+        while(it != scripts.end()) {
+            auto *script = it->get();
+            auto *state = script->get_state();
+            auto &callbacks = script->get_callbacks("script function");
+            for(auto &callback : callbacks) {
+                lua_getglobal(state, callback.c_str());
+                lua_pushstring(state, name);
+                lua_pushstring(state, function->name);
+                
+                // Get parameters
+                lua_newtable(state);
+                for(std::size_t i = 0; i < function->parameter_count; i++) {
+                    switch(function->get_parameters()[i]) {
+                        case HaloData::ScriptFunction::DATA_TYPE_BOOLEAN: {
+                            lua_pushboolean(state, *reinterpret_cast<const std::uint8_t *>(params + i));
+                            break;
+                        }
+
+                        case HaloData::ScriptFunction::DATA_TYPE_REAL: {
+                            lua_pushnumber(state, *reinterpret_cast<const float *>(params + i));
+                            break;
+                        }
+
+                        case HaloData::ScriptFunction::DATA_TYPE_SHORT: {
+                            lua_pushinteger(state, *reinterpret_cast<const std::uint16_t *>(params + i));
+                            break;
+                        }
+
+                        case HaloData::ScriptFunction::DATA_TYPE_LONG: {
+                            lua_pushinteger(state, params[i]);
+                            break;
+                        }
+
+                        case HaloData::ScriptFunction::DATA_TYPE_STRING: {
+                            lua_pushstring(state, reinterpret_cast<const char *>(params[i]));
+                            break;
+                        }
+
+                        default: {
+                            lua_pushinteger(state, params[i]);
+                            break;
+                        }
+                    }
+                    lua_rawseti(state, -2, i + 1);
+                }
+
+                if(lua_pcall(state, 3, 0, 0) != LUA_OK) {
+                    script->print_last_error();
+                }
+            }
+            it++;
+        }
     }
 
     int lua_unload_harmony(lua_State *state) noexcept {

@@ -11,7 +11,8 @@ namespace Harmony {
     static std::vector<Event<MultiplayerSoundEventFunction>> multiplayer_sound_events;
 
     extern "C" {
-        void on_multiplayer_sound_asm();
+        void multiplayer_sound_override();
+        const void *multiplayer_sound_fn_return;
     }
 
     void add_multiplayer_sound_event(MultiplayerSoundEventFunction function, EventPriority priority) {
@@ -31,10 +32,10 @@ namespace Harmony {
         }
     }
 
-    extern "C" void do_on_multiplayer_sound(HaloData::MultiplayerSound sound) {
+    extern "C" bool do_on_multiplayer_sound(HaloData::MultiplayerSound sound) {
         bool allow = true;
         call_in_order_allow(multiplayer_sound_events, allow, sound);
-        on_multiplayer_sound_hook.execute_original_code(allow);
+        return allow;
     }
 
     void set_up_multiplayer_sounds_event() {
@@ -49,7 +50,7 @@ namespace Harmony {
         static auto &on_multiplayer_sound_sig = Harmony::get().get_signature("on_multiplayer_sound");
         
         // Write hacks
-        on_multiplayer_sound_hook.initialize(on_multiplayer_sound_sig.get_data(), reinterpret_cast<void *>(on_multiplayer_sound_asm), true);
+        on_multiplayer_sound_hook.initialize(on_multiplayer_sound_sig.get_data(), reinterpret_cast<void *>(multiplayer_sound_override), &multiplayer_sound_fn_return);
         on_multiplayer_sound_hook.hook();
     }
 }
