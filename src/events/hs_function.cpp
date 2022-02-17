@@ -9,20 +9,22 @@
 #include "../messaging/message_box.hpp"
 
 namespace Harmony {
-    static Memory::SwitchHook hs_function_hook;
+    static Memory::RawHook hs_function_hook;
     static Memory::FunctionOverride hs_get_function_parameters_function_hook;
     static std::vector<Event<HsFunctionEvent_t>> hs_function_events;
 
     extern "C" {
-        void script_function();
+        void hs_function_hook_fn();
+        const void *hs_function_hook_fn_return;
 
-        void on_hs_function(const char *script, HaloData::ScriptFunction *function, const std::uint32_t *params) {
+        bool on_hs_function(const char *script, HaloData::ScriptFunction *function, const std::uint32_t *params) {
             bool allow = true;
-            call_in_order(hs_function_events, script, function, params);
+            call_in_order_allow(hs_function_events, allow, script, function, params);
+            return allow;
         }
 
-        void get_script_function_parameters_override();
-        const void *get_script_function_parameters_fn;
+        void get_hs_function_parameters_fn_override();
+        const void *get_hs_function_parameters_fn_return;
     }
 
     void add_hs_function_event(HsFunctionEvent_t function, EventPriority priority) {
@@ -55,8 +57,8 @@ namespace Harmony {
         auto &hs_get_function_parameters_function_sig = Harmony::get().get_signature("hs_get_function_parameters_function");
         
         // Write the hacks
-        hs_function_hook.initialize(hs_function_call_sig.get_data(), reinterpret_cast<void *>(script_function), false);
-        hs_get_function_parameters_function_hook.initialize(hs_get_function_parameters_function_sig.get_data(), reinterpret_cast<void *>(get_script_function_parameters_override), &get_script_function_parameters_fn);
+        hs_function_hook.initialize(hs_function_call_sig.get_data(), reinterpret_cast<void *>(hs_function_hook_fn), &hs_function_hook_fn_return);
+        hs_get_function_parameters_function_hook.initialize(hs_get_function_parameters_function_sig.get_data(), reinterpret_cast<void *>(get_hs_function_parameters_fn_override), &get_hs_function_parameters_fn_return);
 
         // Hook everything
         hs_function_hook.hook();

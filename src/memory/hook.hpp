@@ -206,6 +206,46 @@ namespace Harmony::Memory {
         ~FunctionOverride() noexcept;
     };
 
+    class RawHook : public Hook {
+    public:
+        /**
+         * Hook it!
+         */
+        void hook() noexcept;
+
+        /**
+         * Initialize raw hook.
+         * @param instruction   Pointer to instruction to hook.
+         * @param function      Function to be called in the hook.
+         * @param cave_return   Return address for function.
+         */
+        void initialize(void *instruction, const void *function, const void **cave_return);
+
+        /**
+         * Raw hook constructor.
+         * @param instruction   Pointer to instruction to hook.
+         * @param function      Function to be called in the hook.
+         * @param cave_return   Return address for function.
+         */
+        RawHook(void *instruction, const void *function, const void **cave_return) {
+            initialize(instruction, function, cave_return);
+        }
+
+        /**
+         * Empty constructor.
+         */
+        RawHook() {}
+
+        /**
+         * Destroy hook.
+         */
+        ~RawHook() noexcept;
+
+    private:
+        /** Pointer to function */
+        const void *function;
+    };
+
     class ChimeraFunctionOverride : public Hook {
     public:
         /**

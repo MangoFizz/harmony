@@ -278,7 +278,7 @@ namespace Harmony::Lua {
         return allow;
     }
 
-    void Library::script_function(const char *name, HaloData::ScriptFunction *function, const std::uint32_t *params) noexcept {
+    bool Library::script_function(const char *name, HaloData::ScriptFunction *function, const std::uint32_t *params) noexcept {
         auto &scripts = library->get_scripts();
         bool allow = true;
         auto it = scripts.begin();
@@ -328,12 +328,18 @@ namespace Harmony::Lua {
                     lua_rawseti(state, -2, i + 1);
                 }
 
-                if(lua_pcall(state, 3, 0, 0) != LUA_OK) {
+                if(lua_pcall(state, 3, 1, 0) == LUA_OK) {
+                    if(allow) {
+                        allow = lua_toboolean(state, -1);
+                    }
+                }
+                else {
                     script->print_last_error();
                 }
             }
             it++;
         }
+        return allow;
     }
 
     int lua_unload_harmony(lua_State *state) noexcept {

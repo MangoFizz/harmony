@@ -8,7 +8,7 @@
 #include "event.hpp"
 
 namespace Harmony {
-    using HsFunctionEvent_t = void (*)(const char *script, HaloData::ScriptFunction *function, const std::uint32_t *params);
+    using HsFunctionEvent_t = bool (*)(const char *script, HaloData::ScriptFunction *function, const std::uint32_t *params);
 
     /**
      * Add a halo script function event

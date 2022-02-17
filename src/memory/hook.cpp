@@ -444,6 +444,51 @@ namespace Harmony::Memory {
         this->release();
     }
 
+    void RawHook::hook() noexcept {
+        if(!this->cave.empty() && this->hooked) {
+            return;
+        }
+        this->hooked = true;
+
+        // Kill original code
+        for(std::size_t i = 0; i < this->original_code.size(); i++) {
+            overwrite(this->instruction + i, static_cast<std::byte>(0x90));
+        }
+
+        // Write hook
+        overwrite(this->instruction, static_cast<std::byte>(0xE9));
+        overwrite(this->instruction + 1, this->calculate_32bit_offset(this->instruction, this->function));
+    }
+
+    void RawHook::initialize(void *instruction, const void *function, const void **cave_return) {
+        if(this->hooked) {
+            return;
+        }
+
+        // Set instruction
+        this->instruction = reinterpret_cast<std::byte *>(instruction);
+
+        // Set function address
+        this->function = function;
+
+        // Set override return
+        *cave_return = this->instruction + 5;
+
+        // Copy instruction code into cave
+        std::uint8_t instruction_size;
+        try {
+            // Copy instructions
+            this->copy_instructions(instruction, instruction_size);
+        }
+        catch(Hook::Exception &e) {
+            throw;
+        }
+    }
+
+    RawHook::~RawHook() noexcept {
+        this->release();
+    }
+
     void ChimeraFunctionOverride::initialize(void *cave, const void *function, const void **cave_return) {
         if(this->hooked) {
             return;
