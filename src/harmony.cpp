@@ -5,11 +5,12 @@
 #include "events/d3d9_end_scene.hpp"
 #include "events/d3d9_reset.hpp"
 #include "events/hs_function.hpp"
-#include "events/menu_accept.hpp"
-#include "events/menu_back.hpp"
-#include "events/menu_list_tab.hpp"
-#include "events/menu_mouse_button_press.hpp"
-#include "events/menu_sound.hpp"
+#include "events/keypress.hpp"
+#include "events/widget_accept.hpp"
+#include "events/widget_close.hpp"
+#include "events/widget_list_tab.hpp"
+#include "events/widget_mouse_button_press.hpp"
+#include "events/widget_sound.hpp"
 #include "lua/library.hpp"
 #include "events/map_load.hpp"
 #include "events/multiplayer_event.hpp"
@@ -112,12 +113,12 @@ namespace Harmony {
       set_up_multiplayer_event();
       set_up_multiplayer_sounds_event();
 
-      // Set up menu events
-      set_up_menu_accept_event();
-      set_up_menu_back_event();
-      set_up_menu_mouse_button_press_event();
-      set_up_menu_list_tab_event();
-      set_up_menu_sound_event();
+      // Widget events
+      set_up_widget_accept_event();
+      set_up_widget_close_event();
+      set_up_widget_mouse_button_press_event();
+      set_up_widget_list_tab_event();
+      set_up_widget_sound_event();
 
       // Set up script event
       set_up_hs_function_event();

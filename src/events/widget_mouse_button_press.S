@@ -9,15 +9,14 @@ menu_button_event: .long 0
 
 .text
 
-.globl _menu_mouse_button_press
-_menu_mouse_button_press:
+.globl _handle_widget_mouse_button_press_asm
+_handle_widget_mouse_button_press_asm:
     ;# Save stuff
     pushad
     pushfd
 
-    ;# Get menu widget tag ID
+    ;# Get pressed widget
     mov ebx, dword ptr [esp + 0x48]
-    mov ebx, [ebx]
 
     ;# Get button event
     mov ecx, eax
@@ -31,7 +30,7 @@ _menu_mouse_button_press:
     ;# Run events
     push edx
     push ebx
-    call _on_menu_button_press
+    call _call_widget_mouse_button_press_events
     add esp, 8
 
     ;# Check if the mouse button matches the menu button event

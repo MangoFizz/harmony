@@ -3,6 +3,7 @@
 #ifndef CHIMERA_TAG_HPP
 #define CHIMERA_TAG_HPP
 
+#include <string>
 #include <cstring>
 #include <cstddef>
 
@@ -121,7 +122,7 @@ namespace Harmony::HaloData {
      * @param  tag_class class of the tag
      * @return           pointer to the tag if found, nullptr if not
      */
-    Tag *get_tag(const char *path, std::uint32_t tag_class) noexcept;
+    Tag *get_tag(std::string path, std::uint32_t tag_class) noexcept;
 }
 
 #endif

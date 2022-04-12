@@ -213,7 +213,7 @@ namespace Harmony::Memory {
                     break;
                 }
 
-                // movzx
+                // movsx 
                 case 0x0F: {
                     if(instruction[1] == 0xB6 && instruction[2] == 0x47) { // eax, byte ptr [edi + disp8]
                         this->cave.insert(&instruction[0], 4);
@@ -229,11 +229,15 @@ namespace Harmony::Memory {
                     break;
                 }
 
-                // cmp
+                // cmp / inc
                 case 0x66: {
-                    if(instruction[1] == 0x39 && instruction[2] == 0x46) { // word ptr [esi + disp8], ax
+                    if(instruction[1] == 0x39 && instruction[2] == 0x46) { // cmp word ptr [esi + disp8], ax
                         this->cave.insert(&instruction[0], 4);
                         instruction_size = 4;
+                    }
+                    else if(instruction[1] == 0xFF && instruction[2] == 0x05) { // inc word ptr [imm32]
+                        this->cave.insert(&instruction[0], 7);
+                        instruction_size = 7;
                     }
                     else {
                         throw Hook::Exception("Unsupported cmp instruction.");
@@ -255,7 +259,7 @@ namespace Harmony::Memory {
                     break;
                 }
 
-                // cmp / add
+                // cmp / add / sub
                 case 0x83: {
                     if(instruction[1] == 0xF8) { // eax, imm8
                         this->cave.insert(&instruction[0], 3);
@@ -265,8 +269,12 @@ namespace Harmony::Memory {
                         this->cave.insert(&instruction[0], 3);
                         instruction_size = 3;
                     }
+                    else if(instruction[1] == 0xEC) { // sub esp, imm8
+                        this->cave.insert(&instruction[0], 3);
+                        instruction_size = 3;
+                    }
                     else {
-                        throw Hook::Exception("Unsupported cmp/add instruction.");
+                        throw Hook::Exception("Unsupported cmp/add/sub instruction.");
                     }
                     break;
                 }
@@ -304,6 +312,10 @@ namespace Harmony::Memory {
                     if(instruction[1] == 0x4C && instruction[2] == 0x24) {
                         this->cave.insert(&instruction[0], 4);
                         instruction_size = 4;
+                    }
+                    else if(instruction[1] == 0xD8) {
+                        this->cave.insert(&instruction[0], 2);
+                        instruction_size = 2;
                     }
                     break;
                 }

@@ -4,29 +4,24 @@
 
 .text
 
-.globl _menu_list_tab
-_menu_list_tab:
+.globl _call_widget_list_tab_events_asm
+_call_widget_list_tab_events_asm:
     pushad
     pushfd
 
     ;# Get pressed key
     mov ecx, [esp + 0x2C]
-    mov eax, 0
+    xor eax, eax
     mov al, byte ptr [ecx + 4]
 
-    ;# Get menu list ID
-    mov ecx, [ebx]
-
-    ;# Get pressed button index
-    mov edx, [ebx + 0x38]
-    mov edx, [edx]
+    ;# Get list widget
+    mov edx, ebx
 
     ;# Run events
     push edx
-    push ecx
     push eax
-    call _on_menu_list_tab
-    add esp, 12
+    call _call_widget_list_tab_events
+    add esp, 8
 
     popfd
     popad
