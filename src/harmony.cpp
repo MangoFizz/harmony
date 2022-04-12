@@ -123,6 +123,9 @@ namespace Harmony {
       // Set up script event
       set_up_hs_function_event();
 
+      // Set up input event
+      set_up_keypress_event();
+
       // Set up console commands
       set_up_console_command_event();
 

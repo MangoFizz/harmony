@@ -27,6 +27,8 @@ add_library(harmony MODULE
     src/events/d3d9_reset.S
     src/events/hs_function.cpp
     src/events/hs_function.S
+    src/events/keypress.cpp
+    src/events/keypress.S
     src/events/map_load.cpp
     src/events/multiplayer_event.cpp
     src/events/multiplayer_event.S
