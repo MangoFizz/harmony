@@ -14,7 +14,7 @@
 #include "../harmony.hpp"
 #include "widescreen_override.hpp"
 
-namespace Harmony::UserInterface {
+namespace Harmony::Menu {
     /** Instance pointer */
     static WidescreenOverride *instance;
 

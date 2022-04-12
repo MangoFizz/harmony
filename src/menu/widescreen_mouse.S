@@ -7,7 +7,7 @@
 ;# edx = x, ecx = y
 
 .globl _widescreen_mouse
-    _widescreen_mouse:
+_widescreen_mouse:
     push edx
 
     ;# Y bounds is always 0-480

@@ -60,7 +60,7 @@ namespace Harmony {
       return *this->optic_handler;
    }
 
-   UserInterface::WidescreenOverride &Harmony::get_widescreen_override_handle() noexcept {
+   Menu::WidescreenOverride &Harmony::get_widescreen_override_handle() noexcept {
       return *this->widescreen_fix_override;
    }
 
@@ -75,7 +75,7 @@ namespace Harmony {
       this->optic_handler = std::make_unique<Optic::Handler>();
 
       // Set up widescreen override
-      this->widescreen_fix_override = std::make_unique<UserInterface::WidescreenOverride>();
+      this->widescreen_fix_override = std::make_unique<Menu::WidescreenOverride>();
 
       // Set error handling
       std::set_terminate(terminate);

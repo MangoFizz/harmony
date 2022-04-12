@@ -9,7 +9,7 @@
 #include <cstddef>
 #include "../memory/hook.hpp"
 
-namespace Harmony::UserInterface {
+namespace Harmony::Menu {
     class WidescreenOverride {
     public:
         /**
