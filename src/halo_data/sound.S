@@ -10,8 +10,8 @@ play_sound_address: .long 0
 
 play_sound_function_sig: .string "play_sound"
 
-.globl _play_sound
-_play_sound:
+.globl _play_sound_asm
+_play_sound_asm:
     pushad
     pushfd
 

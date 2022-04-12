@@ -10,7 +10,7 @@ namespace Harmony::HaloData {
      * Play a sound
      * @param sound     Tag ID of the sound
      */
-    extern "C" void play_sound(TagID sound) noexcept;
+    void play_sound(TagID sound) noexcept;
 }
 
 #endif

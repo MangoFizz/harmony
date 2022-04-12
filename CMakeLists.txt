@@ -51,6 +51,7 @@ add_library(harmony MODULE
     src/halo_data/multiplayer_sounds.cpp
     src/halo_data/path.cpp
     src/halo_data/resolution.cpp
+    src/halo_data/sound.cpp
     src/halo_data/sound.S
     src/halo_data/tag.cpp
     src/halo_data/tag.S
