@@ -1,98 +1,30 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include <functional>
 #include <d3d9.h>
 #include <cmath>
 #include "../memory/signature.hpp"
 #include "../menu/widescreen_override.hpp"
 #include "../harmony.hpp"
+#include "../messaging/message_box.hpp"
 #include "widget.hpp"
 
 namespace Harmony::HaloData {
-    extern "C" {
-        /**
-         * Open a widget.
-         * @param widget_id     Tag ID of the widget to open
-         */
-        void open_widget_asm(TagID widget_id) noexcept;
-
-        /**
-         * Open a widget and pushes the current one to the menu history.
-         * If there is no widget instance, the widget will not open.
-         * @param previous_widget_instance  Pointer to the current root widget instance
-         * @param widget_id                 Tag ID of the widget to open
-         */
-        void open_widget_push_history_asm(WidgetInstance *previous_widget_instance, TagID widget_id) noexcept;
-    }
-
-    std::string GamepadButtonWidgetEvent::string_for_button(GamepadButtonWidgetEvent::Button btn) noexcept {
-        switch(btn) {
-            case Button::BUTTON_A:
-                return "a";
-            case Button::BUTTON_B:
-                return "b";
-            case Button::BUTTON_X:
-                return "x";
-            case Button::BUTTON_Y:
-                return "y";
-            case Button::BUTTON_BLACK:
-                return "black";
-            case Button::BUTTON_WHITE:
-                return "white";
-            case Button::BUTTON_LEFT_TRIGGER:
-                return "left trigger";
-            case Button::BUTTON_RIGHT_TRIGGER:
-                return "right trigger";
-            case Button::BUTTON_DPAD_UP:
-                return "dpad up";
-            case Button::BUTTON_DPAD_DOWN:
-                return "dpad down";
-            case Button::BUTTON_DPAD_LEFT:
-                return "dpad left";
-            case Button::BUTTON_DPAD_RIGHT:
-                return "dpad right";
-            case Button::BUTTON_START:
-                return "start";
-            case Button::BUTTON_BACK:
-                return "back";
-            case Button::BUTTON_LEFT_THUMB:
-                return "left thumb";
-            case Button::BUTTON_RIGHT_THUMB:
-                return "right thumb";
-            default:
-                return "unknown button " + std::to_string(btn);
-        }
-    }
-
-    std::string MouseButtonWidgetEvent::string_for_button(MouseButtonWidgetEvent::Button btn) noexcept {
-        switch(btn) {
-            case Button::BUTTON_LEFT:
-                return "left";
-            case Button::BUTTON_MIDDLE:
-                return "middle";
-            case Button::BUTTON_RIGHT:
-                return "right";
-            case Button::BUTTON_DOUBLE_LEFT:
-                return "double left";
-            default:
-                return "unknown button " + std::to_string(btn);
-        }
-    }
-
     WidgetEventGlobals &WidgetEventGlobals::get() {
-        static auto &menu_widget_event_globals_sig = Harmony::get().get_signature("menu_widget_event_globals");
-        static auto *widget_event_globals = *reinterpret_cast<WidgetEventGlobals **>(menu_widget_event_globals_sig.get_data());
+        static auto &widget_event_globals_sig = Harmony::get().get_signature("widget_event_globals");
+        static auto *widget_event_globals = *reinterpret_cast<WidgetEventGlobals **>(widget_event_globals_sig.get_data());
         return *widget_event_globals;
     }
     
     WidgetCursorGlobals &WidgetCursorGlobals::get() {
-        static auto &menu_cursor_globals_sig = Harmony::get().get_signature("menu_cursor_globals");
-        static auto *widget_cursor_globals = *reinterpret_cast<WidgetCursorGlobals **>(menu_cursor_globals_sig.get_data());
+        static auto &cursor_globals_sig = Harmony::get().get_signature("widget_cursor_globals");
+        static auto *widget_cursor_globals = *reinterpret_cast<WidgetCursorGlobals **>(cursor_globals_sig.get_data());
         return *widget_cursor_globals;
     }
     
     WidgetGlobals &WidgetGlobals::get() {
-        static auto &menu_widget_globals_sig = Harmony::get().get_signature("menu_widget_globals");
-        static auto *widget_globals = *reinterpret_cast<WidgetGlobals **>(menu_widget_globals_sig.get_data());
+        static auto &widget_globals_sig = Harmony::get().get_signature("widget_globals");
+        static auto *widget_globals = *reinterpret_cast<WidgetGlobals **>(widget_globals_sig.get_data());
         return *widget_globals;
     }
     
@@ -117,15 +49,284 @@ namespace Harmony::HaloData {
         return {normalized_x * present_parameters->BackBufferWidth, normalized_y * present_parameters->BackBufferHeight};
     }
 
-    void open_widget(TagID widget_id, bool push_history) noexcept {
+    WidgetInstance *get_widget(std::uint32_t widget_header_index) noexcept {
+        auto &widget_globals = HaloData::WidgetGlobals::get();
+        auto *widget_base = widget_globals.root_widget_instance;
+
+        WidgetInstance *widget = nullptr;
+            
+        std::function<void(WidgetInstance *)> search_instances = [&](WidgetInstance *current_widget) {
+            if(widget) {
+                return;
+            }
+
+            if(current_widget->get_header().index == widget_header_index) {
+                widget = current_widget;
+                return;
+            }
+
+            if(current_widget->child_widget) {
+                search_instances(current_widget->child_widget);
+            }
+
+            if(current_widget->next_widget) {
+                search_instances(current_widget->next_widget);
+            }
+        };
+        search_instances(widget_base);
+
+        return widget;
+    }
+
+    std::vector<WidgetInstance *> find_widgets(TagID widget_definition, bool first_match, WidgetInstance *widget_base) noexcept {
+        if(!widget_base) {
+            auto &widget_globals = HaloData::WidgetGlobals::get();
+            widget_base = widget_globals.root_widget_instance;
+        }
+
+        std::vector<WidgetInstance *> found_widgets;
+            
+        std::function<void(WidgetInstance *)> search_instances = [&](WidgetInstance *widget) {
+            if(first_match && !found_widgets.empty()) {
+                return;
+            }
+            
+            if(widget->tag_id == widget_definition) {
+                found_widgets.push_back(widget);
+                return;
+            }
+
+            if(widget->child_widget) {
+                search_instances(widget->child_widget);
+            }
+
+            if(widget->next_widget) {
+                search_instances(widget->next_widget);
+            }
+        };
+        search_instances(widget_base);
+
+        return std::move(found_widgets);
+    }
+
+    extern "C" {
+        /**
+         * Create a widget.
+         * @param widget_definition     Tag ID of widget definition
+         * @param widget_replace        Widget to replace; can be null (not sure about this description)
+         * @return                      Pointer to the new widget
+         */
+        WidgetInstance *create_widget_asm(TagID widget_definition, WidgetInstance *widget_replace = nullptr) noexcept;
+
+        /**
+         * Open a widget and creates a history entry for current root widget.
+         * If there isn't a widget, the widget will not be opened.
+         * @param current_root_widget   Current root widget
+         * @param widget_id             Tag ID of the widget to open
+         * @return                      Pointer to the new widget
+         */
+        WidgetInstance *open_widget_asm(WidgetInstance *current_root_widget, TagID widget_definition) noexcept;
+
+        /**
+         * Close current root widget, return to the previous one in history
+         * @param current_root_widget   Current root widget
+         */
+        void close_widget_asm(WidgetInstance *current_root_widget) noexcept;
+
+        /**
+         * Find a widget from a given widget definition
+         * @param widget                Widget where to look
+         * @param widget_definition     Tag ID of a widget definition
+         * @return                      Widget if found, nullptr if not
+         */
+        WidgetInstance *find_widget_asm(WidgetInstance *widget, TagID widget_definition) noexcept;
+
+        /**
+         * Focus a child widget from a given widget
+         * @param root_widget       Root widget
+         * @param widget_to_focus   Child widget to focus
+         */
+        void focus_widget_asm(WidgetInstance *root_widget, WidgetInstance *widget_to_focus) noexcept;
+
+        /**
+         * Get index for widget list item
+         * @param widget    Widget list item
+         * @return          Index of the list item
+         */
+        std::uint16_t get_widget_list_item_index_asm(WidgetInstance *widget) noexcept; 
+    }
+
+    WidgetInstance *find_widget(TagID widget_definition, WidgetInstance *widget_base) noexcept {
+        if(!widget_base) {
+            auto &widget_globals = WidgetGlobals::get();
+            widget_base = widget_globals.root_widget_instance;
+        }
+
+        return find_widget_asm(widget_base, widget_definition);
+    }
+
+    WidgetInstance *open_widget(TagID widget_definition, bool push_history) noexcept {
         auto &widget_globals = WidgetGlobals::get();
-        auto *current_widget_instance = widget_globals.root_widget_instance;
+        auto *current_root_widget = widget_globals.root_widget_instance;
         
-        if(push_history && current_widget_instance) {
-            open_widget_push_history_asm(current_widget_instance, widget_id);
+        if(push_history && current_root_widget) {
+            return open_widget_asm(current_root_widget, widget_definition);
         }
         else {
-            open_widget_asm(widget_id);
+            return create_widget_asm(widget_definition);
+        }
+    }
+
+    void close_widget() noexcept {
+        auto &widget_globals = WidgetGlobals::get();
+        auto *current_root_widget = widget_globals.root_widget_instance;
+
+        // fool proof
+        if(current_root_widget) {
+            close_widget_asm(current_root_widget);
+        }
+    }
+
+    WidgetInstance *replace_widget(WidgetInstance *widget, TagID widget_definition) noexcept {
+        auto *new_widget = create_widget_asm(widget_definition, widget);
+        auto *old_widget = widget;
+        auto *old_widget_parent = widget->parent_widget;
+        auto *old_widget_previous = widget->previous_widget;
+        auto *old_widget_next = widget->next_widget;
+        auto *old_widget_focussed = widget->focused_child;
+
+        new_widget->left_bound = old_widget->left_bound;
+        new_widget->top_bound = old_widget->top_bound;
+
+        new_widget->parent_widget = nullptr;
+        new_widget->previous_widget = nullptr;
+        new_widget->next_widget = nullptr;
+        new_widget->focused_child = nullptr;
+
+        if(old_widget_parent) {
+            new_widget->parent_widget = old_widget_parent;
+
+            if(old_widget_parent->child_widget == old_widget) {
+                old_widget_parent->child_widget = new_widget;
+            }
+
+            if(old_widget_parent->focused_child == old_widget) {
+                old_widget_parent->focused_child = new_widget;
+            } 
+            
+            old_widget->parent_widget = nullptr;
+        }
+
+        if(old_widget_previous) {
+            new_widget->previous_widget = old_widget_previous;
+            old_widget_previous->next_widget = new_widget;
+            old_widget->previous_widget = nullptr;
+        }
+
+        if(old_widget_next) {
+            new_widget->next_widget = old_widget_next;
+            old_widget_next->previous_widget = new_widget;
+            old_widget->next_widget = nullptr;
+        }
+
+        auto &widget_globals = HaloData::WidgetGlobals::get();
+        auto *root_widget = widget_globals.root_widget_instance;
+        if(widget == root_widget) {
+            widget_globals.root_widget_instance = new_widget;
+        }
+
+        // Remove widget definition tag id on old widget
+        old_widget->tag_id = TagID::null_id();
+
+        return new_widget;
+    }
+
+    WidgetInstance *reload_widget(WidgetInstance *widget) noexcept {
+        auto *new_widget = replace_widget(widget, widget->tag_id);
+        auto *old_widget = widget;
+
+        if(old_widget->focused_child) {
+            std::uint16_t focused_list_item_index = get_widget_list_item_index_asm(old_widget->focused_child);
+
+            auto *child_widget = new_widget->child_widget;
+            for(std::size_t i = 0; i < focused_list_item_index; i++) {
+                if(!child_widget) {
+                    break;
+                }
+                child_widget = child_widget->next_widget;
+            }
+
+            if(child_widget) {
+                focus_widget(child_widget);
+            }
+        }
+
+        return new_widget;
+    }
+
+    void focus_widget(WidgetInstance *widget) noexcept {
+        // fool proof
+        if(widget->parent_widget) {
+            focus_widget_asm(widget->parent_widget, widget);
+        }
+    }
+
+    /**
+     * Ugly to_string methods incoming...
+     */
+
+    std::string GamepadButtonWidgetEvent::to_string(GamepadButton button) noexcept {
+        switch(button) {
+            case GAMEPAD_BUTTON_A:              return "a";
+            case GAMEPAD_BUTTON_B:              return "b";
+            case GAMEPAD_BUTTON_X:              return "x";
+            case GAMEPAD_BUTTON_Y:              return "y";
+            case GAMEPAD_BUTTON_BLACK:          return "black";
+            case GAMEPAD_BUTTON_WHITE:          return "white";
+            case GAMEPAD_BUTTON_LEFT_TRIGGER:   return "left trigger";
+            case GAMEPAD_BUTTON_RIGHT_TRIGGER:  return "right trigger";
+            case GAMEPAD_BUTTON_DPAD_UP:        return "dpad up";
+            case GAMEPAD_BUTTON_DPAD_DOWN:      return "dpad down";
+            case GAMEPAD_BUTTON_DPAD_LEFT:      return "dpad left";
+            case GAMEPAD_BUTTON_DPAD_RIGHT:     return "dpad right";
+            case GAMEPAD_BUTTON_START:          return "start";
+            case GAMEPAD_BUTTON_BACK:           return "back";
+            case GAMEPAD_BUTTON_LEFT_THUMB:     return "left thumb";
+            case GAMEPAD_BUTTON_RIGHT_THUMB:    return "right thumb";
+            default:                            return "unknown button " + std::to_string(button);
+        }
+    }
+
+    std::string MouseButtonWidgetEvent::to_string(MouseButtonWidgetEvent::MouseButton button) noexcept {
+        switch(button) {
+            case MOUSE_BUTTON_LEFT:           return "left";
+            case MOUSE_BUTTON_MIDDLE:         return "middle";
+            case MOUSE_BUTTON_RIGHT:          return "right";
+            case MOUSE_BUTTON_DOUBLE_LEFT:    return "double left";
+            default:                    return "unknown mouse button " + std::to_string(button);
+        }
+    }
+
+    std::string WidgetInstance::type_to_string(WidgetInstance::Type type) noexcept {
+        switch(type) {
+            case WIDGET_TYPE_CONTAINER:     return "container";
+            case WIDGET_TYPE_TEXT_BOX:      return "text box";
+            case WIDGET_TYPE_SPINNER_LIST:  return "spinner list";
+            case WIDGET_TYPE_COLUMN_LIST:   return "column list";
+            case WIDGET_TYPE_GAME_MODEL:    return "game model";
+            case WIDGET_TYPE_MOVIE:         return "movie";
+            case WIDGET_TYPE_CUSTOM:        return "custom";
+            default:                        return "unknown widget type " + std::to_string(type);
+        }
+    }
+
+    std::string to_string(WidgetNavigationSound sound) noexcept {
+        switch(sound) {
+            case WIDGET_NAVIGATION_SOUND_CURSOR:        return "cursor";
+            case WIDGET_NAVIGATION_SOUND_FORWARD:       return "forward";
+            case WIDGET_NAVIGATION_SOUND_BACK:          return "back";
+            case WIDGET_NAVIGATION_SOUND_FLAG_FAILURE:  return "flag failure";
+            default:                                    return "unknown navigation sound " + std::to_string(sound);
         }
     }
 }

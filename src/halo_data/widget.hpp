@@ -75,27 +75,27 @@ namespace Harmony::HaloData {
      * However, Halo only ever fills the gamepad button events.
      */
     struct GamepadButtonWidgetEvent {
-        enum Button : std::int8_t {
-            BUTTON_A = 0,
-            BUTTON_B,
-            BUTTON_X,
-            BUTTON_Y,
-            BUTTON_BLACK,
-            BUTTON_WHITE,
-            BUTTON_LEFT_TRIGGER,
-            BUTTON_RIGHT_TRIGGER,
-            BUTTON_DPAD_UP,
-            BUTTON_DPAD_DOWN,
-            BUTTON_DPAD_LEFT,
-            BUTTON_DPAD_RIGHT,
-            BUTTON_START,
-            BUTTON_BACK,
-            BUTTON_LEFT_THUMB,
-            BUTTON_RIGHT_THUMB
+        enum GamepadButton : std::int8_t {
+            GAMEPAD_BUTTON_A = 0,
+            GAMEPAD_BUTTON_B,
+            GAMEPAD_BUTTON_X,
+            GAMEPAD_BUTTON_Y,
+            GAMEPAD_BUTTON_BLACK,
+            GAMEPAD_BUTTON_WHITE,
+            GAMEPAD_BUTTON_LEFT_TRIGGER,
+            GAMEPAD_BUTTON_RIGHT_TRIGGER,
+            GAMEPAD_BUTTON_DPAD_UP,
+            GAMEPAD_BUTTON_DPAD_DOWN,
+            GAMEPAD_BUTTON_DPAD_LEFT,
+            GAMEPAD_BUTTON_DPAD_RIGHT,
+            GAMEPAD_BUTTON_START,
+            GAMEPAD_BUTTON_BACK,
+            GAMEPAD_BUTTON_LEFT_THUMB,
+            GAMEPAD_BUTTON_RIGHT_THUMB
         };
 
         /** The gamepad button pressed. */
-        Button button;
+        GamepadButton pressed_button;
 
         /**
          * The duration #button has been pressed for.
@@ -105,10 +105,10 @@ namespace Harmony::HaloData {
         
         /**
          * Get string for a gamepad button
-         * @param btn   Gamepad button code
-         * @return      Stringified button
+         * @param button    Gamepad button code
+         * @return          Stringified code
          */
-        static std::string string_for_button(Button btn) noexcept;
+        static std::string to_string(GamepadButton button) noexcept;
     };
     
     /**
@@ -118,25 +118,25 @@ namespace Harmony::HaloData {
         /** Maximum duration for event */
         static constexpr auto duration_max = std::numeric_limits<std::uint8_t>::max();
 
-        enum Button : std::int8_t {
-            BUTTON_LEFT = 0,
-            BUTTON_MIDDLE,
-            BUTTON_RIGHT,
-            BUTTON_DOUBLE_LEFT
+        enum MouseButton : std::int8_t {
+            MOUSE_BUTTON_LEFT = 0,
+            MOUSE_BUTTON_MIDDLE,
+            MOUSE_BUTTON_RIGHT,
+            MOUSE_BUTTON_DOUBLE_LEFT
         };
 
         /** The mouse button pressed. */
-        Button button;
+        MouseButton button;
 
         /** The duration #button was held for, up to #duration_max. */
         std::uint8_t duration;
 
         /**
          * Get string for a mouse button
-         * @param btn   Mouse button code
-         * @return      Stringified button
+         * @param button    Mouse button code
+         * @return          Stringified button
          */
-        static std::string string_for_button(Button btn) noexcept;
+        static std::string to_string(MouseButton button) noexcept;
     };
     
     /** 
@@ -271,6 +271,39 @@ namespace Harmony::HaloData {
     };
     static_assert(sizeof(WidgetCursorGlobals) == 0x0C);
 
+    /**
+     * Header structure for widget, widget history entries and widget unicode strings
+     */
+    struct WidgetElementHeader {
+        enum ElementSize : std::uint16_t {
+            ELEMENT_SIZE_WIDGET = 0x70,
+            ELEMENT_SIZE_HISTORY_ENTRY = 0x20
+        };
+
+        /** Instance struct size */
+        std::uint16_t size;
+
+        /** 0x8000 constant */
+        PADDING(0x2);
+
+        /** Item index */
+        std::uint32_t index;
+
+        /** Previous item */
+        WidgetElementHeader *previous;
+
+        /** Next item */
+        WidgetElementHeader *next;
+
+        /**
+         * Get element
+         */
+        template<typename T> inline T &get_element() noexcept {
+            return *reinterpret_cast<T *>(reinterpret_cast<std::uint32_t>(this) + sizeof(WidgetElementHeader));
+        }
+    };
+    static_assert(sizeof(WidgetElementHeader) == 0x10);
+
     struct WidgetInstance {
         enum Type : std::uint16_t {
             WIDGET_TYPE_CONTAINER = 0,
@@ -306,7 +339,7 @@ namespace Harmony::HaloData {
         PADDING(0x4);
 
         /** A widget instance related to the history */
-        WidgetInstance *unknown_history_thing_1;
+        PADDING(0x4);
 
         /** Milliseconds to close widgets */
         std::uint32_t ms_to_close;
@@ -317,17 +350,17 @@ namespace Harmony::HaloData {
         /** Widget opacity (from 0 to 1) */
         float opacity;
 
-        /** Previous widget of the list. Null in the first list item. */
+        /** Previous widget of the list. Null on first list item. */
         WidgetInstance *previous_widget;
 
-        /** Next widget of the list. Null in the last list item. */
+        /** Next widget of the list. Null on last list item. */
         WidgetInstance *next_widget;
 
-        /** Parent widget. Null in the root widget. */
-        WidgetInstance *parent;
+        /** Parent widget. Null on root widget. */
+        WidgetInstance *parent_widget;
 
-        /** Child widget. */
-        WidgetInstance *child;
+        /** Child widget. Null if there is no child items. */
+        WidgetInstance *child_widget;
 
         /** Focussed child widget. Null in non-list widgets. */
         WidgetInstance *focused_child;
@@ -346,10 +379,25 @@ namespace Harmony::HaloData {
         PADDING(0x4);
         PADDING(0x4);
 
-        /** Currently focussed */
-        std::uint32_t focused;
+        /** Background bitmap index */
+        std::uint16_t bitmap_index;
+        PADDING(0x2);
 
         PADDING(0x4);
+
+        /** 
+         * Get header for this instance
+         */
+        inline WidgetElementHeader &get_header() noexcept {
+            return *reinterpret_cast<WidgetElementHeader *>(reinterpret_cast<std::uint32_t>(this) - sizeof(WidgetElementHeader));
+        }
+
+        /**
+         * Get string for a widget type
+         * @param type      Code of widget type
+         * @return          Stringified widget type
+         */
+        static std::string type_to_string(Type type) noexcept;
     }; 
     static_assert(sizeof(WidgetInstance) == 0x60);
 
@@ -360,8 +408,8 @@ namespace Harmony::HaloData {
         /** Previous menu list widget */
         WidgetInstance *previous_menu_list;
 
-        /** Unknown flags */
-        PADDING(0x2);
+        /** Previous menu list foccused item index */
+        std::uint16_t focussed_item_index;
         PADDING(0x2);
 
         /** Previous history entry */
@@ -455,12 +503,77 @@ namespace Harmony::HaloData {
     };
     static_assert(sizeof(WidgetGlobals) == 0x34);
 
+    enum WidgetNavigationSound {
+        WIDGET_NAVIGATION_SOUND_CURSOR = 0,
+        WIDGET_NAVIGATION_SOUND_FORWARD,
+        WIDGET_NAVIGATION_SOUND_BACK,
+        WIDGET_NAVIGATION_SOUND_FLAG_FAILURE
+    };
+
     /**
-     * Open a UI widget
-     * @param widget_id         Tag ID of the widget that will be opened.
-     * @param push_history      Do not create an entry in the history, just override the current widget.
+     * Get string for a widget navigation sound
+     * @param sound     Code of a navigation sound
+     * @return          Sound string
      */
-    void open_widget(TagID widget_id, bool push_history = true) noexcept;
+    std::string to_string(WidgetNavigationSound sound) noexcept;
+
+    /**
+     * Get widget from it's header index
+     * @param widget_header_index   Index of the widget header
+     * @return                      Widget if header index still valid, nullptr if not.
+     */
+    WidgetInstance *get_widget(std::uint32_t widget_header_index) noexcept;
+    
+    /**
+     * Find a widget from a given widget definition.
+     * This is the function used by the game; it only returns the first coincidence.
+     * @param widget_definition     Widget definition tag ID of the widget to find
+     * @param widget_base           Widget where to look
+     * @return                      Pointer to widget if found, nullptr if not
+     */
+    WidgetInstance *find_widget(TagID widget_definition, WidgetInstance *widget_base = nullptr) noexcept;
+
+    /**
+     * Find widgets from a given widget definition.
+     * @param widget_definition     Widget definition tag ID of the widget to find
+     * @param widget_base           Widget where to look
+     * @return                      Vector of widgets
+     */
+    std::vector<WidgetInstance *> find_widgets(TagID widget_definition, bool first_match = true, WidgetInstance *widget_base = nullptr) noexcept;
+
+    /**
+     * Open a widget
+     * @param widget_definition     Tag ID of widget definition
+     * @param push_history          Push or not the current root widget to menu history.
+     * @return                      Pointer to the new widget
+     */
+    WidgetInstance *open_widget(TagID widget_definition, bool push_history = true) noexcept;
+
+    /**
+     * Close current root widget; return to the previous one in history.
+     */
+    void close_widget() noexcept;
+
+    /**
+     * Replace a widget
+     * @param widget                Widget to be replaced
+     * @param widget_definition     Tag ID of the definition for the widget replace 
+     * @return                      Pointer to the new widget
+     */
+    WidgetInstance *replace_widget(WidgetInstance *widget, TagID widget_definition) noexcept;
+
+    /**
+     * Reload a widget.
+     * @param widget    Widget to reload
+     * @return          Pointer to the new widget
+     */
+    WidgetInstance *reload_widget(WidgetInstance *widget) noexcept;
+
+    /**
+     * Focus a widget.
+     * @param widget    Widget to be focussed
+     */
+    void focus_widget(WidgetInstance *widget) noexcept;
 }
 
 #endif

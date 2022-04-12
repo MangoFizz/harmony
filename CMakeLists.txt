@@ -58,6 +58,7 @@ add_library(harmony-core STATIC
     src/halo_data/widget.cpp
     src/halo_data/widget.S
     src/halo_data/window.cpp
+    src/lua/helpers.cpp
     src/math/geometry.cpp
     src/memory/codecave.cpp
     src/memory/codefinder.cpp
