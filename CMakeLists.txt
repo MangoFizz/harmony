@@ -14,10 +14,10 @@ set(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel")
 
 # Include Lua
-include("ext/lua53/lua53.cmake")
+include("ext/lua53.cmake")
 
 # Include Soloud
-include("ext/soloud/soloud.cmake")
+include("ext/soloud.cmake")
 
 add_library(harmony MODULE
     src/events/console_command.cpp
