@@ -89,6 +89,7 @@ add_library(harmony MODULE
     src/optic/render.cpp
     src/optic/sound.cpp
     src/optic/sprite.cpp
+    src/server/status.cpp
     src/harmony.cpp
 )
 

@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <optional>
+#include <map>
 #include <cstdint>
 #include <lua.hpp>
 #include "../halo_data/widget.hpp"
@@ -25,6 +26,13 @@ namespace Harmony::Lua {
         }
         return result;
     }
+
+    /**
+     * Push a map to stack
+     * @param state     Lua state
+     * @param map       Map to be pushed
+     */
+    void lua_push_string_map(lua_State *state, std::map<std::string, std::string> map) noexcept;
 
     /** Unique ID for widget */
     union WidgetID {
