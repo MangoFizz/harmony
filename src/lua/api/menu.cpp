@@ -63,6 +63,7 @@ namespace Harmony::Lua {
             auto *widget = get_widget_from_id(widget_id);
 
             if(widget) {
+                auto name = widget->name;
                 auto tag_id = widget->tag_id.whole_id;
                 auto left_bound = widget->left_bound;
                 auto top_bound = widget->top_bound;
@@ -77,8 +78,9 @@ namespace Harmony::Lua {
                     lua_settable(state, -3); \
                 }
 
+                INSERT_ELEMENT(name, lua_pushstring);
                 INSERT_ELEMENT(tag_id, lua_pushinteger);
-                INSERT_ELEMENT(left_bound, lua_pushinteger);\
+                INSERT_ELEMENT(left_bound, lua_pushinteger);
                 INSERT_ELEMENT(top_bound, lua_pushinteger);
                 INSERT_ELEMENT(opacity, lua_pushnumber);
                 INSERT_ELEMENT(background_bitmap_index, lua_pushinteger);
