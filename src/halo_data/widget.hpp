@@ -362,13 +362,13 @@ namespace Harmony::HaloData {
         /** Child widget. Null if there is no child items. */
         WidgetInstance *child_widget;
 
-        /** Focussed child widget. Null in non-list widgets. */
+        /** focused child widget. Null in non-list widgets. */
         WidgetInstance *focused_child;
 
         /** Text box content. Null in non-text box widgets. */
         const wchar_t *text;
 
-        /** Last widget list element focussed by cursor */
+        /** Last widget list element focused by cursor */
         std::uint16_t cursor_index;
         PADDING(0x2);
 
@@ -409,7 +409,7 @@ namespace Harmony::HaloData {
         WidgetInstance *previous_menu_list;
 
         /** Previous menu list foccused item index */
-        std::uint16_t focussed_item_index;
+        std::uint16_t focused_item_index;
         PADDING(0x2);
 
         /** Previous history entry */
@@ -564,7 +564,7 @@ namespace Harmony::HaloData {
 
     /**
      * Focus a widget.
-     * @param widget    Widget to be focussed
+     * @param widget    Widget to be focused
      */
     void focus_widget(WidgetInstance *widget) noexcept;
 }

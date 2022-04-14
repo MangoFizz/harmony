@@ -45,6 +45,8 @@ add_library(harmony MODULE
     src/events/widget_list_tab.S
     src/events/widget_mouse_button_press.cpp
     src/events/widget_mouse_button_press.S
+    src/events/widget_mouse_focus.cpp
+    src/events/widget_mouse_focus.S
     src/events/widget_sound.cpp
     src/events/widget_sound.S
     src/halo_data/path.cpp

@@ -11,6 +11,7 @@
 #include "events/widget_close.hpp"
 #include "events/widget_list_tab.hpp"
 #include "events/widget_mouse_button_press.hpp"
+#include "events/widget_mouse_focus.hpp"
 #include "events/widget_sound.hpp"
 #include "lua/library.hpp"
 #include "events/map_load.hpp"
@@ -119,6 +120,7 @@ namespace Harmony {
         set_up_widget_close_event();
         set_up_widget_mouse_button_press_event();
         set_up_widget_list_tab_event();
+        set_up_widget_mouse_focus_event();
         set_up_widget_sound_event();
 
         // Set up script event

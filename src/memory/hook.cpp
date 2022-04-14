@@ -318,6 +318,10 @@ namespace Harmony::Memory {
                         this->cave.insert(&instruction[0], 2);
                         instruction_size = 2;
                     }
+                    else if(instruction[1] == 0x56) { // mov edx, [esi + imm8]
+                        this->cave.insert(&instruction[0], 3);
+                        instruction_size = 3;
+                    }
                     else {
                         throw Hook::Exception("Unsupported lea / mov instruction.");
                     }
@@ -328,6 +332,18 @@ namespace Harmony::Memory {
                 case 0x53: {
                     this->cave.insert(0x53);
                     instruction_size = 1;
+                    break;
+                }
+
+                // mov
+                case 0x89: {
+                    if(instruction[1] == 0x72) { // mov [edx + imm8], esi
+                        this->cave.insert(&instruction[0], 3);
+                        instruction_size = 3;
+                    }
+                    else {
+                        throw Hook::Exception("Unsupported mov instruction.");
+                    }
                     break;
                 }
 

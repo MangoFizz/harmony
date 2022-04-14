@@ -164,7 +164,7 @@ namespace Harmony::HaloData {
         auto *old_widget_parent = widget->parent_widget;
         auto *old_widget_previous = widget->previous_widget;
         auto *old_widget_next = widget->next_widget;
-        auto *old_widget_focussed = widget->focused_child;
+        auto *old_widget_focused = widget->focused_child;
 
         new_widget->left_bound = old_widget->left_bound;
         new_widget->top_bound = old_widget->top_bound;

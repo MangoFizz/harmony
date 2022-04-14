@@ -12,6 +12,7 @@
 #include "../../events/widget_close.hpp"
 #include "../../events/widget_list_tab.hpp"
 #include "../../events/widget_mouse_button_press.hpp"
+#include "../../events/widget_mouse_focus.hpp"
 #include "../../events/widget_sound.hpp"
 #include "../../harmony.hpp"
 #include "../helpers.hpp"
@@ -27,8 +28,9 @@ namespace Harmony::Lua {
     static bool multiplayer_sound_event(HaloData::MultiplayerSound) noexcept;
     static bool widget_accept(HaloData::WidgetInstance *) noexcept;
     static bool widget_close(HaloData::WidgetInstance *) noexcept;
-    static bool widget_mouse_button_press(HaloData::WidgetInstance *, HaloData::MouseButtonWidgetEvent::MouseButton) noexcept;
     static bool widget_list_tab(HaloData::GamepadButtonWidgetEvent::GamepadButton, HaloData::WidgetInstance *, HaloData::WidgetInstance *) noexcept;
+    static bool widget_mouse_button_press(HaloData::WidgetInstance *, HaloData::MouseButtonWidgetEvent::MouseButton) noexcept;
+    static bool widget_mouse_focus(HaloData::WidgetInstance *) noexcept;
     static bool widget_sound(HaloData::WidgetNavigationSound) noexcept;
     static bool script_function(const char *, HaloData::ScriptFunction *, const std::uint32_t *) noexcept;
 
@@ -46,6 +48,7 @@ namespace Harmony::Lua {
                 "widget back",
                 "widget list tab",
                 "widget mouse button press",
+                "widget mouse focus",
                 "widget sound",
                 "hs function",
             };
@@ -81,8 +84,9 @@ namespace Harmony::Lua {
         add_multiplayer_event(multiplayer_event);
         add_widget_accept_event(widget_accept);
         add_widget_close_event(widget_close);
-        add_widget_mouse_button_press_event(widget_mouse_button_press);
         add_widget_list_tab_event(widget_list_tab);
+        add_widget_mouse_button_press_event(widget_mouse_button_press);
+        add_widget_mouse_focus_event(widget_mouse_focus);
         add_widget_sound_event(widget_sound);
         add_hs_function_event(script_function);
 
@@ -262,6 +266,33 @@ namespace Harmony::Lua {
                 lua_pushinteger(state, widget_id);
                 lua_pushstring(state, mouse_button_string.c_str());
                 if(lua_pcall(state, 2, 1, 0) == LUA_OK) {
+                    if(allow) {
+                        allow = lua_toboolean(state, -1);
+                    }
+                }
+                else {
+                    script->print_last_error();
+                }
+            }
+            it++;
+        }
+        return allow;
+    }
+
+    bool widget_mouse_focus(HaloData::WidgetInstance *widget) noexcept {
+        auto &scripts = library->get_scripts();
+        bool allow = true;
+        auto it = scripts.begin();
+        while(it != scripts.end()) {
+            auto *script = it->get();
+            auto *state = script->get_state();
+            auto &callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_WIDGET_MOUSE_FOCUS);
+            for(auto &callback : callbacks) {
+                auto widget_id = get_widget_id(widget);
+                
+                lua_getglobal(state, callback.c_str());
+                lua_pushinteger(state, widget_id);
+                if(lua_pcall(state, 1, 1, 0) == LUA_OK) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);
                     }

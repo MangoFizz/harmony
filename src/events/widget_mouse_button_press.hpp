@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#ifndef HARMONY_EVENT_WIDGET_BUTTON_PRESS_HPP
-#define HARMONY_EVENT_WIDGET_BUTTON_PRESS_HPP
+#ifndef HARMONY_EVENT_WIDGET_MOUSE_BUTTON_PRESS_HPP
+#define HARMONY_EVENT_WIDGET_MOUSE_BUTTON_PRESS_HPP
 
 #include "../halo_data/widget.hpp"
 #include "../halo_data/tag.hpp"
