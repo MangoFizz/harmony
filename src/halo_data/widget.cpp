@@ -49,35 +49,6 @@ namespace Harmony::HaloData {
         return {normalized_x * present_parameters->BackBufferWidth, normalized_y * present_parameters->BackBufferHeight};
     }
 
-    WidgetInstance *get_widget(std::uint32_t widget_header_index) noexcept {
-        auto &widget_globals = HaloData::WidgetGlobals::get();
-        auto *widget_base = widget_globals.root_widget_instance;
-
-        WidgetInstance *widget = nullptr;
-            
-        std::function<void(WidgetInstance *)> search_instances = [&](WidgetInstance *current_widget) {
-            if(widget) {
-                return;
-            }
-
-            if(current_widget->get_header().index == widget_header_index) {
-                widget = current_widget;
-                return;
-            }
-
-            if(current_widget->child_widget) {
-                search_instances(current_widget->child_widget);
-            }
-
-            if(current_widget->next_widget) {
-                search_instances(current_widget->next_widget);
-            }
-        };
-        search_instances(widget_base);
-
-        return widget;
-    }
-
     std::vector<WidgetInstance *> find_widgets(TagID widget_definition, bool first_match, WidgetInstance *widget_base) noexcept {
         if(!widget_base) {
             auto &widget_globals = HaloData::WidgetGlobals::get();

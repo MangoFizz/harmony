@@ -18,22 +18,8 @@ namespace Harmony::Lua {
     }
 
     std::uint32_t get_widget_id(HaloData::WidgetInstance *widget) noexcept {
-        auto &widget_globals = HaloData::WidgetGlobals::get();
-        auto *root_widget = widget_globals.root_widget_instance;
-
-        WidgetID widget_id;
-
-        auto &widget_header = widget->get_header();
-        widget_id.widget_index = widget_header.index;
-
-        if(widget == root_widget) {
-            widget_id.parent_widget_index = widget_header.index;
-        }
-        else {
-            auto *parent_widget = widget->parent_widget;
-            auto &parent_widget_header = parent_widget->get_header();
-            widget_id.parent_widget_index = parent_widget_header.index;
-        }
+        WidgetID widget_id = reinterpret_cast<std::uint32_t>(widget);
+        widget_id.tag_index = widget->tag_id.index.index;
 
         return widget_id.id;
     }
@@ -42,20 +28,16 @@ namespace Harmony::Lua {
         auto &widget_globals = HaloData::WidgetGlobals::get();
         auto *root_widget = widget_globals.root_widget_instance;
 
-        auto *widget = HaloData::get_widget(widget_id.widget_index);
-        if(widget) {
-            if(widget->parent_widget) {
-                auto &parent_widget_header = widget->parent_widget->get_header();
-                if(widget_id.parent_widget_index == parent_widget_header.index) {
+        auto *tag = HaloData::get_tag(widget_id.tag_index);
+        if(tag) {
+            auto widgets = HaloData::find_widgets(tag->id);
+            for(auto &widget : widgets) {
+                WidgetID meme_id = reinterpret_cast<std::uint32_t>(widget);
+                meme_id.tag_index = widget_id.tag_index;
+                if(widget_id.id = meme_id.id) {
                     return widget;
                 }
             }
-            else if(widget == root_widget) {
-                auto &widget_header = widget->get_header();
-                if(widget_id.parent_widget_index == widget_header.index) {
-                    return widget;
-                }
-            } 
         }
         return nullptr;
     }

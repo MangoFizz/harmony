@@ -37,8 +37,8 @@ namespace Harmony::Lua {
     /** Unique ID for widget */
     union WidgetID {
         struct {
-            std::uint16_t parent_widget_index;
-            std::uint16_t widget_index;
+            std::uint16_t unique_id;
+            std::uint16_t tag_index;
         };
 
         std::uint32_t id;

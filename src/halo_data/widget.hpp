@@ -286,8 +286,8 @@ namespace Harmony::HaloData {
         /** 0x8000 constant */
         PADDING(0x2);
 
-        /** Item index */
-        std::uint32_t index;
+        /** Item index (?) */
+        PADDING(0x4);
 
         /** Previous item */
         WidgetElementHeader *previous;
@@ -516,13 +516,6 @@ namespace Harmony::HaloData {
      * @return          Sound string
      */
     std::string to_string(WidgetNavigationSound sound) noexcept;
-
-    /**
-     * Get widget from it's header index
-     * @param widget_header_index   Index of the widget header
-     * @return                      Widget if header index still valid, nullptr if not.
-     */
-    WidgetInstance *get_widget(std::uint32_t widget_header_index) noexcept;
     
     /**
      * Find a widget from a given widget definition.
