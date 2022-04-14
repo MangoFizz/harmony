@@ -138,13 +138,31 @@ namespace Harmony {
     }
 
     static bool info_commands(std::string command, std::string arguments) noexcept {
-        console_output("%s %s", command.c_str(), arguments.c_str());
         if(command == "harmony") {
             ConsoleColor blue = {1, 0.1, 0.8, 0.9};
             console_output(blue, "Harmony version %s", HARMONY_VERSION);
-            return false;
         }
-        return true;
+        else if(command == "harmony_signature") {
+            auto arguments_slices = split_arguments(arguments);
+            if(!arguments_slices.empty()) {
+                auto &harmony = Harmony::get();
+                auto sig_name = arguments_slices[0];
+                if(harmony.signature_exists(sig_name)) {
+                    auto &sig = harmony.get_signature(sig_name);
+                    console_output("%s: 0x%p", sig_name.c_str(), sig.get_data());
+                }
+                else {
+                    console_error("Signature %s does not exists!", sig_name.c_str());
+                }
+            }
+            else {
+                console_output("Usage: harmony_signature <name>");
+            }
+        }
+        else {
+            return true;
+        }
+        return false;
     }
 
     static void terminate() noexcept {
