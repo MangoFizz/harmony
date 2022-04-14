@@ -13,6 +13,19 @@ namespace Harmony::Lua {
     class Script {
     friend class Library;
     public:
+        enum CallbackType {
+            CALLBACK_TYPE_MULTIPLAYER_EVENT,
+            CALLBACK_TYPE_MULTIPLAYER_SOUND,
+            CALLBACK_TYPE_MENU_ACCEPT,
+            CALLBACK_TYPE_WIDGET_ACCEPT,
+            CALLBACK_TYPE_WIDGET_BACK,
+            CALLBACK_TYPE_WIDGET_LIST_TAB,
+            CALLBACK_TYPE_WIDGET_MOUSE_BUTTON_PRESS,
+            CALLBACK_TYPE_WIDGET_SOUND,
+            CALLBACK_TYPE_HS_FUNCTION,
+            CALLBACK_TYPE_INVALID
+        };
+
         /**
          * Get script name
          */
@@ -38,12 +51,12 @@ namespace Harmony::Lua {
         /**
          * Get callbacks
          */
-        std::vector<std::string> &get_callbacks(std::string callback) noexcept;
+        std::vector<std::string> &get_callbacks(CallbackType callback) noexcept;
         
         /**
          * Register a callback
          */
-        void add_callback(std::string callback, std::string function) noexcept;
+        void add_callback(CallbackType callback, std::string function) noexcept;
 
         /**
          * Get optic container
@@ -114,7 +127,7 @@ namespace Harmony::Lua {
         std::string data_path;
 
         /** Script callbacks */
-        std::map<std::string, std::vector<std::string>> callbacks;
+        std::map<CallbackType, std::vector<std::string>> callbacks;
 
         /** Optic container */
         Optic::Container *optic_container;

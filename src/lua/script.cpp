@@ -29,17 +29,14 @@ namespace Harmony::Lua {
         return false;
     }
 
-    std::vector<std::string> &Script::get_callbacks(std::string callback) noexcept {
-        if(this->callbacks.find(callback) != this->callbacks.end()) {
-            return this->callbacks[callback];
+    std::vector<std::string> &Script::get_callbacks(CallbackType callback) noexcept {
+        if(this->callbacks.find(callback) == this->callbacks.end()) {
+            this->callbacks.insert_or_assign(callback, std::vector<std::string>());
         }
-        else if(this->callbacks.find("invalid") == this->callbacks.end()) {
-            this->callbacks["invalid"] = std::vector<std::string>();
-        }
-        return this->callbacks["invalid"];
+        return this->callbacks[callback];
     }
 
-    void Script::add_callback(std::string callback, std::string function) noexcept {
+    void Script::add_callback(CallbackType callback, std::string function) noexcept {
         this->callbacks[callback].emplace_back(function);
     }
 

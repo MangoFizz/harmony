@@ -19,6 +19,8 @@
 #include "callback.hpp"
 
 namespace Harmony::Lua {
+    using CallbackType = Script::CallbackType;
+
     static Library *library = nullptr;
 
     static bool multiplayer_event(HaloData::MultiplayerEvent, HaloData::PlayerID, HaloData::PlayerID, HaloData::PlayerID) noexcept;
@@ -29,7 +31,6 @@ namespace Harmony::Lua {
     static bool widget_list_tab(HaloData::GamepadButtonWidgetEvent::GamepadButton, HaloData::WidgetInstance *, HaloData::WidgetInstance *) noexcept;
     static bool widget_sound(HaloData::WidgetNavigationSound) noexcept;
     static bool script_function(const char *, HaloData::ScriptFunction *, const std::uint32_t *) noexcept;
-    static void keypress(std::uint8_t, wchar_t, std::uint8_t) noexcept;
 
     int lua_set_callback(lua_State *state) noexcept {
         int args = lua_gettop(state);
@@ -37,30 +38,31 @@ namespace Harmony::Lua {
             std::string callback_name = luaL_checkstring(state, 1);
             std::string function = luaL_checkstring(state, 2);
 
-            auto callback_exists = [callback_name]() {
-                #define CHECK_CALLBACK(callback) (callback == callback_name) {}
-
-                if CHECK_CALLBACK("multiplayer event")
-                else if CHECK_CALLBACK("multiplayer sound")
-                else if CHECK_CALLBACK("menu accept")
-                else if CHECK_CALLBACK("widget accept")
-                else if CHECK_CALLBACK("widget back")
-                else if CHECK_CALLBACK("widget list tab")
-                else if CHECK_CALLBACK("widget mouse button press")
-                else if CHECK_CALLBACK("widget sound")
-                else if CHECK_CALLBACK("script function")
-                else if CHECK_CALLBACK("key press")
-                else return false;
-                return true;
+            static constexpr const char *callback_names[] = {
+                "multiplayer event",
+                "multiplayer sound",
+                "menu accept",
+                "widget accept",
+                "widget back",
+                "widget list tab",
+                "widget mouse button press",
+                "widget sound",
+                "hs function",
             };
 
-            if(callback_exists()) {
-                auto &harmony = Harmony::get();
-                auto &handler = harmony.get_lua_library_handler();
-                auto *script  = handler.get_script(state);
-                script->add_callback(callback_name, function);
+            std::size_t i;
+            std::size_t n = sizeof(callback_names) / sizeof(const char *);
+            for(i = 0; i < n; i++) {
+                if(callback_name == callback_names[i]) {
+                    auto &harmony = Harmony::get();
+                    auto &handler = harmony.get_lua_library_handler();
+                    auto *script  = handler.get_script(state);
+                    script->add_callback(static_cast<CallbackType>(i), function);
+                    break;
+                }
             }
-            else {
+
+            if(i == n) {
                 luaL_error(state, "invalid callback in harmony set_callback function");
             }
         }
@@ -83,7 +85,6 @@ namespace Harmony::Lua {
         add_widget_list_tab_event(widget_list_tab);
         add_widget_sound_event(widget_sound);
         add_hs_function_event(script_function);
-        add_keypress_event(keypress);
 
         lua_pushstring(state, "set_callback");
         lua_pushcfunction(state, lua_set_callback);
@@ -97,7 +98,7 @@ namespace Harmony::Lua {
         while(it != scripts.end()) {
             auto *script = it->get();
             auto *state = script->get_state();
-            auto &callbacks = script->get_callbacks("multiplayer event");
+            auto &callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_MULTIPLAYER_EVENT);
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushstring(state, HaloData::string_from_multiplayer_event(type).c_str());
@@ -125,7 +126,7 @@ namespace Harmony::Lua {
         while(it != scripts.end()) {
             auto *script = it->get();
             auto *state = script->get_state();
-            auto &callbacks = script->get_callbacks("multiplayer sound");
+            auto &callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_MULTIPLAYER_SOUND);
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushstring(state, HaloData::string_from_multiplayer_sound(sound).c_str());
@@ -151,7 +152,7 @@ namespace Harmony::Lua {
             auto *script = it->get();
             auto *state = script->get_state();
             
-            auto &callbacks = script->get_callbacks("widget accept");
+            auto &callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_WIDGET_ACCEPT);
             for(auto &callback : callbacks) {
                 auto widget_id = get_widget_id(widget);
                 
@@ -167,7 +168,7 @@ namespace Harmony::Lua {
                 }
             }
 
-            auto &old_callbacks = script->get_callbacks("menu accept");
+            auto &old_callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_MENU_ACCEPT);
             for(auto &callback : old_callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushinteger(state, widget->tag_id.whole_id);
@@ -193,7 +194,7 @@ namespace Harmony::Lua {
         while(it != scripts.end()) {
             auto *script = it->get();
             auto *state = script->get_state();
-            auto &callbacks = script->get_callbacks("widget back");
+            auto &callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_WIDGET_BACK);
             for(auto &callback : callbacks) {
                 auto widget_id = get_widget_id(widget);
                 
@@ -220,7 +221,7 @@ namespace Harmony::Lua {
         while(it != scripts.end()) {
             auto *script = it->get();
             auto *state = script->get_state();
-            auto &callbacks = script->get_callbacks("widget list tab");
+            auto &callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_WIDGET_LIST_TAB);
             for(auto &callback : callbacks) {
                 auto list_widget_id = get_widget_id(list_widget);
                 auto pressed_widget_id = get_widget_id(pressed_widget);
@@ -252,7 +253,7 @@ namespace Harmony::Lua {
         while(it != scripts.end()) {
             auto *script = it->get();
             auto *state = script->get_state();
-            auto &callbacks = script->get_callbacks("widget mouse button press");
+            auto &callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_WIDGET_MOUSE_BUTTON_PRESS);
             for(auto &callback : callbacks) {
                 auto widget_id = get_widget_id(widget);
                 auto mouse_button_string = HaloData::MouseButtonWidgetEvent::to_string(mouse_button);
@@ -281,7 +282,7 @@ namespace Harmony::Lua {
         while(it != scripts.end()) {
             auto *script = it->get();
             auto *state = script->get_state();
-            auto &callbacks = script->get_callbacks("widget sound");
+            auto &callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_WIDGET_SOUND);
             for(auto &callback : callbacks) {
                 auto sound_string = HaloData::to_string(sound);
 
@@ -308,7 +309,7 @@ namespace Harmony::Lua {
         while(it != scripts.end()) {
             auto *script = it->get();
             auto *state = script->get_state();
-            auto &callbacks = script->get_callbacks("script function");
+            auto &callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_HS_FUNCTION);
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushstring(state, name);
@@ -363,25 +364,5 @@ namespace Harmony::Lua {
             it++;
         }
         return allow;
-    }
-
-    void keypress(std::uint8_t modifier, wchar_t character, std::uint8_t keycode) noexcept {
-        auto &scripts = library->get_scripts();
-        auto it = scripts.begin();
-        while(it != scripts.end()) {
-            auto *script = it->get();
-            auto *state = script->get_state();
-            auto &callbacks = script->get_callbacks("key press");
-            for(auto &callback : callbacks) {
-                lua_getglobal(state, callback.c_str());
-                lua_pushinteger(state, modifier);
-                lua_pushinteger(state, character);
-                lua_pushinteger(state, keycode);
-                if(!lua_pcall(state, 3, 0, 0) == LUA_OK) {
-                    script->print_last_error();
-                }
-            }
-            it++;
-        }
     }
 }
