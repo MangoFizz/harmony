@@ -307,7 +307,8 @@ namespace Harmony::Memory {
                     break;
                 }
 
-                // mov
+                // lea / mov
+                case 0x8D:
                 case 0x8B: {
                     if(instruction[1] == 0x4C && instruction[2] == 0x24) {
                         this->cave.insert(&instruction[0], 4);
@@ -316,6 +317,9 @@ namespace Harmony::Memory {
                     else if(instruction[1] == 0xD8) {
                         this->cave.insert(&instruction[0], 2);
                         instruction_size = 2;
+                    }
+                    else {
+                        throw Hook::Exception("Unsupported lea / mov instruction.");
                     }
                     break;
                 }

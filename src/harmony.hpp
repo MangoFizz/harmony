@@ -29,14 +29,14 @@ namespace Harmony {
          * @param name  Name of signature
          * @return      Reference to signature
          */
-        Signature &get_signature(const char *name) noexcept;
+        Signature &get_signature(std::string name) noexcept;
 
         /** 
          * Look for a signature
          * @param name  Name of signature
          * @return      True if signature exists, false if not
          */
-        bool signature_exists(const char *name) noexcept;
+        bool signature_exists(std::string name) noexcept;
 
         /**
          * Get Lua library handler
