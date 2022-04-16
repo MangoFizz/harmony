@@ -272,9 +272,22 @@ namespace Harmony::HaloData {
     static_assert(sizeof(WidgetCursorGlobals) == 0x0C);
 
     /**
-     * Header structure for widget, widget history entries and widget unicode strings
+     * Widget memory pool
      */
-    struct WidgetElementHeader {
+    struct WidgetMemoryPool {
+        /**
+         * Handle for memory widget structure
+         */
+        struct ResourceHandle;
+
+        /** Name of memory pool (widget_memory_pool) */
+        const char *name;
+
+        /** First memory pool resource */
+        ResourceHandle *first_resource;
+    };
+
+    struct WidgetMemoryPool::ResourceHandle {
         enum ElementSize : std::uint16_t {
             ELEMENT_SIZE_WIDGET = 0x70,
             ELEMENT_SIZE_HISTORY_ENTRY = 0x20
@@ -290,19 +303,19 @@ namespace Harmony::HaloData {
         PADDING(0x4);
 
         /** Previous item */
-        WidgetElementHeader *previous;
+        ResourceHandle *previous;
 
         /** Next item */
-        WidgetElementHeader *next;
+        ResourceHandle *next;
 
         /**
          * Get element
          */
         template<typename T> inline T &get_element() noexcept {
-            return *reinterpret_cast<T *>(reinterpret_cast<std::uint32_t>(this) + sizeof(WidgetElementHeader));
+            return *reinterpret_cast<T *>(reinterpret_cast<std::uint32_t>(this) + sizeof(ResourceHandle));
         }
     };
-    static_assert(sizeof(WidgetElementHeader) == 0x10);
+    static_assert(sizeof(WidgetMemoryPool::ResourceHandle) == 0x10);
 
     struct WidgetInstance {
         enum Type : std::uint16_t {
@@ -388,8 +401,8 @@ namespace Harmony::HaloData {
         /** 
          * Get header for this instance
          */
-        inline WidgetElementHeader &get_header() noexcept {
-            return *reinterpret_cast<WidgetElementHeader *>(reinterpret_cast<std::uint32_t>(this) - sizeof(WidgetElementHeader));
+        inline WidgetMemoryPool::ResourceHandle &get_handle() noexcept {
+            return *reinterpret_cast<WidgetMemoryPool::ResourceHandle *>(reinterpret_cast<std::uint32_t>(this) - sizeof(WidgetMemoryPool::ResourceHandle));
         }
 
         /**

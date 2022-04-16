@@ -122,9 +122,15 @@ namespace Harmony::HaloData {
         /**
          * Get index for widget list item
          * @param widget    Widget list item
-         * @return          Index of the list item
+         * @return          Index of the list item, -1 if widget is null.
          */
         std::uint16_t get_widget_list_item_index_asm(WidgetInstance *widget) noexcept; 
+
+        /**
+         * Release widget memory
+         * @param widget    Pointer to widget to release
+         */
+        void free_widget_asm(WidgetInstance *widget) noexcept; 
     }
 
     WidgetInstance *find_widget(TagID widget_definition, WidgetInstance *widget_base) noexcept {
@@ -144,6 +150,7 @@ namespace Harmony::HaloData {
             return open_widget_asm(current_root_widget, widget_definition);
         }
         else {
+            free_widget_asm(current_root_widget);
             return create_widget_asm(widget_definition);
         }
     }
@@ -159,7 +166,7 @@ namespace Harmony::HaloData {
     }
 
     WidgetInstance *replace_widget(WidgetInstance *widget, TagID widget_definition) noexcept {
-        auto *new_widget = create_widget_asm(widget_definition, widget);
+        auto *new_widget = create_widget_asm(widget_definition, widget->parent_widget);
         auto *old_widget = widget;
         auto *old_widget_parent = widget->parent_widget;
         auto *old_widget_previous = widget->previous_widget;
@@ -200,14 +207,18 @@ namespace Harmony::HaloData {
             old_widget->next_widget = nullptr;
         }
 
+        if(new_widget->type == WidgetInstance::WIDGET_TYPE_COLUMN_LIST) {
+            new_widget->focused_child = new_widget->child_widget;
+        }
+
         auto &widget_globals = HaloData::WidgetGlobals::get();
         auto *root_widget = widget_globals.root_widget_instance;
         if(widget == root_widget) {
             widget_globals.root_widget_instance = new_widget;
         }
 
-        // Remove widget definition tag id on old widget
-        old_widget->tag_id = TagID::null_id();
+        // Free old widget
+        free_widget_asm(old_widget);
 
         return new_widget;
     }

@@ -9,6 +9,7 @@ close_widget_function_address: .long 0
 find_widget_function_address: .long 0
 focus_widget_function_address: .long 0
 get_widget_list_item_index_function_address: .long 0
+free_widget_memory_function_address: .long 0
 
 .text
 create_widget_function_sig: .string "widget_create_function"
@@ -17,6 +18,7 @@ close_widget_function_sig: .string "widget_close_function"
 find_widget_function_sig: .string "widget_find_function"
 focus_widget_function_sig: .string "widget_focus_function"
 get_widget_list_item_index_function_sig: .string "widget_list_item_index_function"
+free_widget_memory_function_sig: .string "widget_memory_release_function"
 
 .globl _create_widget_asm
 _create_widget_asm:
@@ -144,5 +146,22 @@ _get_widget_list_item_index_asm:
     mov esi, [esp + 4] ;# Widget 
 
     call dword ptr get_widget_list_item_index_function_address
+
+    ret
+
+.globl _free_widget_asm
+_free_widget_asm:
+    cmp dword ptr free_widget_memory_function_address, 0
+    jnz do_free_widget
+    lea eax, byte ptr free_widget_memory_function_sig
+    push eax
+    call _get_address_for_signature
+    add esp, 4
+    mov free_widget_memory_function_address, eax
+
+    do_free_widget:
+    push [esp + 4] ;# Widget 
+    call dword ptr free_widget_memory_function_address
+    add esp, 4
 
     ret
