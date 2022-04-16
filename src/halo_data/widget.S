@@ -143,9 +143,10 @@ _get_widget_list_item_index_asm:
     mov get_widget_list_item_index_function_address, eax
 
     do_get_widget_list_item_index:
-    mov esi, [esp + 4] ;# Widget 
-
+    push esi
+    mov esi, [esp + 8] ;# Widget 
     call dword ptr get_widget_list_item_index_function_address
+    pop esi
 
     ret
 

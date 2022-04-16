@@ -224,22 +224,26 @@ namespace Harmony::HaloData {
     }
 
     WidgetInstance *reload_widget(WidgetInstance *widget) noexcept {
-        auto *new_widget = replace_widget(widget, widget->tag_id);
-        auto *old_widget = widget;
+        // Save old widget focused item
+        std::uint16_t focused_list_item_index = get_widget_list_item_index_asm(widget->focused_child);
+        std::uint16_t focused_list_item_bitmap_index = widget->focused_child->bitmap_index;
 
-        if(old_widget->focused_child) {
-            std::uint16_t focused_list_item_index = get_widget_list_item_index_asm(old_widget->focused_child);
+        // Create new widget
+        WidgetInstance *new_widget = replace_widget(widget, widget->tag_id);
 
+        if(focused_list_item_index != -1) {
             auto *child_widget = new_widget->child_widget;
             for(std::size_t i = 0; i < focused_list_item_index; i++) {
                 if(!child_widget) {
+                    child_widget = new_widget->child_widget;
                     break;
                 }
                 child_widget = child_widget->next_widget;
             }
 
             if(child_widget) {
-                focus_widget(child_widget);
+                new_widget->focused_child = child_widget;
+                child_widget->bitmap_index = focused_list_item_bitmap_index;
             }
         }
 
