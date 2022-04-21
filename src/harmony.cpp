@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <windows.h>
+#include "events/console_command.hpp"
 #include "command/command.hpp"
-#include "events/console_unknown_command.hpp"
+#include "events/console_command.hpp"
 #include "events/d3d9_end_scene.hpp"
 #include "events/d3d9_reset.hpp"
 #include "events/hs_function.hpp"
@@ -28,7 +29,7 @@
 
 namespace Harmony {
     static void first_tick() noexcept;
-    static bool info_commands(std::string command, std::string arguments) noexcept;
+    static bool info_commands(const char *command) noexcept;
     static void terminate() noexcept;
 
     Harmony *Harmony::instance = nullptr;
@@ -130,25 +131,26 @@ namespace Harmony {
         set_up_keypress_event();
 
         // Set up console commands
-        set_up_console_unknown_command_event();
+        set_up_console_command_event();
 
         // Add info commands
-        add_console_unknown_command_event(info_commands);
+        add_console_command_event(info_commands);
 
         // Override Chimera's widescreen fix
         Harmony::get().get_widescreen_override_handle().enable(true);
     }
 
-    static bool info_commands(std::string command, std::string arguments) noexcept {
-        if(command == "harmony") {
+    static bool info_commands(const char *command) noexcept {
+        auto command_slices = split_arguments(command);
+        auto command_name = command_slices[0];
+        if(command_name == "harmony") {
             ConsoleColor blue = {1, 0.1, 0.8, 0.9};
             console_output(blue, "Harmony version %s", HARMONY_VERSION);
         }
-        else if(command == "harmony_signature") {
-            auto arguments_slices = split_arguments(arguments);
-            if(!arguments_slices.empty()) {
+        else if(command_name == "harmony_signature") {
+            if(command_slices.size() > 1) {
                 auto &harmony = Harmony::get();
-                auto sig_name = arguments_slices[0];
+                auto sig_name = command_slices[1];
                 if(harmony.signature_exists(sig_name)) {
                     auto &sig = harmony.get_signature(sig_name);
                     console_output("%s: 0x%p", sig_name.c_str(), sig.get_data());
