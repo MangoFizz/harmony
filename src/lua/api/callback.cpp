@@ -15,6 +15,7 @@
 #include "../../events/widget_mouse_focus.hpp"
 #include "../../events/widget_open.hpp"
 #include "../../events/widget_sound.hpp"
+#include "../../halo_data/input_devices.hpp"
 #include "../../harmony.hpp"
 #include "../helpers.hpp"
 #include "../library.hpp"
@@ -35,6 +36,7 @@ namespace Harmony::Lua {
     static void widget_open(HaloData::WidgetInstance *) noexcept;
     static bool widget_sound(HaloData::WidgetNavigationSound) noexcept;
     static bool script_function(const char *, HaloData::ScriptFunction *, const std::uint32_t *) noexcept;
+    static void keypress(std::int8_t, std::int8_t, std::int16_t) noexcept;
 
     int lua_set_callback(lua_State *state) noexcept {
         int args = lua_gettop(state);
@@ -54,6 +56,7 @@ namespace Harmony::Lua {
                 "widget open",
                 "widget sound",
                 "hs function",
+                "key press"
             };
 
             std::size_t i;
@@ -93,6 +96,7 @@ namespace Harmony::Lua {
         add_widget_open_event(widget_open);
         add_widget_sound_event(widget_sound);
         add_hs_function_event(script_function);
+        add_keypress_event(keypress);
 
         lua_pushstring(state, "set_callback");
         lua_pushcfunction(state, lua_set_callback);
@@ -419,5 +423,47 @@ namespace Harmony::Lua {
             it++;
         }
         return allow;
+    }
+
+    void keypress(std::int8_t modifier, std::int8_t character, std::int16_t keycode) noexcept {
+        using Modifier = HaloData::InputGlobals::BufferedKey::Modifier;
+
+        auto &scripts = library->get_scripts();
+        auto it = scripts.begin();
+        while(it != scripts.end()) {
+            auto *script = it->get();
+            auto *state = script->get_state();
+            auto &callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_KEYPRESS);
+            for(auto &callback : callbacks) {
+                lua_getglobal(state, callback.c_str());
+
+                // Push modifiers
+                std::map<std::string, bool> modifiers;
+                modifiers.insert_or_assign("shift", (modifier & Modifier::MODIFIER_SHIFT) != 0);
+                modifiers.insert_or_assign("alt", (modifier & Modifier::MODIFIER_ALT) != 0);
+                lua_push_map<bool>(state, modifiers, lua_pushboolean);
+
+                // Push character
+                if(character != -1 && character >= 33 && character <= 126) {
+                    lua_pushlstring(state, reinterpret_cast<char *>(&character), 1);
+                }
+                else {
+                    lua_pushnil(state);
+                }
+
+                // Push keycode
+                if(keycode != -1) {
+                    lua_pushinteger(state, keycode);
+                }
+                else {
+                    lua_pushnil(state);
+                }
+
+                if(!lua_pcall(state, 3, 0, 0) == LUA_OK) {
+                    script->print_last_error();
+                }
+            }
+            it++;
+        }
     }
 }

@@ -27,6 +27,19 @@ namespace Harmony::Lua {
     void lua_push_string_map(lua_State *state, std::map<std::string, std::string> map) noexcept;
 
     /**
+     * Push map
+     */
+    template <typename T>
+    void lua_push_map(lua_State *state, std::map<std::string, T> map, std::function<void (lua_State *, T)> function) noexcept {
+        lua_newtable(state);
+        for(auto &pair : map) {
+            lua_pushstring(state, pair.first.c_str());
+            function(state, pair.second);
+            lua_settable(state, -3);
+        }
+    }
+
+    /**
      * Get field from table
      * @param state     Lua state
      * @param field     Field name

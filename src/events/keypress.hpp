@@ -7,7 +7,7 @@
 #include "event.hpp"
 
 namespace Harmony {
-    using KeypressEvent_t = void (*)(std::uint8_t, wchar_t, std::uint8_t);
+    using KeypressEvent_t = void (*)(std::int8_t, std::int8_t, std::int16_t);
 
     /**
      * Add a keypress event.

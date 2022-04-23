@@ -26,6 +26,7 @@ namespace Harmony::Lua {
             CALLBACK_TYPE_WIDGET_OPEN,
             CALLBACK_TYPE_WIDGET_SOUND,
             CALLBACK_TYPE_HS_FUNCTION,
+            CALLBACK_TYPE_KEYPRESS,
             CALLBACK_TYPE_INVALID
         };
 
