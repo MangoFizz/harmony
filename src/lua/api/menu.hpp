@@ -4,6 +4,7 @@
 #define HARMONY_LUA_API_MENU_HPP
 
 #include <lua.hpp>
+#include "../../halo_data/widget.hpp"
 
 namespace Harmony::Lua {
     /**

@@ -4,12 +4,14 @@
 #include <d3d9.h>
 #include <cmath>
 #include "../memory/signature.hpp"
+#include "../memory/hook.hpp"
 #include "../menu/widescreen_override.hpp"
 #include "../harmony.hpp"
-#include "../messaging/message_box.hpp"
 #include "widget.hpp"
 
 namespace Harmony::HaloData {
+    static Memory::SwitchHook widget_input_handler_hook;
+
     WidgetEventGlobals &WidgetEventGlobals::get() {
         static auto &widget_event_globals_sig = Harmony::get().get_signature("widget_event_globals");
         static auto *widget_event_globals = *reinterpret_cast<WidgetEventGlobals **>(widget_event_globals_sig.get_data());
@@ -254,6 +256,24 @@ namespace Harmony::HaloData {
         // fool proof
         if(widget->parent_widget) {
             focus_widget_asm(widget->parent_widget, widget);
+        }
+    }
+
+    void block_widget_input() noexcept {
+        if(!widget_input_handler_hook.is_hooked()) {
+            static auto &harmony = Harmony::get();
+            static auto &sig = harmony.get_signature("widget_input_handler_call");
+
+            widget_input_handler_hook.initialize(sig.get_data(), nullptr);
+            widget_input_handler_hook.hook();
+        }
+
+        widget_input_handler_hook.execute_original_code(false);
+    }
+
+    void unblock_widget_input() noexcept {
+        if(widget_input_handler_hook.is_hooked()) {
+            widget_input_handler_hook.execute_original_code(true);
         }
     }
 

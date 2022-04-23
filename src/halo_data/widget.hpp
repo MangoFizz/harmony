@@ -580,6 +580,16 @@ namespace Harmony::HaloData {
      * @param widget    Widget to be focused
      */
     void focus_widget(WidgetInstance *widget) noexcept;
+
+    /**
+     * Block widget input
+     */
+    void block_widget_input() noexcept;
+
+    /**
+     * Block widget input
+     */
+    void unblock_widget_input() noexcept;
 }
 
 #endif

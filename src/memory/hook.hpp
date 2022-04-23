@@ -17,6 +17,11 @@ namespace Harmony::Memory {
         class Exception;
 
         /**
+         * Is the hook hooked?
+         */
+        bool is_hooked() noexcept;
+
+        /**
          * Hook it!
          */
         void hook() noexcept;

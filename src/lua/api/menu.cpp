@@ -5,7 +5,6 @@
 #include "../script.hpp"
 #include "../library.hpp"
 #include "../../halo_data/sound.hpp"
-#include "../../halo_data/widget.hpp"
 #include "../../menu/widescreen_override.hpp"
 #include "menu.hpp"
 
@@ -370,6 +369,23 @@ namespace Harmony::Lua {
         return 0;
     }
 
+    static int lua_block_input(lua_State *state) noexcept {
+        int args = lua_gettop(state);
+        if(args == 1) {
+            bool block_input = lua_toboolean(state, 1);
+            if(block_input) {
+                HaloData::block_widget_input();
+            }
+            else {
+                HaloData::unblock_widget_input();
+            }
+        }
+        else {
+            luaL_error(state, "invalid number of arguments in harmony block_input function");
+        }
+        return 0;
+    }
+
     static const luaL_Reg menu[] = {
         {"set_aspect_ratio", lua_set_aspect_ratio},
         {"play_sound", lua_play_sound},
@@ -381,6 +397,7 @@ namespace Harmony::Lua {
         {"reload_widget", lua_reload_widget},
         {"find_widgets", lua_find_widgets},
         {"focus_widget", lua_focus_widget},
+        {"block_input", lua_block_input},
         {NULL, NULL}
     };
 

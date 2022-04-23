@@ -9,6 +9,10 @@
 #include "hook.hpp"
 
 namespace Harmony::Memory {
+
+    bool Hook::is_hooked() noexcept {
+        return this->hooked;
+    }
     
     void Hook::hook() noexcept {
         if(!this->cave.empty() && this->hooked) {
@@ -381,8 +385,10 @@ namespace Harmony::Memory {
         // Initialize execute original code flag
         this->execute_original_code_flag = std::make_unique<bool>(true);
 
-        // write function call
-        this->write_function_call(function, pushad);
+        if(function) {
+            // write function call
+            this->write_function_call(function, pushad);
+        }
 
         // cmp byte ptr [flag], 0
         this->cave.insert(0x80);
