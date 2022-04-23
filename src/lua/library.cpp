@@ -5,6 +5,7 @@
 #include "../messaging/message_box.hpp"
 #include "../harmony.hpp"
 #include "api/callback.hpp"
+#include "api/math.hpp"
 #include "api/optic.hpp"
 #include "api/menu.hpp"
 #include "api/server.hpp"
@@ -95,6 +96,7 @@ namespace Harmony::Lua {
         set_callback_functions(state);
         set_optic_functions(state);
         set_server_functions(state);
+        set_math_api(state);
         set_menu_functions(state);
 
         /**

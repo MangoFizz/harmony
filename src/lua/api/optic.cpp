@@ -8,6 +8,7 @@
 #include "../../harmony.hpp"
 #include "../script.hpp"
 #include "../library.hpp"
+#include "../helpers.hpp"
 #include "optic.hpp"
 
 namespace Harmony::Lua {
@@ -66,10 +67,10 @@ namespace Harmony::Lua {
                 }
                 else {
                     float x1 = luaL_checknumber(state, 2);
-                    float x2 = luaL_checknumber(state, 3);
-                    float y1 = luaL_checknumber(state, 4);
+                    float y1 = luaL_checknumber(state, 3);
+                    float x2 = luaL_checknumber(state, 4);
                     float y2 = luaL_checknumber(state, 5);
-                    curve = Math::QuadraticBezier({x1, x2}, {y1, y2});
+                    curve = Math::QuadraticBezier({x1, y1}, {x2, y2});
                 }
 
                 auto property = Optic::Animation::get_render_property_from_string(luaL_checkstring(state, -2));
@@ -421,7 +422,7 @@ namespace Harmony::Lua {
         return 0;
     }
 
-    static const struct luaL_Reg optic[] = {
+    static const luaL_Reg optic[] = {
         {"create_animation", lua_create_animation},
         {"set_animation_property", lua_set_animation_property},
         {"create_sprite", lua_create_sprite},
@@ -436,16 +437,10 @@ namespace Harmony::Lua {
     };
 
     void set_optic_functions(lua_State *state) noexcept {
-        if(!library && !optic_handler) {
-            auto &harmony = Harmony::get();
-            library = &(harmony.get_lua_library_handler());
-            optic_handler = &(harmony.get_optic_handler());
-        }
+        auto &harmony = Harmony::get();
+        library = &harmony.get_lua_library_handler();
+        optic_handler = &harmony.get_optic_handler();
 
-        lua_pushstring(state, "optic");
-        luaL_newlibtable(state, optic);
-        luaL_setfuncs(state, optic, 0);
-
-        lua_settable(state, -3);
+        lua_create_functions_table(state, "optic", optic);
     }
 }

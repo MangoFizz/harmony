@@ -65,6 +65,7 @@ add_library(harmony MODULE
     src/halo_data/widget.S
     src/halo_data/window.cpp
     src/lua/api/callback.cpp
+    src/lua/api/math.cpp
     src/lua/api/optic.cpp
     src/lua/api/menu.cpp
     src/lua/api/server.cpp

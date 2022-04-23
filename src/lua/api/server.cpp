@@ -36,10 +36,6 @@ namespace Harmony::Lua {
     };
 
     void set_server_functions(lua_State *state) noexcept {
-        lua_pushstring(state, "server");
-        luaL_newlibtable(state, server);
-        luaL_setfuncs(state, server, 0);
-
-        lua_settable(state, -3);
+        lua_create_functions_table(state, "server", server);
     }
 }
