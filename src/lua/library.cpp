@@ -95,10 +95,7 @@ namespace Harmony::Lua {
         set_callback_functions(state);
         set_optic_functions(state);
         set_server_functions(state);
-
-        if(Script::get_global_from_state(state, "script_type") == "map") {
-            set_menu_functions(state);
-        }
+        set_menu_functions(state);
 
         /**
          * Set __gc metamethod

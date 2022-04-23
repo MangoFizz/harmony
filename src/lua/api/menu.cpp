@@ -10,11 +10,17 @@
 #include "menu.hpp"
 
 namespace Harmony::Lua {
-    static int lua_set_widescreen_aspect_ratio(lua_State *state) noexcept {
+    static int lua_set_aspect_ratio(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 2) {
             static auto &harmony = Harmony::get();
-            auto &ws_override = harmony.get_widescreen_override_handle();
+            static auto &library = harmony.get_lua_library_handler();
+            static auto &ws_override = harmony.get_widescreen_override_handle();
+
+            auto *script = library.get_script(state);
+            if(script->get_type() != "map") {
+                return luaL_error(state, "set_aspect_ratio function unavailable on non-map scripts");
+            }
 
             std::uint16_t x = luaL_checknumber(state, 1);
             std::uint16_t y = luaL_checknumber(state, 2);
@@ -130,12 +136,12 @@ namespace Harmony::Lua {
             }
 
             // Get table
-            lua_settop(state, 2);
+            lua_remove(state, 1);
             luaL_checktype(state, 1, LUA_TTABLE);
 
             auto left_bound = lua_get_table_field<std::uint16_t>(state, "left_bound", luaL_checkinteger);
             auto top_bound = lua_get_table_field<std::uint16_t>(state, "top_bound", luaL_checkinteger);
-            auto opacity = lua_get_table_field<float>(state, "opacity", luaL_checkinteger);
+            auto opacity = lua_get_table_field<float>(state, "opacity", luaL_checknumber);
             auto bitmap_index = lua_get_table_field<std::uint16_t>(state, "background_bitmap_index", luaL_checkinteger);
             auto previous_widget_id = lua_get_table_field<std::uint16_t>(state, "previous_widget", luaL_checkinteger);
             auto next_widget_id = lua_get_table_field<std::uint16_t>(state, "next_widget", luaL_checkinteger);
@@ -308,9 +314,9 @@ namespace Harmony::Lua {
                 }
             }
 
-            bool first_match = true;
+            bool multiple_search = false;
             if(args == 2) {
-                first_match = lua_toboolean(state, 2);
+                multiple_search = lua_toboolean(state, 2);
             }
 
             HaloData::WidgetInstance *base_widget = nullptr;
@@ -322,11 +328,21 @@ namespace Harmony::Lua {
                 }
             }
 
-            auto found_widgets = HaloData::find_widgets(widget_definition, first_match, base_widget);
-            lua_newtable(state);
-            for(std::size_t i = 0; i < found_widgets.size(); i++) {
-                lua_pushinteger(state, get_widget_id(found_widgets[i]));
-                lua_rawseti(state, -2, i + 1);
+            auto found_widgets = HaloData::find_widgets(widget_definition, multiple_search, base_widget);
+            if(multiple_search) {
+                lua_newtable(state);
+                for(std::size_t i = 0; i < found_widgets.size(); i++) {
+                    lua_pushinteger(state, get_widget_id(found_widgets[i]));
+                    lua_rawseti(state, -2, i + 1);
+                }
+            }
+            else {
+                if(!found_widgets.empty()) {
+                    lua_pushinteger(state, get_widget_id(found_widgets[0]));
+                }
+                else {
+                    lua_pushnil(state);
+                }
             }
 
             return 1;
@@ -354,11 +370,11 @@ namespace Harmony::Lua {
         return 0;
     }
 
-    static const struct luaL_Reg menu[] = {
-        {"set_aspect_ratio", lua_set_widescreen_aspect_ratio},
+    static const luaL_Reg menu[] = {
+        {"set_aspect_ratio", lua_set_aspect_ratio},
         {"play_sound", lua_play_sound},
         {"get_widget_values", lua_get_widget_values},
-        {"set_widget_values", lua_get_widget_values},
+        {"set_widget_values", lua_set_widget_values},
         {"open_widget", lua_open_widget},
         {"close_widget", lua_close_widget},
         {"replace_widget", lua_replace_widget},
@@ -369,10 +385,6 @@ namespace Harmony::Lua {
     };
 
     void set_menu_functions(lua_State *state) noexcept {
-        lua_pushstring(state, "menu");
-        luaL_newlibtable(state, menu);
-        luaL_setfuncs(state, menu, 0);
-
-        lua_settable(state, -3);
+        lua_create_functions_table(state, "menu", menu);
     }
 }
