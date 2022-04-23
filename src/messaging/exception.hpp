@@ -3,11 +3,11 @@
 #ifndef HARMONY_EXCEPTION_HPP
 #define HARMONY_EXCEPTION_HPP
 
-#include <exception>
+#include <stdexcept>
 #include <string>
 
 namespace Harmony {
-    class ExceptionBox : public std::exception {
+    class ExceptionBox : public std::runtime_error {
     public:
         /**
          * Constructor for exception message box

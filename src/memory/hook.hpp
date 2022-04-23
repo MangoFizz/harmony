@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <exception>
+#include <stdexcept>
 #include <cstdint>
 #include "codecave.hpp"
 
@@ -118,21 +118,12 @@ namespace Harmony::Memory {
         void write_cave_return_jmp() noexcept;
     };
 
-    class Hook::Exception : public std::exception {
+    class Hook::Exception : public std::runtime_error {
     public:
-        /**
-         * Return the error message
-         */
-        const char *what() const noexcept;
-
         /**
          * Constructor for Hook exception
          */
         Exception(std::string message) noexcept;
-
-    private:
-        /** Error message */
-        std::string message;
     };
 
     class SwitchHook : public Hook {

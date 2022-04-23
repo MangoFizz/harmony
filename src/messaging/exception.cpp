@@ -4,7 +4,7 @@
 #include "exception.hpp"
 
 namespace Harmony {
-    ExceptionBox::ExceptionBox(std::string message) noexcept {
+    ExceptionBox::ExceptionBox(std::string message) noexcept : std::runtime_error(message) {
         message_box(message.c_str());
     }
 }

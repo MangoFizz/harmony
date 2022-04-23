@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include "../messaging/message_box.hpp"
 #include "../memory/hook.hpp"
 #include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
@@ -49,9 +50,16 @@ namespace Harmony {
         auto &on_widget_button_press_sig = Harmony::get().get_signature("widget_mouse_pressed_button_check");
         auto *on_widget_button_press_address = on_widget_button_press_sig.get_data();
         
-        // Write the hacks
-        Memory::fill_with_nops(reinterpret_cast<void *>(on_widget_button_press_sig.get_data()), 0x1E); // Remove original memes, we will take care about it
-        widget_mouse_button_press_hook.initialize(on_widget_button_press_sig.get_data(), reinterpret_cast<void *>(handle_widget_mouse_button_press_asm), nullptr, false);
-        widget_mouse_button_press_hook.hook();
+        
+        try {
+            // Write the hacks
+            Memory::fill_with_nops(reinterpret_cast<void *>(on_widget_button_press_sig.get_data()), 0x1E); // Remove original memes, we will take care about it
+            widget_mouse_button_press_hook.initialize(on_widget_button_press_sig.get_data(), reinterpret_cast<void *>(handle_widget_mouse_button_press_asm), nullptr, false);
+            widget_mouse_button_press_hook.hook();
+        }
+        catch(std::runtime_error &e) {
+            message_box("Failed to set up widget mouse button press event.");
+            std::terminate();
+        }
     }
 }

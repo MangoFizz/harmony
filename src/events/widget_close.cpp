@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-#include <stdexcept>
 #include "../messaging/message_box.hpp"
 #include "../memory/hook.hpp"
-#include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "widget_close.hpp"
@@ -51,7 +49,13 @@ namespace Harmony {
         // Write the hacks
         auto &widget_close_function_sig = Harmony::get().get_signature("widget_close_function");
 
-        widget_close_function_hook.initialize(widget_close_function_sig.get_data(), reinterpret_cast<void *>(close_widget_override), &close_widget_fn_return);
-        widget_close_function_hook.hook();
+        try {
+            widget_close_function_hook.initialize(widget_close_function_sig.get_data(), reinterpret_cast<void *>(close_widget_override), &close_widget_fn_return);
+            widget_close_function_hook.hook();
+        }
+        catch(std::runtime_error &e) {
+            message_box("Failed to set up widget close event.");
+            std::terminate();
+        }
     }
 }

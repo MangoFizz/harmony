@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include "../messaging/message_box.hpp"
 #include "../memory/hook.hpp"
-#include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "widget_accept.hpp"
@@ -48,8 +48,14 @@ namespace Harmony {
         // Get signature
         auto &widget_accept_event_check_sig = Harmony::get().get_signature("widget_accept_event_check");
         
-        // Write the hacks
-        widget_accept_event_check_hook.initialize(widget_accept_event_check_sig.get_data(), nullptr, reinterpret_cast<void *>(call_widget_accept_events_asm), false);
-        widget_accept_event_check_hook.hook();
+        try {
+            // Write the hacks
+            widget_accept_event_check_hook.initialize(widget_accept_event_check_sig.get_data(), nullptr, reinterpret_cast<void *>(call_widget_accept_events_asm), false);
+            widget_accept_event_check_hook.hook();
+        }
+        catch(std::runtime_error &e) {
+            message_box("Failed to set up widget accept event.");
+            std::terminate();
+        }
     }
 }

@@ -286,27 +286,6 @@ namespace Harmony::Memory {
                     break;
                 }
 
-                // push ecx
-                case 0x51: {
-                    this->cave.insert(0x51);
-                    instruction_size = 1;
-                    break;
-                }
-
-                // push edi
-                case 0x57: {
-                    this->cave.insert(0x57);
-                    instruction_size = 1;
-                    break;
-                }
-
-                // push eax
-                case 0x50: {
-                    this->cave.insert(0x50);
-                    instruction_size = 1;
-                    break;
-                }
-
                 // lea / mov
                 case 0x8D:
                 case 0x8B: {
@@ -328,13 +307,6 @@ namespace Harmony::Memory {
                     break;
                 }
 
-                // push ebx
-                case 0x53: {
-                    this->cave.insert(0x53);
-                    instruction_size = 1;
-                    break;
-                }
-
                 // mov
                 case 0x89: {
                     if(instruction[1] == 0x72) { // mov [edx + imm8], esi
@@ -344,6 +316,13 @@ namespace Harmony::Memory {
                     else {
                         throw Hook::Exception("Unsupported mov instruction.");
                     }
+                    break;
+                }
+
+                // push r32 / pop r32 
+                case 0x50 ... 0x5F: {
+                    this->cave.insert(instruction[0]);
+                    instruction_size = 1;
                     break;
                 }
 
@@ -381,13 +360,7 @@ namespace Harmony::Memory {
         this->cave.insert_address(offset);
     }
 
-    const char *Hook::Exception::what() const noexcept {
-        return this->message.c_str();
-    }
-
-    Hook::Exception::Exception(std::string message) noexcept {
-        this->message = message;
-
+    Hook::Exception::Exception(std::string message) noexcept : std::runtime_error(message) {
         #ifdef DEBUG
         message_box(message.c_str());
         #endif

@@ -272,7 +272,7 @@ namespace Harmony::Lua {
             HaloData::WidgetInstance *widget;
             if(args == 0) {
                 auto &widget_globals = HaloData::WidgetGlobals::get();
-                widget = widget_globals.root_widget_instance;
+                widget = widget_globals.root_widget;
             }
             else {
                 WidgetID widget_id = luaL_checkinteger(state, 1);

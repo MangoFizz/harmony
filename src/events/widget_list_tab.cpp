@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include "../messaging/message_box.hpp"
 #include "../memory/hook.hpp"
-#include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "widget_list_tab.hpp"
@@ -56,14 +56,20 @@ namespace Harmony {
             hook_sig->hook(); \
         }
 
-        // Write a ton of hacks
-        HOOK_WIDGET_LIST_TAB(widget_tab_list_items_next_vertical_call);
-        HOOK_WIDGET_LIST_TAB(widget_tab_list_items_next_horizontal_call);
-        HOOK_WIDGET_LIST_TAB(widget_tab_list_items_previous_vertical_call);
-        HOOK_WIDGET_LIST_TAB(widget_tab_list_items_previous_horizontal_call);
-        HOOK_WIDGET_LIST_TAB(widget_tab_children_next_vertical_call);
-        HOOK_WIDGET_LIST_TAB(widget_tab_children_next_horizontal_call);
-        HOOK_WIDGET_LIST_TAB(widget_tab_children_previous_call);
+        try {
+            // Write a ton of hacks
+            HOOK_WIDGET_LIST_TAB(widget_tab_list_items_next_vertical_call);
+            HOOK_WIDGET_LIST_TAB(widget_tab_list_items_next_horizontal_call);
+            HOOK_WIDGET_LIST_TAB(widget_tab_list_items_previous_vertical_call);
+            HOOK_WIDGET_LIST_TAB(widget_tab_list_items_previous_horizontal_call);
+            HOOK_WIDGET_LIST_TAB(widget_tab_children_next_vertical_call);
+            HOOK_WIDGET_LIST_TAB(widget_tab_children_next_horizontal_call);
+            HOOK_WIDGET_LIST_TAB(widget_tab_children_previous_call);
+        }
+        catch(std::runtime_error &e) {
+            message_box("Failed to set up widget list tab event.");
+            std::terminate();
+        }
 
         #undef HOOK_WIDGET_LIST_TAB
     }

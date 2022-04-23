@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include "../messaging/message_box.hpp"
 #include "../memory/hook.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
@@ -47,8 +48,14 @@ namespace Harmony {
         // Get signature
         auto &on_widget_focus_sig = Harmony::get().get_signature("widget_mouse_focus_update");
         
-        // Write the hacks
-        widget_mouse_focus_hook.initialize(on_widget_focus_sig.get_data(), reinterpret_cast<void *>(handle_widget_mouse_focus_asm), true);
-        widget_mouse_focus_hook.hook();
+        try {
+            // Write the hacks
+            widget_mouse_focus_hook.initialize(on_widget_focus_sig.get_data(), reinterpret_cast<void *>(handle_widget_mouse_focus_asm), true);
+            widget_mouse_focus_hook.hook();
+        }
+        catch(std::runtime_error &e) {
+            message_box("Failed to set up widget mouse focus event.");
+            std::terminate();
+        }
     }
 }

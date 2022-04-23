@@ -52,7 +52,7 @@ namespace Harmony::HaloData {
     std::vector<WidgetInstance *> find_widgets(TagID widget_definition, bool first_match, WidgetInstance *widget_base) noexcept {
         if(!widget_base) {
             auto &widget_globals = HaloData::WidgetGlobals::get();
-            widget_base = widget_globals.root_widget_instance;
+            widget_base = widget_globals.root_widget;
         }
 
         std::vector<WidgetInstance *> found_widgets;
@@ -136,7 +136,7 @@ namespace Harmony::HaloData {
     WidgetInstance *find_widget(TagID widget_definition, WidgetInstance *widget_base) noexcept {
         if(!widget_base) {
             auto &widget_globals = WidgetGlobals::get();
-            widget_base = widget_globals.root_widget_instance;
+            widget_base = widget_globals.root_widget;
         }
 
         return find_widget_asm(widget_base, widget_definition);
@@ -144,7 +144,7 @@ namespace Harmony::HaloData {
 
     WidgetInstance *open_widget(TagID widget_definition, bool push_history) noexcept {
         auto &widget_globals = WidgetGlobals::get();
-        auto *current_root_widget = widget_globals.root_widget_instance;
+        auto *current_root_widget = widget_globals.root_widget;
         
         if(push_history && current_root_widget) {
             return open_widget_asm(current_root_widget, widget_definition);
@@ -157,7 +157,7 @@ namespace Harmony::HaloData {
 
     void close_widget() noexcept {
         auto &widget_globals = WidgetGlobals::get();
-        auto *current_root_widget = widget_globals.root_widget_instance;
+        auto *current_root_widget = widget_globals.root_widget;
 
         // fool proof
         if(current_root_widget) {
@@ -212,9 +212,9 @@ namespace Harmony::HaloData {
         }
 
         auto &widget_globals = HaloData::WidgetGlobals::get();
-        auto *root_widget = widget_globals.root_widget_instance;
+        auto *root_widget = widget_globals.root_widget;
         if(widget == root_widget) {
-            widget_globals.root_widget_instance = new_widget;
+            widget_globals.root_widget = new_widget;
         }
 
         // Free old widget

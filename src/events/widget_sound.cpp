@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include "../messaging/message_box.hpp"
 #include "../memory/hook.hpp"
-#include "../memory/memory.hpp"
 #include "../memory/signature.hpp"
 #include "../harmony.hpp"
 #include "widget_sound.hpp"
@@ -49,8 +49,14 @@ namespace Harmony {
         // Get signature
         auto &widget_sound_play_function_sig = Harmony::get().get_signature("widget_sound_play_function");
         
-        // Write the hacks
-        widget_sound_hook.initialize(widget_sound_play_function_sig.get_data(), reinterpret_cast<void *>(play_widget_sound_override), &play_widget_sound_fn_return);
-        widget_sound_hook.hook();
+        try {
+            // Write the hacks
+            widget_sound_hook.initialize(widget_sound_play_function_sig.get_data(), reinterpret_cast<void *>(play_widget_sound_override), &play_widget_sound_fn_return);
+            widget_sound_hook.hook();
+        }
+        catch(std::runtime_error &e) {
+            message_box("Failed to set up widget sound event.");
+            std::terminate();
+        }
     }
 }

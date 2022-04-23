@@ -464,7 +464,7 @@ namespace Harmony::HaloData {
         static_assert(sizeof(DeferredErrorDescriptor) == 0x04);
 
         /** The root widget instance for current menu. */
-        WidgetInstance *root_widget_instance;
+        WidgetInstance *root_widget;
 
         /** Last widget history entry */
         WidgetHistoryEntry *history_top_entry;

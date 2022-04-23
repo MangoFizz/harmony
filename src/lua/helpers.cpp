@@ -33,7 +33,7 @@ namespace Harmony::Lua {
 
     HaloData::WidgetInstance *get_widget_from_id(WidgetID widget_id) noexcept {
         auto &widget_globals = HaloData::WidgetGlobals::get();
-        auto *root_widget = widget_globals.root_widget_instance;
+        auto *root_widget = widget_globals.root_widget;
 
         auto *tag = HaloData::get_tag(widget_id.tag_index);
         if(tag) {
