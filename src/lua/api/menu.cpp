@@ -9,6 +9,8 @@
 #include "menu.hpp"
 
 namespace Harmony::Lua {
+    using namespace HaloData;
+
     static int lua_set_aspect_ratio(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 2) {
@@ -37,18 +39,18 @@ namespace Harmony::Lua {
         if(args == 1) {
             if(lua_type(state, 1) == LUA_TSTRING) {
                 const char *tag_path = luaL_checkstring(state, 1);
-                auto sound_id = HaloData::get_tag_id(tag_path, HaloData::TAG_CLASS_SOUND);
+                auto sound_id = get_tag_id(tag_path, TAG_CLASS_SOUND);
                 if(!sound_id.is_null()) {
-                    HaloData::play_sound(sound_id);
+                    play_sound(sound_id);
                 }
                 else {
                     luaL_error(state, "invalid sound tag in harmony play_sound function");
                 }
             }
             else if(lua_type(state, 1) == LUA_TNUMBER) {
-                HaloData::TagID sound_id = luaL_checkinteger(state, 1);
-                if(HaloData::get_tag(sound_id)) {
-                    HaloData::play_sound(sound_id);
+                TagID sound_id = luaL_checkinteger(state, 1);
+                if(get_tag(sound_id)) {
+                    play_sound(sound_id);
                 }
                 else {
                     luaL_error(state, "invalid sound tag in harmony play_sound function");
@@ -131,7 +133,7 @@ namespace Harmony::Lua {
             WidgetID widget_id = luaL_checkinteger(state, 1);
             auto *widget = get_widget_from_id(widget_id);
             if(!widget) {
-                return luaL_error(state, "invalid widget id in harmony get_widget_values function");
+                return luaL_error(state, "invalid widget id in harmony set_widget_values function");
             }
 
             // Get table
@@ -186,17 +188,17 @@ namespace Harmony::Lua {
         int args = lua_gettop(state);
         if(args == 2) {
             // Get widget tag ID
-            auto widget_definition = HaloData::TagID::null_id();
+            auto widget_definition = TagID::null_id();
             if(lua_type(state, 1) == LUA_TSTRING) {
                 const char *tag_path = luaL_checkstring(state, 1);
-                widget_definition = HaloData::get_tag_id(tag_path, HaloData::TAG_CLASS_UI_WIDGET_DEFINITION);
+                widget_definition = get_tag_id(tag_path, TAG_CLASS_UI_WIDGET_DEFINITION);
                 if(widget_definition.is_null()) {
                     luaL_error(state, "invalid widget tag path in harmony open_widget function");
                 }
             }
             else {
                 widget_definition = luaL_checkinteger(state, 1);
-                if(!HaloData::get_tag(widget_definition)) {
+                if(!get_tag(widget_definition)) {
                     luaL_error(state, "invalid tag ID in harmony open_widget function");
                 }
             }
@@ -204,7 +206,7 @@ namespace Harmony::Lua {
             // Get history flag
             bool dont_push_history = lua_toboolean(state, 1);
 
-            auto *new_widget = HaloData::open_widget(widget_definition, dont_push_history);
+            auto *new_widget = open_widget(widget_definition, dont_push_history);
             auto new_widget_id = get_widget_id(new_widget);
 
             lua_pushinteger(state, new_widget_id);
@@ -219,7 +221,7 @@ namespace Harmony::Lua {
     static int lua_close_widget(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 0) {
-            HaloData::close_widget();
+            close_widget();
         }
         else {
             luaL_error(state, "invalid number of arguments in harmony close_widget function");
@@ -231,25 +233,25 @@ namespace Harmony::Lua {
         int args = lua_gettop(state);
         if(args == 2) {
             WidgetID widget_id = luaL_checkinteger(state, 1);
-            auto widget_definition = HaloData::TagID::null_id();
+            auto widget_definition = TagID::null_id();
             
             if(lua_type(state, 1) == LUA_TSTRING) {
                 const char *tag_path = luaL_checkstring(state, 2);
-                widget_definition = HaloData::get_tag_id(tag_path, HaloData::TAG_CLASS_UI_WIDGET_DEFINITION);
+                widget_definition = get_tag_id(tag_path, TAG_CLASS_UI_WIDGET_DEFINITION);
                 if(widget_definition.is_null()) {
                     luaL_error(state, "invalid widget tag path in harmony replace_widget function");
                 }
             }
             else {
                 widget_definition = luaL_checkinteger(state, 2);
-                if(!HaloData::get_tag(widget_definition)) {
+                if(!get_tag(widget_definition)) {
                     luaL_error(state, "invalid widget tag ID in harmony replace_widget function");
                 }
             }
 
             auto *widget = get_widget_from_id(widget_id);
             if(widget) {
-                auto *new_widget = HaloData::replace_widget(widget, widget_definition);
+                auto *new_widget = replace_widget(widget, widget_definition);
                 auto new_widget_id = get_widget_id(new_widget);
                 
                 lua_pushinteger(state, new_widget_id);
@@ -268,9 +270,9 @@ namespace Harmony::Lua {
     static int lua_reload_widget(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 0 || args == 1) {
-            HaloData::WidgetInstance *widget;
+            WidgetInstance *widget;
             if(args == 0) {
-                auto &widget_globals = HaloData::WidgetGlobals::get();
+                auto &widget_globals = WidgetGlobals::get();
                 widget = widget_globals.root_widget;
             }
             else {
@@ -279,7 +281,7 @@ namespace Harmony::Lua {
             }
 
             if(widget) {
-                auto *new_widget = HaloData::reload_widget(widget);
+                auto *new_widget = reload_widget(widget);
                 auto new_widget_id = get_widget_id(new_widget);
 
                 lua_pushinteger(state, new_widget_id);
@@ -298,17 +300,17 @@ namespace Harmony::Lua {
     static int lua_find_widgets(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args >= 1 && args <= 3) {
-            auto widget_definition = HaloData::TagID::null_id();
+            auto widget_definition = TagID::null_id();
             if(lua_type(state, 1) == LUA_TSTRING) {
                 const char *tag_path = luaL_checkstring(state, 1);
-                widget_definition = HaloData::get_tag_id(tag_path, HaloData::TAG_CLASS_UI_WIDGET_DEFINITION);
+                widget_definition = get_tag_id(tag_path, TAG_CLASS_UI_WIDGET_DEFINITION);
                 if(widget_definition.is_null()) {
                     luaL_error(state, "invalid widget tag path in harmony find_widgets function");
                 }
             }
             else {
                 widget_definition = luaL_checkinteger(state, 1);
-                if(!HaloData::get_tag(widget_definition)) {
+                if(!get_tag(widget_definition)) {
                     luaL_error(state, "invalid widget tag ID in harmony find_widgets function");
                 }
             }
@@ -318,7 +320,7 @@ namespace Harmony::Lua {
                 multiple_search = lua_toboolean(state, 2);
             }
 
-            HaloData::WidgetInstance *base_widget = nullptr;
+            WidgetInstance *base_widget = nullptr;
             if(args == 3) {
                 WidgetID widget_id = luaL_checkinteger(state, 2);
                 auto *widget = get_widget_from_id(widget_id);
@@ -327,7 +329,7 @@ namespace Harmony::Lua {
                 }
             }
 
-            auto found_widgets = HaloData::find_widgets(widget_definition, multiple_search, base_widget);
+            auto found_widgets = find_widgets(widget_definition, multiple_search, base_widget);
             if(multiple_search) {
                 lua_newtable(state);
                 for(std::size_t i = 0; i < found_widgets.size(); i++) {
@@ -355,13 +357,12 @@ namespace Harmony::Lua {
     static int lua_focus_widget(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 1) {
-            auto widget_index = luaL_checkinteger(state, 1);
             WidgetID widget_id = luaL_checkinteger(state, 1);
             auto *widget = get_widget_from_id(widget_id);
             if(!widget) {
                 return luaL_error(state, "invalid widget id in harmony focus_widget function");
             }
-            HaloData::focus_widget(widget);
+            focus_widget(widget);
         }
         else {
             luaL_error(state, "invalid number of arguments in harmony focus_widget function");
@@ -369,15 +370,35 @@ namespace Harmony::Lua {
         return 0;
     }
 
+    static int lua_get_root_widget(lua_State *state) noexcept {
+        int args = lua_gettop(state);
+        if(args == 0) {
+            auto &widget_globals = WidgetGlobals::get();
+            auto *root_widget = widget_globals.root_widget;
+
+            if(root_widget) {
+                lua_pushinteger(state, get_widget_id(root_widget));
+            }
+            else {
+                lua_pushnil(state);
+            }
+
+            return 1;
+        }
+        else {
+            return luaL_error(state, "invalid number of arguments in harmony insert_widget function");
+        }
+    }
+
     static int lua_block_input(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 1) {
             bool block_input = lua_toboolean(state, 1);
             if(block_input) {
-                HaloData::block_widget_input();
+                block_widget_input();
             }
             else {
-                HaloData::unblock_widget_input();
+                unblock_widget_input();
             }
         }
         else {
@@ -397,6 +418,7 @@ namespace Harmony::Lua {
         {"reload_widget", lua_reload_widget},
         {"find_widgets", lua_find_widgets},
         {"focus_widget", lua_focus_widget},
+        {"get_root_widget", lua_get_root_widget},
         {"block_input", lua_block_input},
         {NULL, NULL}
     };
