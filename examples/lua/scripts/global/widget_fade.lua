@@ -59,7 +59,7 @@ end
 function OnWidgetOpen(widget)
     currentWidget = widget
 
-    -- Update widget backgrouund
+    -- Update widget background
     local currentWidgetValues = harmony.menu.get_widget_values(currentWidget)
     local currentWidgetDefinition = blam.uiWidgetDefinition(currentWidgetValues.tag_id)
     lastWidgetBackground = currentWidgetBackground
