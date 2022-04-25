@@ -1,13 +1,21 @@
 -- SPDX-License-Identifier: GPL-3.0-only
 
+------------------------------------------------------------------------------
+-- Menu fade-in effect
+-- This script adds a fade-in effect to menus
+-- Source: https://github.com/JerryBrick/harmony
+------------------------------------------------------------------------------
+
 clua_version = 2.056
 
 local harmony = require "mods.harmony"
 local blam = require "blam"
 
+local animationDurationSecs = 0.20
+
+-- Script globals
 local ticksCount = 0
 local currentWidget = nil
-local animationDurationSecs = 0.15
 local animationPlay = false
 local animationStartTimestamp = nil
 local currentWidgetBackground = nil
@@ -38,6 +46,7 @@ function OnPreframe()
                 opacity = newOpacity
             }
             
+            -- If previous widget background is the same on current widget, just apply the effect to its childs.
             if(currentWidgetBackground == lastWidgetBackground) then
                 local currentWidgetValues = harmony.menu.get_widget_values(currentWidget)
                 local currentChild = currentWidgetValues.child_widget
@@ -64,6 +73,28 @@ function OnWidgetOpen(widget)
     local currentWidgetDefinition = blam.uiWidgetDefinition(currentWidgetValues.tag_id)
     lastWidgetBackground = currentWidgetBackground
     currentWidgetBackground = currentWidgetDefinition.backgroundBitmap
+
+    -- Workaround for stock UI widget wrappers. Use wrapped widget instead.
+    if(currentWidgetDefinition.name:find("wrapper") or currentWidgetDefinition.name:find("connected")) then
+        if(currentWidgetDefinition.childWidgetsCount == 1) then
+            local wrappedWidgetDefinition = blam.uiWidgetDefinition(currentWidgetDefinition.childWidgets[1].widgetTag)
+            local backgrounBitmap = wrappedWidgetDefinition.backgroundBitmap
+
+            currentWidget = currentWidgetValues.child_widget
+            currentWidgetValues = harmony.menu.get_widget_values(currentWidget)
+            currentWidgetBackground = backgrounBitmap
+
+            if(wrappedWidgetDefinition.name:find("wrapper")) then
+                wrappedWidgetDefinition = blam.uiWidgetDefinition(wrappedWidgetDefinition.childWidgets[1].widgetTag)
+                backgrounBitmap = wrappedWidgetDefinition.backgroundBitmap
+
+                local wrappedWidgetValues = harmony.menu.get_widget_values(currentWidgetValues.child_widget)
+                currentWidget = wrappedWidgetValues.child_widget
+                currentWidgetValues = harmony.menu.get_widget_values(currentWidget)
+                currentWidgetBackground = backgrounBitmap
+            end
+        end
+    end
 
     animationStartTimestamp = nil
     animationPlay = true
