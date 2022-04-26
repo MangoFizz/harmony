@@ -48,8 +48,12 @@ namespace Harmony::Lua {
         return this->optic_container;
     }
 
-    MathContainer &Script::get_math_container() noexcept {
-        return this->math_container;
+    ScriptMathApiStore &Script::get_math_api_store() noexcept {
+        return this->math_api_store;
+    }
+
+    ScriptTimeApiStore &Script::get_time_api_store() noexcept {
+        return this->time_api_store;
     }
 
     lua_State *Script::get_state() noexcept {

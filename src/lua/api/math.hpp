@@ -9,7 +9,7 @@
 #include "../../math/geometry.hpp"
 
 namespace Harmony::Lua {
-    struct MathContainer {
+    struct ScriptMathApiStore {
         /** Bezier curves */
         std::map<std::string, Math::QuadraticBezier> curves; 
     };

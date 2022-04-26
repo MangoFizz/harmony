@@ -13,8 +13,8 @@ namespace Harmony::Lua {
         int args = lua_gettop(state);
         if(args == 2 || args == 5) {
             auto *script = library->get_script(state);
-            auto &container = script->get_math_container();
-            auto &curves = container.curves;
+            auto &store = script->get_math_api_store();
+            auto &curves = store.curves;
 
             auto *name = luaL_checkstring(state, 1);
             if(curves.find(name) != curves.end()) {
@@ -61,8 +61,8 @@ namespace Harmony::Lua {
         int args = lua_gettop(state);
         if(args == 4) {
             auto *script = library->get_script(state);
-            auto &container = script->get_math_container();
-            auto &curves = container.curves;
+            auto &store = script->get_math_api_store();
+            auto &curves = store.curves;
 
             auto *name = luaL_checkstring(state, 1);
             auto initial_value = luaL_checkinteger(state, 2);
@@ -97,7 +97,8 @@ namespace Harmony::Lua {
 
     static const luaL_Reg math[] = {
         {"create_bezier_curve", lua_create_bezier_curve},
-        {"interpolate_value", lua_interpolate_value},
+        {"get_bezier_curve_point", lua_interpolate_value},
+        {"interpolate_value", lua_interpolate_value}, // deprecated
         {NULL, NULL}
     };
 

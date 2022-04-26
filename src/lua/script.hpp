@@ -8,6 +8,7 @@
 #include <map>
 #include <lua.hpp>
 #include "api/math.hpp"
+#include "api/time.hpp"
 #include "../optic/container.hpp"
 
 namespace Harmony::Lua {
@@ -68,9 +69,14 @@ namespace Harmony::Lua {
         Optic::Container *get_optic_container() noexcept;
 
         /**
-         * Get math container
+         * Get math API store
          */
-        MathContainer &get_math_container() noexcept;
+        ScriptMathApiStore &get_math_api_store() noexcept;
+
+        /**
+         * Get time API store
+         */
+        ScriptTimeApiStore &get_time_api_store() noexcept;
 
         /**
          * Get require count
@@ -141,8 +147,11 @@ namespace Harmony::Lua {
         /** Optic container */
         Optic::Container *optic_container;
 
-        /** Math API stuff */
-        MathContainer math_container;
+        /** Math API store */
+        ScriptMathApiStore math_api_store;
+
+        /** Time API store */
+        ScriptTimeApiStore time_api_store;
 
         /** Number of times this script required harmony */
         std::size_t require_count;

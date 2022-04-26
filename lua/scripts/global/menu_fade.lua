@@ -11,13 +11,12 @@ clua_version = 2.056
 local harmony = require "mods.harmony"
 local blam = require "blam"
 
-local animationDurationSecs = 0.20
+-- Duration in milliseconds
+local animationDuration = 200
 
 -- Script globals
-local ticksCount = 0
-local currentWidget = nil
 local animationPlay = false
-local animationStartTimestamp = nil
+local currentWidget = nil
 local currentWidgetBackground = nil
 local lastWidgetBackground = nil
 
@@ -25,22 +24,14 @@ function OnLoad()
     harmony.math.create_bezier_curve("fade in", "ease in")
 end
 
-function OnTick() 
-    ticksCount = ticksCount + 1
-end
-
 function OnPreframe()
     if(animationPlay and harmony.menu.get_root_widget()) then
-        if(animationStartTimestamp == nil) then
-            animationStartTimestamp = ticksCount
-        end
-
         -- Calculate elapsed seconds
-        local animationElapsedSeconds = (ticksCount - animationStartTimestamp) / 30
+        local animationElapsedMilliseconds = harmony.time.get_elapsed_milliseconds("anim")
         
-        if(math.floor(animationElapsedSeconds) < animationDurationSecs) then
-            local t = animationElapsedSeconds / animationDurationSecs
-            local newOpacity = harmony.math.interpolate_value("fade in", 0, 1, t)
+        if(animationElapsedMilliseconds < animationDuration) then
+            local t = animationElapsedMilliseconds / animationDuration
+            local newOpacity = harmony.math.get_bezier_curve_point("fade in", 0, 1, t)
     
             local newWidgetValues = {
                 opacity = newOpacity
@@ -59,8 +50,10 @@ function OnPreframe()
                 harmony.menu.set_widget_values(currentWidget, newWidgetValues)
             end
         else
+            -- Reset opacity, just in case
+            harmony.menu.set_widget_values(currentWidget, { opacity = 1.0 })
+            
             animationPlay = false
-            animationStartTimestamp = nil
         end
     end
 end
@@ -96,12 +89,11 @@ function OnWidgetOpen(widget)
         end
     end
 
-    animationStartTimestamp = nil
+    harmony.time.set_timestamp("anim")
     animationPlay = true
 end
 
 -- Set up callbacks
-set_callback("tick", "OnTick")
 set_callback("preframe", "OnPreframe")
 harmony.set_callback("widget open", "OnWidgetOpen")
 
