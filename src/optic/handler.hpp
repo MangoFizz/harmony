@@ -7,7 +7,7 @@
 #include <map>
 #include <d3dx9.h>
 #include "animation.hpp"
-#include "container.hpp"
+#include "store.hpp"
 #include "sprite.hpp"
 #include "render.hpp"
 
@@ -19,14 +19,14 @@ namespace Harmony::Optic {
          * @param name  Name of the group
          * @return      Pointer to the group if exists, nullptr if not
          */
-        Container *get_optic(std::string name) noexcept;
+        Store *get_optic(std::string name) noexcept;
 
         /**
          * Create container for optic
          * @param name  Name for the container
          * @exception   If optic container already exists
          */
-        Container *create_optic(std::string name);
+        Store *create_optic(std::string name);
 
         /**
          * Remove optic container
@@ -54,7 +54,7 @@ namespace Harmony::Optic {
 
     private:
         /** Render group */
-        std::map<std::string, std::unique_ptr<Container>> optics;
+        std::map<std::string, std::unique_ptr<Store>> optics;
     };
 }
 

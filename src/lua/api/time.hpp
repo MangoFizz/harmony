@@ -4,14 +4,14 @@
 #define HARMONY_LUA_API_TIME_HPP
 
 #include <string>
-#include <map>
+#include <vector>
 #include <chrono>
 #include <lua.hpp>
 
 namespace Harmony::Lua {
     struct ScriptTimeApiStore {
         /** Timestamps */
-        std::map<std::string, std::chrono::steady_clock::time_point> timestamps;
+        std::vector<std::chrono::steady_clock::time_point> timestamps;
     };
 
     /**

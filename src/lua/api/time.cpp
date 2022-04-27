@@ -10,16 +10,15 @@ namespace Harmony::Lua {
 
     static int lua_set_timestamp(lua_State *state) noexcept {
         int args = lua_gettop(state);
-        if(args == 1) {
+        if(args == 0) {
             auto *script = library->get_script(state);
             auto &store = script->get_time_api_store();
             auto &timestamps = store.timestamps;
 
-            auto *timestamp_name = luaL_checkstring(state, 1);
+            timestamps.push_back(std::chrono::steady_clock::now());
+            lua_pushinteger(state, timestamps.size() - 1);
 
-            timestamps.insert_or_assign(timestamp_name, std::chrono::steady_clock::now());
-
-            return 0;
+            return 1;
         }
         else {
             return luaL_error(state, "invalid number of arguments in harmony set_timestamp function");
@@ -33,12 +32,12 @@ namespace Harmony::Lua {
             auto &store = script->get_time_api_store();
             auto &timestamps = store.timestamps;
 
-            auto *name = luaL_checkstring(state, 1);
-            if(timestamps.find(name) == timestamps.end()) {
-                return luaL_error(state, "invalid timestamp name in harmony get_elapsed_milliseconds function");
+            std::size_t handle = luaL_checkinteger(state, 1);
+            if(handle > timestamps.size()) {
+                return luaL_error(state, "invalid timestamp handle in harmony get_elapsed_milliseconds function");
             }
 
-            auto const &timestamp = timestamps[name];
+            auto const &timestamp = timestamps[handle];
             auto elapsed_time = std::chrono::steady_clock::now() - timestamp;
             auto elapsed_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time);
 
@@ -58,12 +57,12 @@ namespace Harmony::Lua {
             auto &store = script->get_time_api_store();
             auto &timestamps = store.timestamps;
 
-            auto *name = luaL_checkstring(state, 1);
-            if(timestamps.find(name) == timestamps.end()) {
-                return luaL_error(state, "invalid timestamp name in harmony get_elapsed_seconds function");
+            std::size_t handle = luaL_checkinteger(state, 1);
+            if(handle > timestamps.size()) {
+                return luaL_error(state, "invalid timestamp handle in harmony get_elapsed_seconds function");
             }
 
-            auto const &timestamp = timestamps[name];
+            auto const &timestamp = timestamps[handle];
             auto elapsed_time = std::chrono::steady_clock::now() - timestamp;
             auto elapsed_milliseconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed_time);
 

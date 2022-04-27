@@ -9,7 +9,7 @@
 #include <lua.hpp>
 #include "api/math.hpp"
 #include "api/time.hpp"
-#include "../optic/container.hpp"
+#include "../optic/store.hpp"
 
 namespace Harmony::Lua {
     class Script {
@@ -66,7 +66,7 @@ namespace Harmony::Lua {
         /**
          * Get optic container
          */
-        Optic::Container *get_optic_container() noexcept;
+        Optic::Store *get_optic_container() noexcept;
 
         /**
          * Get math API store
@@ -145,7 +145,7 @@ namespace Harmony::Lua {
         std::map<CallbackType, std::vector<std::string>> callbacks;
 
         /** Optic container */
-        Optic::Container *optic_container;
+        Optic::Store *optic_container;
 
         /** Math API store */
         ScriptMathApiStore math_api_store;

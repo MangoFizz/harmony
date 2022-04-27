@@ -4,14 +4,14 @@
 #define HARMONY_LUA_API_MATH_HPP
 
 #include <string>
-#include <map>
+#include <vector>
 #include <lua.hpp>
 #include "../../math/geometry.hpp"
 
 namespace Harmony::Lua {
     struct ScriptMathApiStore {
         /** Bezier curves */
-        std::map<std::string, Math::QuadraticBezier> curves; 
+        std::vector<Math::QuadraticBezier> curves; 
     };
 
     /**

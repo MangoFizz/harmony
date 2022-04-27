@@ -3,14 +3,6 @@
 #include "animation.hpp"
 
 namespace Harmony::Optic {
-    std::string Animation::get_name() const noexcept {
-        return this->name;
-    }
-
-    void Animation::set_name(std::string name) noexcept {
-        this->name = name;
-    }
-
     long Animation::get_duration() const noexcept {
         return this->duration;
     }
@@ -107,15 +99,13 @@ namespace Harmony::Optic {
         return timeleft;
     }
 
-    Animation::Animation(std::string name, StateTransform transformation, long duration) noexcept {
-        this->name = name;
+    Animation::Animation(StateTransform transformation, long duration) noexcept {
         this->render_state_transform = transformation;
         this->duration = duration;
         this->set_up_default_animation();
     }
 
-    Animation::Animation(std::string name, long duration) noexcept {
-        this->name = name;
+    Animation::Animation(long duration) noexcept {
         this->duration = duration;
         this->set_up_default_animation();
     }

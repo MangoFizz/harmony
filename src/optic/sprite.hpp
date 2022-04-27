@@ -90,17 +90,15 @@ namespace Harmony::Optic {
 
         /**
          * Default constructor for sprite
-         * @param name      Name of the sprite
          * @param texture   Texture path
          * @param width     Width of sprite frames
          * @param height    Height of sprite frames
          * @exception       If texture file does not exists
          */
-        Sprite(std::string name, std::string texture, int width, int height);
+        Sprite(std::string texture, int width, int height);
 
         /**
          * Default constructor for sprite
-         * @param name                  Name or the sprite
          * @param texture               Texture path
          * @param sheet_rows            Number of rows in the sheet
          * @param sheet_columns         Number of columns in the sheet
@@ -110,7 +108,7 @@ namespace Harmony::Optic {
          * @param frame_height          Height of the sprite
          * @exception                   If texture file does not exists
          */
-        Sprite(std::string name, std::string texture, std::size_t sheet_rows, std::size_t sheet_columns, std::size_t sheet_frames, std::size_t frames_per_second, int frame_width, int frame_height);
+        Sprite(std::string texture, std::size_t sheet_rows, std::size_t sheet_columns, std::size_t sheet_frames, std::size_t frames_per_second, int frame_width, int frame_height);
 
         /**
          * Default constructor
@@ -123,9 +121,6 @@ namespace Harmony::Optic {
         ~Sprite() noexcept;
 
     private:
-        /** Sprite name */
-        std::string name;
-
         /** Path of texture sprite */
         std::filesystem::path texture_path;
 

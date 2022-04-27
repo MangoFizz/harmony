@@ -44,7 +44,7 @@ namespace Harmony::Lua {
         return this->require_count;
     }
 
-    Optic::Container *Script::get_optic_container() noexcept {
+    Optic::Store *Script::get_optic_container() noexcept {
         return this->optic_container;
     }
 

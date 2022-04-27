@@ -16,22 +16,24 @@ local animationDuration = 200
 
 -- Script globals
 local animationPlay = false
+local animationBezierCurve = nil
+local animationStartTimestamp = nil
 local currentWidget = nil
 local currentWidgetBackground = nil
 local lastWidgetBackground = nil
 
 function OnLoad()
-    harmony.math.create_bezier_curve("fade in", "ease in")
+    animationBezierCurve = harmony.math.create_bezier_curve("ease in")
 end
 
 function OnPreframe()
     if(animationPlay and harmony.menu.get_root_widget()) then
         -- Calculate elapsed seconds
-        local animationElapsedMilliseconds = harmony.time.get_elapsed_milliseconds("anim")
+        local animationElapsedMilliseconds = harmony.time.get_elapsed_milliseconds(animationStartTimestamp)
         
         if(animationElapsedMilliseconds < animationDuration) then
             local t = animationElapsedMilliseconds / animationDuration
-            local newOpacity = harmony.math.get_bezier_curve_point("fade in", 0, 1, t)
+            local newOpacity = harmony.math.get_bezier_curve_point(animationBezierCurve, 0, 1, t)
     
             local newWidgetValues = {
                 opacity = newOpacity
@@ -89,7 +91,7 @@ function OnWidgetOpen(widget)
         end
     end
 
-    harmony.time.set_timestamp("anim")
+    animationStartTimestamp = harmony.time.set_timestamp()
     animationPlay = true
 end
 

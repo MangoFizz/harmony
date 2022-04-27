@@ -6,14 +6,6 @@
 #include "sprite.hpp"
 
 namespace Harmony::Optic {
-    std::string Sprite::get_name() const noexcept {
-        return this->name;
-    }
-
-    void Sprite::set_name(std::string name) noexcept {
-        this->name = name;
-    }
-
     std::size_t Sprite::get_frame_count() const noexcept {
         return this->frame_count;
     }
@@ -105,12 +97,11 @@ namespace Harmony::Optic {
         }
     }
 
-    Sprite::Sprite(std::string name, std::string texture, int width, int height) {
+    Sprite::Sprite(std::string texture, int width, int height) {
         if(!std::filesystem::exists(texture)) {
-            throw Exception("Texture file for sprite '" + name + "' does not exists!");
+            throw Exception("Texture file '" + texture + "' does not exists!");
         }
 
-        this->name = name;
         this->texture_path = texture;
         this->texture_width = width;
         this->texture_height = height;
@@ -118,12 +109,11 @@ namespace Harmony::Optic {
         this->frame_height = height;
     }
 
-    Sprite::Sprite(std::string name, std::string texture, std::size_t sheet_rows, std::size_t sheet_columns, std::size_t sheet_frames, std::size_t frames_per_second, int frame_width, int frame_height) {
+    Sprite::Sprite(std::string texture, std::size_t sheet_rows, std::size_t sheet_columns, std::size_t sheet_frames, std::size_t frames_per_second, int frame_width, int frame_height) {
         if(!std::filesystem::exists(texture)) {
-            throw Exception("Texture file for sprite '" + name + "' does not exists!");
+            throw Exception("Texture file '" + texture + "' does not exists!");
         }
 
-        this->name = name;
         this->texture_path = texture;
         this->texture_width = frame_width * sheet_columns;
         this->texture_height = frame_height * sheet_rows;

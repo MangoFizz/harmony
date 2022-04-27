@@ -16,6 +16,7 @@
 
 namespace Harmony::Optic {
     class Render {
+    friend class Handler;
     public:
         /**
          * Play an animation
@@ -68,6 +69,9 @@ namespace Harmony::Optic {
         /** Active animations */
         std::vector<Animation> active_animations;
 
+        /** Is the fade-out animation playing? */
+        bool fading_out = false;
+
         /** Render start time */
         std::chrono::steady_clock::time_point timestamp;
     };
@@ -75,17 +79,6 @@ namespace Harmony::Optic {
     class RenderQueue {
     friend class Handler;
     public:
-        /**
-         * Get queue name
-         */
-        std::string get_name() const noexcept;
-
-        /**
-         * Set queue name
-         * @param name  New name for queue
-         */
-        void set_name(std::string name) noexcept;
-
         /**
          * Get sprite default state
          */
@@ -173,14 +166,13 @@ namespace Harmony::Optic {
 
         /**
          * Constructor for render queue
-         * @param name                      Name of the queue
          * @param initial_render_state      Initial state for rendered sprites
          * @param rotation                  Rotation of sprites in degrees
          * @param maximum_renders           Number of simultaneous renderings
          * @param render_duration           Duration of the renders
          * @param temporal                  If true, the queue will be removed after last render timelife ends
          */
-        RenderQueue(std::string name, Sprite::State initial_render_state, float rotation, std::size_t maximum_renders, long render_duration, bool temporal = false) noexcept;
+        RenderQueue(Sprite::State initial_render_state, float rotation, std::size_t maximum_renders, long render_duration, bool temporal = false) noexcept;
 
         /**
          * Void constructor
@@ -188,9 +180,6 @@ namespace Harmony::Optic {
         RenderQueue() {}
 
     private:
-        /** Name of the queue */
-        std::string name;
-
         /** Initial state for sprites */
         Sprite::State initial_render_state;
 

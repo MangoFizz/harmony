@@ -90,7 +90,7 @@ add_library(harmony MODULE
     src/messaging/exception.cpp
     src/messaging/message_box.cpp
     src/optic/animation.cpp
-    src/optic/container.cpp
+    src/optic/store.cpp
     src/optic/d3dx9.cpp
     src/optic/exception.cpp
     src/optic/handler.cpp

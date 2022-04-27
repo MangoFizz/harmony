@@ -12,7 +12,7 @@
 namespace Harmony::Optic {
     static Handler *handler = nullptr;
 
-    Container *Handler::get_optic(std::string name) noexcept {
+    Store *Handler::get_optic(std::string name) noexcept {
         for(auto &optic : this->optics) {
             if(optic.first == name) {
                 return optic.second.get();
@@ -21,11 +21,11 @@ namespace Harmony::Optic {
         return nullptr;
     }
 
-    Container *Handler::create_optic(std::string name) {
+    Store *Handler::create_optic(std::string name) {
         if(this->get_optic(name)) {
             throw Exception("Optic container '" + name + "' already exists!");
         }
-        this->optics[name] = std::make_unique<Container>();
+        this->optics[name] = std::make_unique<Store>();
         return this->optics[name].get();
     }
 
@@ -156,7 +156,8 @@ namespace Harmony::Optic {
 
                     // Play fade out animation
                     if(queue->get_render_duration() - render.get_timelife() < fade_out_anim.get_duration()) {
-                        if(std::find(active_animations.begin(), active_animations.end(), fade_out_anim) == active_animations.end()) {
+                        if(!render.fading_out) {
+                            render.fading_out = true;
                             render.play_animation(fade_out_anim);
                         }
                     }

@@ -41,14 +41,6 @@ namespace Harmony::Optic {
         this->timestamp = std::chrono::steady_clock::now();
     }
 
-    std::string RenderQueue::get_name() const noexcept {
-        return this->name;
-    }
-
-    void RenderQueue::set_name(std::string name) noexcept {
-        this->name = name;
-    }
-
     Sprite::State RenderQueue::get_sprite_initial_state() noexcept {
         return this->initial_render_state;
     }
@@ -115,8 +107,7 @@ namespace Harmony::Optic {
         return this->temporal_flag;
     }
 
-    RenderQueue::RenderQueue(std::string name, Sprite::State initial_render_state, float rotation, std::size_t maximum_renders, long render_duration, bool temporal) noexcept {
-        this->name = name;
+    RenderQueue::RenderQueue(Sprite::State initial_render_state, float rotation, std::size_t maximum_renders, long render_duration, bool temporal) noexcept {
         this->initial_render_state = initial_render_state;
         this->rotation = rotation;
         this->max_renders = maximum_renders;

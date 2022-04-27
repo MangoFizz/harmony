@@ -11,19 +11,14 @@ namespace Harmony::Lua {
 
     static int lua_create_bezier_curve(lua_State *state) noexcept {
         int args = lua_gettop(state);
-        if(args == 2 || args == 5) {
+        if(args == 1 || args == 4) {
             auto *script = library->get_script(state);
             auto &store = script->get_math_api_store();
             auto &curves = store.curves;
 
-            auto *name = luaL_checkstring(state, 1);
-            if(curves.find(name) != curves.end()) {
-                return luaL_error(state, "invalid curve name in harmony create_bezier_curve function");
-            }
-
             Math::QuadraticBezier curve;
-            if(args == 2) {
-                std::string preset = luaL_checkstring(state, 2);
+            if(args == 1) {
+                std::string preset = luaL_checkstring(state, 1);
                 if(preset == "ease in") {
                     curve = Optic::Animation::ease_in();
                 }
@@ -41,33 +36,38 @@ namespace Harmony::Lua {
                 }
             }
             else {
-                float x1 = luaL_checknumber(state, 2);
-                float y1 = luaL_checknumber(state, 3);
-                float x2 = luaL_checknumber(state, 4);
-                float y2 = luaL_checknumber(state, 5);
+                float x1 = luaL_checknumber(state, 1);
+                float y1 = luaL_checknumber(state, 2);
+                float x2 = luaL_checknumber(state, 3);
+                float y2 = luaL_checknumber(state, 4);
                 curve = Math::QuadraticBezier({x1, y1}, {x2, y2});
             }
 
-            curves.insert_or_assign(name, curve);
+            curves.push_back(curve);
+            lua_pushinteger(state, curves.size() - 1);
 
-            return 0;
+            return 1;
         }
         else {
             return luaL_error(state, "invalid number of arguments in harmony create_bezier_curve function");
         }
     }
 
-    static int lua_interpolate_value(lua_State *state) noexcept {
+    static int lua_get_bezier_curve_point(lua_State *state) noexcept {
         int args = lua_gettop(state);
         if(args == 4) {
             auto *script = library->get_script(state);
             auto &store = script->get_math_api_store();
             auto &curves = store.curves;
 
-            auto *name = luaL_checkstring(state, 1);
+            std::size_t handle = luaL_checkinteger(state, 1);
             auto initial_value = luaL_checkinteger(state, 2);
             auto final_value = luaL_checkinteger(state, 3);
             float t = luaL_checknumber(state, 4);
+
+            if(handle > curves.size()) {
+                return luaL_error(state, "invalid curve handle in harmony get_bezier_curve_point function");
+            }
 
             // fool proof
             if(t > 1.0f) {
@@ -76,12 +76,8 @@ namespace Harmony::Lua {
             else if(t < 0.0f) {
                 t = 0;
             }
-            
-            if(curves.find(name) == curves.end()) {
-                return luaL_error(state, "invalid curve name in harmony interpolate_value function");
-            }
 
-            auto &curve = curves[name];
+            auto &curve = curves[handle];
             auto point = curve.get_point(t);
 
             float transform = point.y * (final_value - initial_value);
@@ -97,8 +93,7 @@ namespace Harmony::Lua {
 
     static const luaL_Reg math[] = {
         {"create_bezier_curve", lua_create_bezier_curve},
-        {"get_bezier_curve_point", lua_interpolate_value},
-        {"interpolate_value", lua_interpolate_value}, // deprecated
+        {"get_bezier_curve_point", lua_get_bezier_curve_point},
         {NULL, NULL}
     };
 

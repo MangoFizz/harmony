@@ -40,17 +40,6 @@ namespace Harmony::Optic {
         };
 
         /**
-         * Get animation name
-         */
-        std::string get_name() const noexcept;
-
-        /**
-         * Set animation name
-         * @param name  New name for animation
-         */
-        void set_name(std::string name) noexcept;
-
-        /**
          * Get the duration of the animation
          */
         long get_duration() const noexcept;
@@ -108,18 +97,16 @@ namespace Harmony::Optic {
 
         /**
          * Constructor for animation
-         * @param name              Name of the animation
          * @param transformation    Transformation for render state
          * @param duration          Duration of the animation in milliseconds
          */
-        Animation(std::string name, StateTransform transformation, long duration) noexcept;
+        Animation(StateTransform transformation, long duration) noexcept;
 
         /**
          * Constructor for animation with default transformation
-         * @param name              Name of the animation
          * @param duration          Duration of the animation in milliseconds
          */
-        Animation(std::string name, long duration) noexcept;
+        Animation(long duration) noexcept;
 
         /**
          * Void constructor for animation
@@ -130,13 +117,6 @@ namespace Harmony::Optic {
          * Destructor for animation
          */
         ~Animation() noexcept;
-
-        /**
-         * Equals operator for std::find function
-         */
-        inline bool operator==(const Animation& anim) {
-            return this->name == anim.get_name();
-        }
 
         /**
          * Get a property from a given string
@@ -155,9 +135,6 @@ namespace Harmony::Optic {
         static Math::QuadraticBezier ease_in_out() noexcept;
 
     private:
-        /** Name of the animation */
-        std::string name;
-
         /** Curves of the animation */
         std::map<RenderProperty, Math::QuadraticBezier> curves;
 
