@@ -203,6 +203,7 @@ function OnMultiplayerEvent(event, localId, killerId, victimId)
         if (localId == victimId) then
             killingSpreeCount = 0
             dyingSpreeCount = dyingSpreeCount - 1
+            deathsCount = deathsCount + 1
             lastkillesby = killerId
             lastDeathTimestamp = harmony.time.setTimestamp()
         end
