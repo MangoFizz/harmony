@@ -57,6 +57,7 @@ add_library(harmony MODULE
     src/halo_data/input_devices.cpp
     src/halo_data/multiplayer_events.cpp
     src/halo_data/multiplayer_sounds.cpp
+    src/halo_data/multiplayer_sounds.S
     src/halo_data/path.cpp
     src/halo_data/resolution.cpp
     src/halo_data/sound.cpp
@@ -68,10 +69,10 @@ add_library(harmony MODULE
     src/halo_data/window.cpp
     src/lua/api/callback.cpp
     src/lua/api/math.cpp
+    src/lua/api/multiplayer.cpp
     src/lua/api/optic.cpp
     src/lua/api/menu.cpp
     src/lua/api/time.cpp
-    src/lua/api/server.cpp
     src/lua/helpers.cpp
     src/lua/library.cpp
     src/lua/script.cpp

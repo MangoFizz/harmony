@@ -297,6 +297,10 @@ namespace Harmony::Memory {
                         this->cave.insert(&instruction[0], 4);
                         instruction_size = 4;
                     }
+                    else if(instruction[1] == 0x84 && instruction[2] == 0x24) {
+                        this->cave.insert(&instruction[0], 7);
+                        instruction_size = 7;
+                    }
                     else if(instruction[1] == 0xD8) {
                         this->cave.insert(&instruction[0], 2);
                         instruction_size = 2;

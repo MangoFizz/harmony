@@ -109,9 +109,9 @@ namespace Harmony::Optic {
         Animation(long duration) noexcept;
 
         /**
-         * Void constructor for animation
+         * Default constructor for animation
          */
-        Animation() {}
+        Animation() = default;
 
         /**
          * Destructor for animation

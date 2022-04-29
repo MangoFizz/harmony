@@ -1,8 +1,35 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include "../memory/signature.hpp"
+#include "../memory/hook.hpp"
+#include "../harmony.hpp"
 #include "multiplayer_sounds.hpp"
 
 namespace Harmony::HaloData {
+    static Memory::FunctionOverride announcer_hook;
+
+    extern "C" {
+        void multiplayer_announcer_hook_asm();
+        const void *multiplayer_announcer_hook_return = nullptr;
+        const void *multiplayer_announcer_fn_return = nullptr;
+        bool skip_multiplayer_announcer = false;
+    }
+
+    void mute_announcer(bool setting) noexcept {
+        if(!multiplayer_announcer_hook_return) {
+            static auto &harmony = Harmony::get();
+            static auto &function = harmony.get_signature("announcer_hud_messages_function");
+            static auto &function_return = harmony.get_signature("announcer_hud_messages_function_return");
+
+            multiplayer_announcer_fn_return = reinterpret_cast<void *>(function_return.get_data());
+
+            announcer_hook.initialize(function.get_data(), reinterpret_cast<void *>(multiplayer_announcer_hook_asm), &multiplayer_announcer_hook_return);
+            announcer_hook.hook();
+        }
+
+        skip_multiplayer_announcer = setting;
+    }
+
     std::string string_from_multiplayer_sound(MultiplayerSound sound) noexcept {
         switch(sound) {
             case MULTIPLAYER_SOUND_PLAYBALL:

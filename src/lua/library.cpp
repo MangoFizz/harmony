@@ -5,10 +5,10 @@
 #include "../harmony.hpp"
 #include "api/callback.hpp"
 #include "api/math.hpp"
+#include "api/multiplayer.hpp"
 #include "api/optic.hpp"
 #include "api/menu.hpp"
 #include "api/time.hpp"
-#include "api/server.hpp"
 #include "script.hpp"
 #include "library.hpp"
 
@@ -98,7 +98,7 @@ namespace Harmony::Lua {
         // Load stuff
         set_callback_functions(state);
         set_optic_functions(state);
-        set_server_functions(state);
+        set_multiplayer_api(state);
         set_math_api(state);
         set_time_api(state);
         set_menu_functions(state);

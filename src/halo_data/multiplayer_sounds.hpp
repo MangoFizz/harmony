@@ -71,6 +71,8 @@ namespace Harmony::HaloData {
     };
 
     std::string string_from_multiplayer_sound(MultiplayerSound sound) noexcept;
+
+    void mute_announcer(bool setting) noexcept;
 }
 
 #endif

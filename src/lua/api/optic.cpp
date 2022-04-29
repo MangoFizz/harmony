@@ -21,18 +21,12 @@ namespace Harmony::Lua {
 
         int args = lua_gettop(state);
         if(args == 1) {
-            // Arguments
             long duration = luaL_checknumber(state, 1);
-
-            try {
-                auto handle = optic->create_animation(duration);
-                
-                lua_pushinteger(state, handle);
-                return 1;
-            }
-            catch(...) {
-                return luaL_error(state, "invalid animation name in create_animation function");
-            }
+            auto handle = optic->create_animation(duration);
+            
+            // Return animation handle
+            lua_pushinteger(state, handle);
+            return 1;
         }
         else {
             return luaL_error(state, "invalid number of arguments in harmony create_animation function");
@@ -128,7 +122,7 @@ namespace Harmony::Lua {
 
             if(script->path_is_valid(texture_path)) {
                 if(std::filesystem::exists(texture_path)) {
-                    if(args == 4) {
+                    if(args == 3) {
                         auto handle = optic->create_sprite(texture_path, frame_width, frame_height);
                         lua_pushinteger(state, handle);
                     }
@@ -181,7 +175,7 @@ namespace Harmony::Lua {
 
             auto *queue = optic->get_render_queue(handle);
 
-            if(args >= 8) {
+            if(args >= 7) {
                 auto *fade_in = optic->get_animation(luaL_checkinteger(state, 7));
                 if(fade_in) {
                     queue->set_fade_in_anim(*fade_in);
@@ -191,7 +185,7 @@ namespace Harmony::Lua {
                 }
             }
 
-            if(args >= 9) {
+            if(args >= 8) {
                 auto *fade_out = optic->get_animation(luaL_checkinteger(state, 8));
                 if(fade_out) {
                     queue->set_fade_out_anim(*fade_out);
@@ -201,7 +195,7 @@ namespace Harmony::Lua {
                 }
             }
 
-            if(args == 10) {
+            if(args == 9) {
                 auto *slide = optic->get_animation(luaL_checkinteger(state, 9));
                 if(slide) {
                     queue->set_slide_anim(*slide);
@@ -345,7 +339,7 @@ namespace Harmony::Lua {
         auto *optic = script->get_optic_container();
 
         int args = lua_gettop(state);
-        if(args == 1) {    
+        if(args == 0) {    
             auto handle = optic->create_audio_engine();
 
             lua_pushinteger(state, handle);

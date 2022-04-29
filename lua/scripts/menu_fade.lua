@@ -2,13 +2,13 @@
 
 ------------------------------------------------------------------------------
 -- Menu fade-in effect
--- This script adds a fade-in effect to menus
+-- Adds a fade-in effect to menus
 -- Source: https://github.com/JerryBrick/harmony
 ------------------------------------------------------------------------------
 
 clua_version = 2.056
 
-local harmony = require "mods.harmony"
+local harmony = require "harmony"
 local blam = require "blam"
 
 -- Duration in milliseconds
@@ -22,18 +22,14 @@ local currentWidget = nil
 local currentWidgetBackground = nil
 local lastWidgetBackground = nil
 
-function OnLoad()
-    animationBezierCurve = harmony.math.create_bezier_curve("ease in")
-end
-
 function OnPreframe()
-    if(animationPlay and harmony.menu.get_root_widget()) then
+    if(animationPlay and harmony.menu.getRootWidget()) then
         -- Calculate elapsed seconds
-        local animationElapsedMilliseconds = harmony.time.get_elapsed_milliseconds(animationStartTimestamp)
+        local animationElapsedMilliseconds = harmony.time.getElapsedMilliseconds(animationStartTimestamp)
         
         if(animationElapsedMilliseconds < animationDuration) then
             local t = animationElapsedMilliseconds / animationDuration
-            local newOpacity = harmony.math.get_bezier_curve_point(animationBezierCurve, 0, 1, t)
+            local newOpacity = harmony.math.getBezierCurvePoint(animationBezierCurve, 0, 1, t)
     
             local newWidgetValues = {
                 opacity = newOpacity
@@ -41,19 +37,19 @@ function OnPreframe()
             
             -- If previous widget background is the same on current widget, just apply the effect to its childs.
             if(currentWidgetBackground == lastWidgetBackground) then
-                local currentWidgetValues = harmony.menu.get_widget_values(currentWidget)
+                local currentWidgetValues = harmony.menu.getWidgetValues(currentWidget)
                 local currentChild = currentWidgetValues.child_widget
                 while(currentChild) do
-                    harmony.menu.set_widget_values(currentChild, newWidgetValues)
-                    local currentWidgetValues = harmony.menu.get_widget_values(currentChild)
+                    harmony.menu.setWidgetValues(currentChild, newWidgetValues)
+                    local currentWidgetValues = harmony.menu.getWidgetValues(currentChild)
                     currentChild = currentWidgetValues.next_widget
                 end
             else 
-                harmony.menu.set_widget_values(currentWidget, newWidgetValues)
+                harmony.menu.setWidgetValues(currentWidget, newWidgetValues)
             end
         else
             -- Reset opacity, just in case
-            harmony.menu.set_widget_values(currentWidget, { opacity = 1.0 })
+            harmony.menu.setWidgetValues(currentWidget, { opacity = 1.0 })
             
             animationPlay = false
         end
@@ -64,7 +60,7 @@ function OnWidgetOpen(widget)
     currentWidget = widget
 
     -- Update widget background
-    local currentWidgetValues = harmony.menu.get_widget_values(currentWidget)
+    local currentWidgetValues = harmony.menu.getWidgetValues(currentWidget)
     local currentWidgetDefinition = blam.uiWidgetDefinition(currentWidgetValues.tag_id)
     lastWidgetBackground = currentWidgetBackground
     currentWidgetBackground = currentWidgetDefinition.backgroundBitmap
@@ -76,28 +72,32 @@ function OnWidgetOpen(widget)
             local backgrounBitmap = wrappedWidgetDefinition.backgroundBitmap
 
             currentWidget = currentWidgetValues.child_widget
-            currentWidgetValues = harmony.menu.get_widget_values(currentWidget)
+            currentWidgetValues = harmony.menu.getWidgetValues(currentWidget)
             currentWidgetBackground = backgrounBitmap
 
             if(wrappedWidgetDefinition.name:find("wrapper")) then
                 wrappedWidgetDefinition = blam.uiWidgetDefinition(wrappedWidgetDefinition.childWidgets[1].widgetTag)
                 backgrounBitmap = wrappedWidgetDefinition.backgroundBitmap
 
-                local wrappedWidgetValues = harmony.menu.get_widget_values(currentWidgetValues.child_widget)
+                local wrappedWidgetValues = harmony.menu.getWidgetValues(currentWidgetValues.child_widget)
                 currentWidget = wrappedWidgetValues.child_widget
-                currentWidgetValues = harmony.menu.get_widget_values(currentWidget)
+                currentWidgetValues = harmony.menu.getWidgetValues(currentWidget)
                 currentWidgetBackground = backgrounBitmap
             end
         end
     end
 
-    animationStartTimestamp = harmony.time.set_timestamp()
+    animationStartTimestamp = harmony.time.setTimestamp()
     animationPlay = true
 end
 
--- Set up callbacks
-set_callback("preframe", "OnPreframe")
-harmony.set_callback("widget open", "OnWidgetOpen")
+function OnLoad()
+    animationBezierCurve = harmony.math.createBezierCurve("ease in")
+
+    -- Set up callbacks
+    set_callback("preframe", "OnPreframe")
+    harmony.setCallback("widget open", "OnWidgetOpen")
+end
 
 -- Load script stuff
 OnLoad()
