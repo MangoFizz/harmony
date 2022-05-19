@@ -75,6 +75,10 @@ local medals = {
     unfriggenbelievable = {name = "unfriggenbelievable"}
 }
 
+local function printMedalHud(str)
+    hud_message(str:gsub("_", " "):gsub("^%l", string.upper) .. "!")
+end
+
 local function renderMedal(medal)
     if(medal.sprite) then
         optic.renderSprite(medal.sprite, renderQueue)
@@ -83,6 +87,8 @@ local function renderMedal(medal)
     if(enableAudio and medal.sound) then
         optic.playSound(medal.sound, audioEngine)
     end
+
+    printMedalHud(medal.name);
 end
 
 function OnMapLoad() 
@@ -101,6 +107,7 @@ function OnMultiplayerSound(sound)
             renderMedal(medals.perfection)
         end
     end
+    return true
 end
 
 function OnMultiplayerEvent(event, localId, killerId, victimId)
