@@ -39,10 +39,16 @@ function OnPreframe()
             if(currentWidgetBackground == lastWidgetBackground) then
                 local currentWidgetValues = harmony.menu.getWidgetValues(currentWidget)
                 local currentChild = currentWidgetValues.child_widget
+                local previousChild = nil
                 while(currentChild) do
+                    if(previousChild == currentChild) then
+                        break
+                    end
                     harmony.menu.setWidgetValues(currentChild, newWidgetValues)
                     local currentWidgetValues = harmony.menu.getWidgetValues(currentChild)
+                    previousChild = currentChild
                     currentChild = currentWidgetValues.next_widget
+                    
                 end
             else 
                 harmony.menu.setWidgetValues(currentWidget, newWidgetValues)
