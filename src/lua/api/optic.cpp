@@ -402,6 +402,33 @@ namespace Harmony::Lua {
         return 0;
     }
 
+    static int lua_set_audio_engine_gain(lua_State *state) noexcept {
+        auto *script = library->get_script(state);
+        auto *optic = script->get_optic_container();
+
+        int args = lua_gettop(state);
+        if(args == 2) {    
+            // Arguments
+            auto engine_handle = luaL_checkinteger(state, 1);
+            auto gain = luaL_checkinteger(state, 2);
+
+            auto *playback_queue = optic->get_audio_engine(engine_handle);
+            if(playback_queue) {
+                if(gain > 100) {
+                    gain = 100;
+                }
+                playback_queue->setGlobalVolume(static_cast<float>(gain) / 100);
+            }
+            else {
+                luaL_error(state, "invalid audio engine handle in harmony set_audio_engine_gain function");
+            }
+        }
+        else {
+            luaL_error(state, "invalid number of arguments in harmony set_audio_engine_gain function");
+        }
+        return 0;
+    }
+
     static const luaL_Reg optic[] = {
         {"create_animation", lua_create_animation},
         {"set_animation_property", lua_set_animation_property},
@@ -413,6 +440,7 @@ namespace Harmony::Lua {
         {"create_audio_engine", lua_create_audio_engine},
         {"play_sound", lua_play_sound},
         {"clear_audio_engine", lua_clear_audio_engine},
+        {"set_audio_engine_gain", lua_set_audio_engine_gain},
         {NULL, NULL}
     };
 

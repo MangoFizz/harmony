@@ -27,6 +27,13 @@ namespace Harmony::Lua {
     void lua_push_string_map(lua_State *state, std::map<std::string, std::string> map) noexcept;
 
     /**
+     * Push a vector of strings to stack
+     * @param state     Lua state
+     * @param vector    Vector to be pushed
+     */
+    void lua_push_string_vector(lua_State *state, std::vector<std::string> vector) noexcept;
+
+    /**
      * Push map
      */
     template <typename T>

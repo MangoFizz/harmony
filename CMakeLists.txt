@@ -72,6 +72,7 @@ add_library(harmony MODULE
     src/lua/api/multiplayer.cpp
     src/lua/api/optic.cpp
     src/lua/api/menu.cpp
+    src/lua/api/misc.cpp
     src/lua/api/time.cpp
     src/lua/helpers.cpp
     src/lua/library.cpp

@@ -9,10 +9,11 @@
 clua_version = 2.056
 
 local blam = require "blam"
+local commandParser = require "command_parser"
 local harmony = require "harmony"
 local optic = harmony.optic
 
--- Paramenters
+-- Medals paramenters
 local size = 20
 local offsetX, offsetY = 20, 280
 local opacity = 255
@@ -42,9 +43,11 @@ local multikillCounts = {}
 local multikillTimestamps = {}
 local lastDeathTimestamp = nil
 local lastkillesby = nil
+local lastMedal = nil
 
 -- Medals resources
 local medals = {
+    kill = {name = "kill"},
     killjoy = {name = "killjoy"},
     avenger = {name = "avenger", audio = "hologram"},
     fromTheGrave = {name = "from_the_grave", audio = "beam"},
@@ -75,6 +78,10 @@ local medals = {
     unfriggenbelievable = {name = "unfriggenbelievable"}
 }
 
+local function setVolume(volume)
+    harmony.optic.setAudioEngineGain(audioEngine, volume)
+end
+
 local function printMedalHud(str)
     hud_message(str:gsub("_", " "):gsub("^%l", string.upper) .. "!")
 end
@@ -89,6 +96,8 @@ local function renderMedal(medal)
     end
 
     printMedalHud(medal.name);
+
+    lastMedal = medal.name
 end
 
 function OnMapLoad() 
@@ -114,6 +123,11 @@ function OnMultiplayerEvent(event, localId, killerId, victimId)
     if(event == "local killed player") then
         if(localId == killerId) then
             killingSpreeCount = killingSpreeCount + 1
+
+            -- Regular kill medal
+            if(lastMedal ~= medals.kill.name) then
+                renderMedal(medals.kill)
+            end
     
             -- Killing spree medals
             if (killingSpreeCount == 5) then
@@ -240,6 +254,10 @@ function OnMultiplayerEvent(event, localId, killerId, victimId)
     end
 end
 
+function OnCommand(command)
+    return not commandParser.executeCommand(command)
+end
+
 function OnUnload() 
     -- Unmute announcer
     harmony.multiplayer.muteAnnouncer(false)
@@ -287,11 +305,17 @@ function OnLoad()
     renderQueue = optic.createRenderQueue(screenOffsetX, screenOffsetY, opacity, rotation, duration, 0, fadeInAnimation, fadeOutAnimation, slideAnimation)
 
     if(enableAudio) then
-        audioEngine = optic.createAudioEngine()        
+        audioEngine = optic.createAudioEngine()
     end
 
     -- Mute announcer
     harmony.multiplayer.muteAnnouncer(true)
+
+    -- Register commands
+    commandParser.addCommand("harmony_medals_volume", setVolume, 1, 1, {"number"}, true)
+
+    -- Read settings
+    commandParser.readSettings()
 
     -- Set harmony callbacks
     harmony.setCallback("multiplayer event", "OnMultiplayerEvent")
@@ -299,6 +323,7 @@ function OnLoad()
 
     -- Set chimera callbacks
     set_callback("map load", "OnMapLoad")
+    set_callback("command", "OnCommand")
     set_callback("unload", "OnUnload")
 end
 

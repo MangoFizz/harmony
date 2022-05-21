@@ -24,6 +24,14 @@ namespace Harmony::Lua {
         }
     }
 
+    void lua_push_string_vector(lua_State *state, std::vector<std::string> vector) noexcept {
+        lua_newtable(state);
+        for(std::size_t i = 0; i < vector.size(); i++) {
+            lua_pushstring(state, vector[i].c_str());
+            lua_rawseti(state, -2, i + 1);
+        }
+    }
+
     std::uint32_t get_widget_id(HaloData::WidgetInstance *widget) noexcept {
         WidgetID widget_id = reinterpret_cast<std::uint32_t>(widget);
         widget_id.tag_index = widget->tag_id.index.index;
