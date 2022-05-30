@@ -117,7 +117,7 @@ namespace Harmony::Lua {
                 return 1;
             }
             else {
-                luaL_error(state, "invalid widget id in harmony get_widget_values function");
+                luaL_error(state, "invalid widget handle in harmony get_widget_values function");
             }
         }
         else {
@@ -133,7 +133,7 @@ namespace Harmony::Lua {
             WidgetID widget_id = luaL_checkinteger(state, 1);
             auto *widget = get_widget_from_id(widget_id);
             if(!widget) {
-                return luaL_error(state, "invalid widget id in harmony set_widget_values function");
+                return luaL_error(state, "invalid widget handle in harmony set_widget_values function");
             }
 
             // Get table
@@ -360,7 +360,7 @@ namespace Harmony::Lua {
             WidgetID widget_id = luaL_checkinteger(state, 1);
             auto *widget = get_widget_from_id(widget_id);
             if(!widget) {
-                return luaL_error(state, "invalid widget id in harmony focus_widget function");
+                return luaL_error(state, "invalid widget handle in harmony focus_widget function");
             }
             focus_widget(widget);
         }

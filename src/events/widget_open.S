@@ -16,6 +16,9 @@ _create_widget_return_hook_asm:
     test edx, edx
     jnz do_not_call_events
 
+    test eax, eax
+    jz do_not_call_events
+
     push eax ;# created widget
     call _call_widget_open_events
     add esp, 4
