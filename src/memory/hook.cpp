@@ -378,6 +378,10 @@ namespace Harmony::Memory {
         *this->execute_original_code_flag = setting;
     }
 
+    bool &SwitchHook::execute_original_code() noexcept {
+        return *this->execute_original_code_flag;
+    }
+
     void SwitchHook::initialize(void *instruction, const void *function, bool pushad) {
         if(this->hooked) {
             return;

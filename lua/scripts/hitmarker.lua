@@ -59,14 +59,12 @@ function OnMultiplayerEvent(eventName, localId, killerId, victimId)
     end
 end
 
-function OnMultiplayerSound(sound)
-    if(sound == "ting") then
-        if(not killmarker) then
-            renderMarker(hitmarkerCornerSprite)
-        else
-            killmarker = false
-            return false
-        end
+function OnMultiplayerHitSound(sound)
+    if(not killmarker) then
+        renderMarker(hitmarkerCornerSprite)
+    else
+        killmarker = false
+        return false
     end
     return true
 end
@@ -99,7 +97,7 @@ function OnLoad()
     
     -- Set harmony callbacks
     harmony.setCallback("multiplayer event", "OnMultiplayerEvent")
-    harmony.setCallback("multiplayer sound", "OnMultiplayerSound")
+    harmony.setCallback("multiplayer hit sound", "OnMultiplayerHitSound")
 end
 
 -- Load stuff

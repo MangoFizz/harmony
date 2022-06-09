@@ -18,6 +18,7 @@ namespace Harmony::Lua {
         enum CallbackType {
             CALLBACK_TYPE_MULTIPLAYER_EVENT,
             CALLBACK_TYPE_MULTIPLAYER_SOUND,
+            CALLBACK_TYPE_MULTIPLAYER_HIT_SOUND,
             CALLBACK_TYPE_MENU_ACCEPT,
             CALLBACK_TYPE_WIDGET_ACCEPT,
             CALLBACK_TYPE_WIDGET_BACK,

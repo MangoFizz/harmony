@@ -8,6 +8,7 @@
 #include "../../events/keypress.hpp"
 #include "../../events/multiplayer_event.hpp"
 #include "../../events/multiplayer_sound.hpp"
+#include "../../events/multiplayer_hit_sound.hpp"
 #include "../../events/widget_accept.hpp"
 #include "../../events/widget_close.hpp"
 #include "../../events/widget_list_tab.hpp"
@@ -28,6 +29,7 @@ namespace Harmony::Lua {
 
     static bool multiplayer_event(HaloData::MultiplayerEvent, HaloData::PlayerID, HaloData::PlayerID, HaloData::PlayerID) noexcept;
     static bool multiplayer_sound_event(HaloData::MultiplayerSound) noexcept;
+    static bool multiplayer_hit_sound_event(float) noexcept;
     static bool widget_accept(HaloData::WidgetInstance *) noexcept;
     static bool widget_close(HaloData::WidgetInstance *) noexcept;
     static bool widget_list_tab(HaloData::GamepadButtonWidgetEvent::GamepadButton, HaloData::WidgetInstance *, HaloData::WidgetInstance *) noexcept;
@@ -47,6 +49,7 @@ namespace Harmony::Lua {
             static constexpr const char *callback_names[] = {
                 "multiplayer event",
                 "multiplayer sound",
+                "multiplayer hit sound",
                 "menu accept",
                 "widget accept",
                 "widget back",
@@ -86,8 +89,9 @@ namespace Harmony::Lua {
         library = &harmony.get_lua_library_handler();
 
         // Set up Lua script events
-        add_multiplayer_sound_event(multiplayer_sound_event);
         add_multiplayer_event(multiplayer_event);
+        add_multiplayer_sound_event(multiplayer_sound_event);
+        add_multiplayer_hit_sound_event(multiplayer_hit_sound_event);
         add_widget_accept_event(widget_accept);
         add_widget_close_event(widget_close);
         add_widget_list_tab_event(widget_list_tab);
@@ -142,6 +146,31 @@ namespace Harmony::Lua {
             for(auto &callback : callbacks) {
                 lua_getglobal(state, callback.c_str());
                 lua_pushstring(state, HaloData::string_from_multiplayer_sound(sound).c_str());
+                if(lua_pcall(state, 1, 1, 0) == LUA_OK) {
+                    if(allow) {
+                        allow = lua_toboolean(state, -1);
+                    }
+                }
+                else {
+                    script->print_last_error();
+                }
+            }
+            it++;
+        }
+        return allow;
+    }
+
+    bool multiplayer_hit_sound_event(float volume) noexcept {
+        auto &scripts = library->get_scripts();
+        bool allow = true;
+        auto it = scripts.begin();
+        while(it != scripts.end()) {
+            auto *script = it->get();
+            auto *state = script->get_state();
+            auto &callbacks = script->get_callbacks(CallbackType::CALLBACK_TYPE_MULTIPLAYER_HIT_SOUND);
+            for(auto &callback : callbacks) {
+                lua_getglobal(state, callback.c_str());
+                lua_pushnumber(state, volume);
                 if(lua_pcall(state, 1, 1, 0) == LUA_OK) {
                     if(allow) {
                         allow = lua_toboolean(state, -1);

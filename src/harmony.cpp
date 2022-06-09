@@ -18,6 +18,7 @@
 #include "lua/library.hpp"
 #include "events/map_load.hpp"
 #include "events/multiplayer_event.hpp"
+#include "events/multiplayer_hit_sound.hpp"
 #include "events/multiplayer_sound.hpp"
 #include "events/tick.hpp"
 #include "memory/signature.hpp"
@@ -115,6 +116,7 @@ namespace Harmony {
 
         // Set up multiplayer events
         set_up_multiplayer_event();
+        set_up_multiplayer_hit_sound_event();
         set_up_multiplayer_sounds_event();
 
         // Widget events

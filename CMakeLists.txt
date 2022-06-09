@@ -34,6 +34,8 @@ add_library(harmony MODULE
     src/events/map_load.cpp
     src/events/multiplayer_event.cpp
     src/events/multiplayer_event.S
+    src/events/multiplayer_hit_sound.cpp
+    src/events/multiplayer_hit_sound.S
     src/events/multiplayer_sound.cpp
     src/events/multiplayer_sound.S
     src/events/tick.cpp

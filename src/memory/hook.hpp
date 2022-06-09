@@ -139,6 +139,11 @@ namespace Harmony::Memory {
         void execute_original_code(bool setting) noexcept;
 
         /**
+         * Get execute original code flag
+        */
+        bool &execute_original_code() noexcept;
+
+        /**
          * Initialize switch hook.
          * @param instruction   Pointer to instruction to hook.
          * @param function      Function to be called in the hook.
