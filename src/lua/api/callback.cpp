@@ -52,7 +52,7 @@ namespace Harmony::Lua {
                 "multiplayer hit sound",
                 "menu accept",
                 "widget accept",
-                "widget back",
+                "widget close",
                 "widget list tab",
                 "widget mouse button press",
                 "widget mouse focus",

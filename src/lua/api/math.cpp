@@ -55,7 +55,7 @@ namespace Harmony::Lua {
 
     static int lua_get_bezier_curve_point(lua_State *state) noexcept {
         int args = lua_gettop(state);
-        if(args == 4) {
+        if(args == 4 || args == 5) {
             auto *script = library->get_script(state);
             auto &store = script->get_math_api_store();
             auto &curves = store.curves;
@@ -64,6 +64,11 @@ namespace Harmony::Lua {
             auto initial_value = luaL_checkinteger(state, 2);
             auto final_value = luaL_checkinteger(state, 3);
             float t = luaL_checknumber(state, 4);
+            
+            bool reverse = false;
+            if(args == 5) {
+                reverse = lua_toboolean(state, 5);
+            }
 
             if(handle > curves.size()) {
                 return luaL_error(state, "invalid curve handle in harmony get_bezier_curve_point function");
@@ -78,7 +83,7 @@ namespace Harmony::Lua {
             }
 
             auto &curve = curves[handle];
-            auto point = curve.get_point(t);
+            auto point = curve.get_point(t, reverse);
 
             float transform = point.y * (final_value - initial_value);
             float result = transform + initial_value;
