@@ -107,9 +107,6 @@ namespace Harmony {
         // remove this event, we only need to run it once
         remove_tick_event(first_tick);
 
-        // Enable console output
-        enable_output(true);
-
         // Set up d3d9 events
         set_up_d3d9_end_scene_event();
         set_up_d3d9_reset_event();
@@ -148,7 +145,7 @@ namespace Harmony {
         auto command_slices = split_arguments(command);
         auto command_name = command_slices[0];
         if(command_name == "harmony") {
-            ConsoleColor blue = {1, 0.1, 0.8, 0.9};
+            HaloData::ColorARGB blue = {1, 0.1, 0.8, 0.9};
             console_output(blue, "Harmony version %s", HARMONY_VERSION);
         }
         else if(command_name == "harmony_signature") {

@@ -53,7 +53,8 @@ add_library(harmony MODULE
     src/events/widget_open.S
     src/events/widget_sound.cpp
     src/events/widget_sound.S
-    src/halo_data/path.cpp
+    src/halo_data/console.cpp
+    src/halo_data/console.S
     src/halo_data/master_volume.cpp
     src/halo_data/game_engine.cpp
     src/halo_data/input_devices.cpp
@@ -89,8 +90,6 @@ add_library(harmony MODULE
     src/menu/widescreen_element_reposition_menu.S
     src/menu/widescreen_mouse.S
     src/menu/widescreen_override.cpp
-    src/messaging/console_output.cpp
-    src/messaging/console_output.S
     src/messaging/exception.cpp
     src/messaging/message_box.cpp
     src/optic/animation.cpp
