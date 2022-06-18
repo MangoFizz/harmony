@@ -1,1 +1,1 @@
-#define HARMONY_VERSION "2.1.0"
+#define HARMONY_VERSION "3.0.0"
