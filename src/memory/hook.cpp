@@ -334,6 +334,18 @@ namespace Harmony::Memory {
                     break;
                 }
 
+                // sub
+                case 0x81: {
+                    if(instruction[1] == 0xEC) { // sub esp, imm32
+                        this->cave.insert(&instruction[0], 6);
+                        instruction_size = 6;
+                    }
+                    else {
+                        throw Hook::Exception("Unsupported sub instruction.");
+                    }
+                    break;
+                }
+
                 default: {
                     char message[256];
                     snprintf(message, sizeof(message), "Unable to build cave: unsupported instruction. \nOpcode: 0x%.2X at 0x%p", instruction[0], instruction);
@@ -493,7 +505,7 @@ namespace Harmony::Memory {
         // Set override return
         *cave_return = this->instruction + 5;
 
-        // Copy instruction code into cave
+        // Save original code into cave
         std::uint8_t instruction_size;
         try {
             // Copy instructions

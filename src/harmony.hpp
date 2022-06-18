@@ -5,8 +5,11 @@
 
 #include <vector>
 #include <memory>
+#include <filesystem>
 
 namespace Harmony {
+    class Command;
+    class Config;
     class Signature;
 
     namespace Lua {
@@ -39,6 +42,28 @@ namespace Harmony {
         bool signature_exists(std::string name) noexcept;
 
         /**
+         * Get commands
+         * @param command_name  name of the desired command
+         */
+        Command *get_command(std::string command_name) noexcept;
+
+        /**
+         * Execute a command
+         * @param command_name  name of the desired command
+         */
+        bool execute_command(std::string command_name, bool quiet = false) noexcept;
+
+        /**
+         * Load config
+         */
+        void load_config() noexcept;
+
+        /**
+         * Get config
+         */
+        Config &get_config() noexcept;
+
+        /**
          * Get Lua library handler
          */
         Lua::Library &get_lua_library_handler() noexcept;
@@ -54,6 +79,11 @@ namespace Harmony {
         Menu::WidescreenOverride &get_widescreen_override_handle() noexcept;
 
         /**
+         * Get harmony data directory path
+         */
+        std::filesystem::path get_data_directory_path() noexcept;
+
+        /**
          * Constructor for everything
          */
         Harmony();
@@ -67,6 +97,12 @@ namespace Harmony {
     private:
         /** Harmony signatures */
         std::vector<Signature> signatures;
+
+        /** Harmony console commands */
+        std::vector<Command> commands;
+
+        /** Command configs */
+        std::unique_ptr<Config> config;
 
         /** Lua handler */
         std::unique_ptr<Lua::Library> lua_handler;

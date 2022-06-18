@@ -21,6 +21,13 @@ include("ext/soloud.cmake")
 
 add_library(harmony MODULE
     src/command/command.cpp
+    src/command/config.cpp
+    src/command/commands/client.cpp
+    src/command/commands/debug/client_player_update_log.cpp
+    src/command/commands/debug/hs_debug.cpp
+    src/command/commands/debug/signature.cpp
+    src/debug/client_player_update_log.cpp
+    src/debug/client_player_update_log.S
     src/events/console_command.cpp
     src/events/console_command.S
     src/events/d3d9_end_scene.cpp
@@ -53,6 +60,7 @@ add_library(harmony MODULE
     src/events/widget_open.S
     src/events/widget_sound.cpp
     src/events/widget_sound.S
+    src/halo_data/color.cpp
     src/halo_data/console.cpp
     src/halo_data/console.S
     src/halo_data/master_volume.cpp
@@ -90,6 +98,7 @@ add_library(harmony MODULE
     src/menu/widescreen_element_reposition_menu.S
     src/menu/widescreen_mouse.S
     src/menu/widescreen_override.cpp
+    src/messaging/console_output.cpp
     src/messaging/exception.cpp
     src/messaging/message_box.cpp
     src/optic/animation.cpp

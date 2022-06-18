@@ -8,6 +8,35 @@
 
 namespace Harmony {
     /**
+     * Get whether or not output is enabled
+     */
+    bool output_is_enabled() noexcept;
+
+    /**
+     * Set whether or not to enable output
+     * @param enabled set to true if output should be enabled
+     */
+    void enable_output(bool enabled) noexcept;
+
+    /**
+     * Set console output prefix
+     * @param prefix    string to append at the start of console output
+     */
+    void set_output_prefix(const char *new_prefix) noexcept;
+
+    /**
+     * Clear console output prefix
+     */
+    void clear_output_prefix() noexcept;
+
+    /**
+     * Display a message of a color
+     * @param color   Color to use in the message
+     * @param message Message to use
+     */
+    void console_output(const HaloData::ColorARGB &color, const char *message) noexcept;
+
+    /**
      * Display a message of a color
      * @param color  Color to use in the message
      * @param format String format (passed to snprintf)
@@ -16,7 +45,7 @@ namespace Harmony {
     template<typename... Args> void console_output(const HaloData::ColorARGB &color, const char *format, Args... args) noexcept {
         char message[256];
         std::snprintf(message, sizeof(message), format, args...);
-        HaloData::console_output_raw(color, message);
+        console_output(color, message);
     }
 
     /**
