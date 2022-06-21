@@ -140,14 +140,14 @@ namespace Harmony::Lua {
             lua_remove(state, 1);
             luaL_checktype(state, 1, LUA_TTABLE);
 
-            auto left_bound = lua_get_table_field<std::uint16_t>(state, "left_bound", luaL_checkinteger);
-            auto top_bound = lua_get_table_field<std::uint16_t>(state, "top_bound", luaL_checkinteger);
+            auto left_bound = lua_get_table_field<float>(state, "left_bound", luaL_checknumber);
+            auto top_bound = lua_get_table_field<float>(state, "top_bound", luaL_checknumber);
             auto opacity = lua_get_table_field<float>(state, "opacity", luaL_checknumber);
             auto bitmap_index = lua_get_table_field<std::uint16_t>(state, "background_bitmap_index", luaL_checkinteger);
-            auto previous_widget_id = lua_get_table_field<std::uint16_t>(state, "previous_widget", luaL_checkinteger);
-            auto next_widget_id = lua_get_table_field<std::uint16_t>(state, "next_widget", luaL_checkinteger);
-            auto parent_widget_id = lua_get_table_field<std::uint16_t>(state, "parent_widget", luaL_checkinteger);
-            auto child_widget_id = lua_get_table_field<std::uint16_t>(state, "child_widget", luaL_checkinteger);
+            auto previous_widget_id = lua_get_table_field<std::uint32_t>(state, "previous_widget", luaL_checkinteger);
+            auto next_widget_id = lua_get_table_field<std::uint32_t>(state, "next_widget", luaL_checkinteger);
+            auto parent_widget_id = lua_get_table_field<std::uint32_t>(state, "parent_widget", luaL_checkinteger);
+            auto child_widget_id = lua_get_table_field<std::uint32_t>(state, "child_widget", luaL_checkinteger);
 
 
             #define SET_VALUE(field) { \
