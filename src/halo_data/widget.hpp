@@ -524,6 +524,36 @@ namespace Harmony::HaloData {
     };
 
     /**
+     * Bounds field from ui widget definition tag
+     */
+    struct WidgetDefinitionBounds {
+        std::uint16_t top;
+        std::uint16_t left;
+        std::uint16_t bottom;
+        std::uint16_t right;
+    };
+    static_assert(sizeof(WidgetDefinitionBounds) == 0x08);
+
+    /**
+     * This structure is passed as value to the function that handles 
+     * the DX9 bitmap render stuff. It represents the rectangle where
+     * the background bitmap of the widget will be drawn.
+     */
+    struct WidgetRenderArea {
+        struct Corner {
+            float x;
+            float y;
+            PADDING(0x8);
+            float unknown[2];
+        };
+
+        Corner top_left;
+        Corner top_right;
+        Corner bottom_right;
+        Corner bottom_left;
+    };
+
+    /**
      * Get string for a widget navigation sound
      * @param sound     Code of a navigation sound
      * @return          Sound string

@@ -20,10 +20,6 @@ namespace Harmony {
         class Handler;
     }
 
-    namespace Menu {
-        class WidescreenOverride;
-    }
-
     /** Harmony class */
     class Harmony {
     public:
@@ -74,11 +70,6 @@ namespace Harmony {
         Optic::Handler &get_optic_handler() noexcept;
 
         /**
-         * Get widescreen override handle
-         */
-        Menu::WidescreenOverride &get_widescreen_override_handle() noexcept;
-
-        /**
          * Get harmony data directory path
          */
         std::filesystem::path get_data_directory_path() noexcept;
@@ -109,9 +100,6 @@ namespace Harmony {
 
         /** Optic Handler */
         std::unique_ptr<Optic::Handler> optic_handler;
-
-        /** Widescreen override */
-        std::unique_ptr<Menu::WidescreenOverride> widescreen_fix_override;
 
         /** Instance pointer */
         static Harmony *instance;

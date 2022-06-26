@@ -29,8 +29,8 @@ _widescreen_mouse:
     mov edx, dword ptr [_widescreen_mouse_x]
     push ebx
     push ecx
-    mov ebx, dword ptr [_widescreen_mouse_left_bounds]
-    mov ecx, dword ptr [_widescreen_mouse_right_bounds]
+    mov ebx, dword ptr [_widescreen_mouse_left_bound]
+    mov ecx, dword ptr [_widescreen_mouse_right_bound]
 
     cmp eax, ecx
     jg x_too_high

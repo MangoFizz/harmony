@@ -28,7 +28,7 @@
 #include "memory/signature.hpp"
 #include "messaging/console_output.hpp"
 #include "messaging/message_box.hpp"
-#include "menu/widescreen_override.hpp"
+#include "menu/widescreen.hpp"
 #include "optic/handler.hpp"
 #include "version.hpp"
 #include "harmony.hpp"
@@ -137,10 +137,6 @@ namespace Harmony {
         return *this->optic_handler;
     }
 
-    Menu::WidescreenOverride &Harmony::get_widescreen_override_handle() noexcept {
-        return *this->widescreen_fix_override;
-    }
-
     std::filesystem::path Harmony::get_data_directory_path() noexcept {
         return HaloData::get_path() / "harmony";
     }
@@ -154,9 +150,6 @@ namespace Harmony {
 
         // Set up optic
         this->optic_handler = std::make_unique<Optic::Handler>();
-
-        // Set up widescreen override
-        this->widescreen_fix_override = std::make_unique<Menu::WidescreenOverride>();
 
         // Set error handling
         std::set_terminate(terminate);
@@ -218,11 +211,11 @@ namespace Harmony {
         // Add execute command function
         add_console_command_event(execute_commands);
 
+        // Override Chimera's widescreen fix
+        Menu::set_up_widescreen_override();
+
         // Set up debug stuff
         Debug::set_up_client_player_update_log();
-
-        // Override Chimera's widescreen fix
-        harmony.get_widescreen_override_handle().enable(true);
     }
 
     static bool execute_commands(const char *console_input) noexcept {

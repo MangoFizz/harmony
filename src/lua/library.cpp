@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include <algorithm>
-#include "../menu/widescreen_override.hpp"
+#include "../menu/widescreen.hpp"
 #include "../harmony.hpp"
 #include "api/callback.hpp"
 #include "api/math.hpp"
@@ -58,13 +58,7 @@ namespace Harmony::Lua {
                 // Look for require count
                 if(script->get_require_count() == 1) {
                     if(script->get_type() == "map") {
-                        /**
-                         * Restore UI frame aspect ratio before unload map script.
-                         * We can't put this in a map load callback because our event
-                         * is executed after Chimera's map load event, so next map 
-                         * script will load BEFORE we can restore the aspect ratio.
-                         */
-                        Harmony::get().get_widescreen_override_handle().reset_frame_aspect_ratio();
+                        Menu::enable_widescreen_override(false);
                     }
 
                     // Unblock widget input

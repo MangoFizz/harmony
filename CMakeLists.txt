@@ -97,7 +97,9 @@ add_library(harmony MODULE
     src/memory/signatures/client.cpp
     src/menu/widescreen_element_reposition_menu.S
     src/menu/widescreen_mouse.S
-    src/menu/widescreen_override.cpp
+    src/menu/widescreen.cpp
+    src/menu/widget_render.cpp
+    src/menu/widget_render.S
     src/messaging/console_output.cpp
     src/messaging/exception.cpp
     src/messaging/message_box.cpp

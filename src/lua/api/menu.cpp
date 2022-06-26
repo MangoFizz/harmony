@@ -5,7 +5,8 @@
 #include "../script.hpp"
 #include "../library.hpp"
 #include "../../halo_data/sound.hpp"
-#include "../../menu/widescreen_override.hpp"
+#include "../../menu/widescreen.hpp"
+#include "../../menu/widget_render.hpp"
 #include "menu.hpp"
 
 namespace Harmony::Lua {
@@ -16,7 +17,6 @@ namespace Harmony::Lua {
         if(args == 2) {
             static auto &harmony = Harmony::get();
             static auto &library = harmony.get_lua_library_handler();
-            static auto &ws_override = harmony.get_widescreen_override_handle();
 
             auto *script = library.get_script(state);
             if(script->get_type() != "map") {
@@ -26,7 +26,8 @@ namespace Harmony::Lua {
             std::uint16_t x = luaL_checknumber(state, 1);
             std::uint16_t y = luaL_checknumber(state, 2);
 
-            ws_override.set_aspect_ratio(x, y);
+            Menu::set_menu_aspect_ratio(x, y);
+            Menu::enable_widescreen_override(true);
         }
         else {
             luaL_error(state, "invalid number of arguments in harmony set_widescreen_aspect_ratio function");
@@ -137,11 +138,10 @@ namespace Harmony::Lua {
             }
 
             // Get table
-            lua_remove(state, 1);
-            luaL_checktype(state, 1, LUA_TTABLE);
+            luaL_checktype(state, -1, LUA_TTABLE);
 
-            auto left_bound = lua_get_table_field<float>(state, "left_bound", luaL_checknumber);
-            auto top_bound = lua_get_table_field<float>(state, "top_bound", luaL_checknumber);
+            auto left_bound = lua_get_table_field<std::uint16_t>(state, "left_bound", luaL_checknumber);
+            auto top_bound = lua_get_table_field<std::uint16_t>(state, "top_bound", luaL_checknumber);
             auto opacity = lua_get_table_field<float>(state, "opacity", luaL_checknumber);
             auto bitmap_index = lua_get_table_field<std::uint16_t>(state, "background_bitmap_index", luaL_checkinteger);
             auto previous_widget_id = lua_get_table_field<std::uint32_t>(state, "previous_widget", luaL_checkinteger);
@@ -407,6 +407,18 @@ namespace Harmony::Lua {
         return 0;
     }
 
+    static int lua_set_cursor_scale(lua_State *state) noexcept {
+        int args = lua_gettop(state);
+        if(args == 1) {
+            float scale = luaL_checknumber(state, 1);
+            Menu::set_cursor_scale(scale);
+        }
+        else {
+            luaL_error(state, "invalid number of arguments in harmony set_cursor_scale function");
+        }
+        return 0;
+    }
+
     static const luaL_Reg menu[] = {
         {"set_aspect_ratio", lua_set_aspect_ratio},
         {"play_sound", lua_play_sound},
@@ -420,6 +432,7 @@ namespace Harmony::Lua {
         {"focus_widget", lua_focus_widget},
         {"get_root_widget", lua_get_root_widget},
         {"block_input", lua_block_input},
+        {"set_cursor_scale", lua_set_cursor_scale},
         {NULL, NULL}
     };
 

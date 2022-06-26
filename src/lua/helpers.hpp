@@ -55,11 +55,11 @@ namespace Harmony::Lua {
     template <typename T>
     std::optional<T> lua_get_table_field(lua_State *state, const char *field, std::function<T (lua_State *, int)> function) noexcept {
         std::optional<T> result;
-        lua_getfield(state, 1, field);
-        if(!lua_isnil(state, -1)) {
+        int type = lua_getfield(state, -1, field);
+        if(type != LUA_TNIL) {
             result = function(state, -1);
-            lua_pop(state, 1);
         }
+        lua_pop(state, 1);
         return result;
     }
 

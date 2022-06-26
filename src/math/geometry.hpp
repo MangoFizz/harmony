@@ -34,13 +34,6 @@ namespace Harmony::Math {
 
     using Curve = std::vector<Point2D>;
 
-    struct Rectangle2D {
-        int left;
-        int top;
-        int right;
-        int bottom;
-    };
-
     class QuadraticBezier {
     public:
         /**
