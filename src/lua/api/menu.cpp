@@ -113,6 +113,11 @@ namespace Harmony::Lua {
                     INSERT_ELEMENT(child_widget, lua_pushinteger);
                 }
 
+                if(widget->focused_child) {
+                    auto focused_child = get_widget_id(widget->focused_child);
+                    INSERT_ELEMENT(focused_child, lua_pushinteger);
+                }
+
                 #undef INSERT_ELEMENT
 
                 return 1;
@@ -148,6 +153,7 @@ namespace Harmony::Lua {
             auto next_widget_id = lua_get_table_field<std::uint32_t>(state, "next_widget", luaL_checkinteger);
             auto parent_widget_id = lua_get_table_field<std::uint32_t>(state, "parent_widget", luaL_checkinteger);
             auto child_widget_id = lua_get_table_field<std::uint32_t>(state, "child_widget", luaL_checkinteger);
+            auto focused_child_id = lua_get_table_field<std::uint32_t>(state, "focused_child", luaL_checkinteger);
 
 
             #define SET_VALUE(field) { \
@@ -174,6 +180,7 @@ namespace Harmony::Lua {
             SET_WIDGET(next_widget);
             SET_WIDGET(parent_widget);
             SET_WIDGET(child_widget);
+            SET_WIDGET(focused_child);
 
             #undef SET_VALUE
             #undef SET_WIDGET 
