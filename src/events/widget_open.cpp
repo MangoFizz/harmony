@@ -15,7 +15,16 @@ namespace Harmony {
         void create_widget_return_hook_asm();
 
         void call_widget_open_events(HaloData::WidgetInstance *widget) {
-            call_in_order(events, widget);
+            auto &widget_globals = HaloData::WidgetGlobals::get();
+
+            /**
+             * When a widget is opened using the create event, this function 
+             * will receive the opened widget before the widget that triggered 
+             * the event, so we just have to ignore it.
+             */
+            if(widget == widget_globals.root_widget) {
+                call_in_order(events, widget);
+            }
         }
     }
 
