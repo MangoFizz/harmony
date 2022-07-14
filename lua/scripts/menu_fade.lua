@@ -14,13 +14,39 @@ local blam = require "blam"
 -- Duration in milliseconds
 local animationDuration = 200
 
--- Script globals
+-- Script state
 local animationPlay = false
 local animationBezierCurve = nil
 local animationStartTimestamp = nil
 local currentWidget = nil
 local currentWidgetBackground = nil
 local lastWidgetBackground = nil
+
+
+local function applyOpacity(opacity)
+    local newWidgetValues = {
+        opacity = opacity
+    }
+
+    -- If previous widget background is the same on current widget, just apply the effect to its childs.
+    if(currentWidgetBackground == lastWidgetBackground) then
+        local currentWidgetValues = harmony.menu.getWidgetValues(currentWidget)
+        local currentChild = currentWidgetValues.child_widget
+        local previousChild = nil
+        while(currentChild) do
+            if(previousChild == currentChild) then
+                break
+            end
+            harmony.menu.setWidgetValues(currentChild, newWidgetValues)
+            local currentWidgetValues = harmony.menu.getWidgetValues(currentChild)
+            previousChild = currentChild
+            currentChild = currentWidgetValues.next_widget
+            
+        end
+    else 
+        harmony.menu.setWidgetValues(currentWidget, newWidgetValues)
+    end
+end
 
 function OnPreframe()
     if(animationPlay and harmony.menu.getRootWidget()) then
@@ -31,31 +57,10 @@ function OnPreframe()
             local t = animationElapsedMilliseconds / animationDuration
             local newOpacity = harmony.math.getBezierCurvePoint(animationBezierCurve, 0, 1, t)
     
-            local newWidgetValues = {
-                opacity = newOpacity
-            }
-            
-            -- If previous widget background is the same on current widget, just apply the effect to its childs.
-            if(currentWidgetBackground == lastWidgetBackground) then
-                local currentWidgetValues = harmony.menu.getWidgetValues(currentWidget)
-                local currentChild = currentWidgetValues.child_widget
-                local previousChild = nil
-                while(currentChild) do
-                    if(previousChild == currentChild) then
-                        break
-                    end
-                    harmony.menu.setWidgetValues(currentChild, newWidgetValues)
-                    local currentWidgetValues = harmony.menu.getWidgetValues(currentChild)
-                    previousChild = currentChild
-                    currentChild = currentWidgetValues.next_widget
-                    
-                end
-            else 
-                harmony.menu.setWidgetValues(currentWidget, newWidgetValues)
-            end
+            applyOpacity(newOpacity)
         else
             -- Reset opacity, just in case
-            harmony.menu.setWidgetValues(currentWidget, { opacity = 1.0 })
+            applyOpacity(1.0)
             
             animationPlay = false
         end
