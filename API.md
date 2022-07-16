@@ -434,13 +434,22 @@ harmony.optic.set_animation_property(fadeInAnim, "ease in", "position y", -60)
 ### create_sprite
 Create a sprite from a texture file.
 
-**Takes:** `string` image_path, `number` width, `number` height
+**Takes (a):** `string` image_path, `number` width, `number` height
 
 **Returns:** `number` sprite_handle
 
 Example:
 ```lua
 local hitmarkerSprite = harmony.optic.create_sprite("images/hitmarker.png", 35, 35)
+```
+
+**Takes (b):** `string` image_path, `number` width, `number` height, `number` sheet_rows, `number` sheet_columns, `number` frames, `number` frames_per_second
+
+**Returns:** `number` sprite_handle
+
+Example:
+```lua
+local hitmarkerSprite = harmony.optic.create_sprite("images/hitmarker.png", 35, 35, 3, 3, 7, 10)
 ```
 
 ### create_render_queue
