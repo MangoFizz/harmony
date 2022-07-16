@@ -8,97 +8,91 @@
 
 clua_version = 2.056
 
-local blam = require "blam"
-local harmony = require "harmony"
+local harmony = require "mods.harmony"
 local optic = harmony.optic
 
 -- Paramenters
-local duration = 140
-local size = 3
-local enableSound = true
+local duration = 125
+local marker_scale = 3
 
-local screenWidth = read_word(blam.addressList.screenWidth)
-local screenHeight = read_word(blam.addressList.screenHeight)
-local markerCornerSize = screenWidth * (size / 640)
-local animationDuration = duration
-local fadeOutDuration = duration / 3
-local animationDisplacement = markerCornerSize * 2
-local killmarker = false
+local screen_width = read_word(0x637CF2)
+local screen_height = read_word(0x637CF0)
+local marker_corner_size = screen_width * (marker_scale / 640)
+local animation_duration = duration
+local fade_out_duration = duration / 3
+local animation_displacement = marker_corner_size * 1.85
+local kill_marker = false
 
 -- Optic resources
-local hitmarkerCornerSprite
-local killmarkerCornerSprite
-local topLeftCornerAnim
-local topRightCornerAnim
-local bottomLeftCornerAnim
-local bottomRightCornerAnim
-local FadeOutAnim
-local hitSound
-local audioEngine
+local hitmarker_corner_sprite
+local killmarker_corner_sprite
+local top_left_corner_anim
+local top_right_corner_anim
+local bottom_left_corner_anim
+local bottom_right_corner_anim
+local fade_out_anim
+local hit_sound
+local audio_engine
 
-local function renderMarker(sprite) 
-    local positionX = (screenWidth - markerCornerSize) / 2
-    local positionY = (screenHeight - markerCornerSize) / 2
-    local displacement = markerCornerSize * 4.5
+local function render_marker(sprite) 
+    local position_x = (screen_width - marker_corner_size) / 2
+    local position_y = (screen_height - marker_corner_size) / 2
+    local displacement = marker_corner_size * 4.5
     local opacity = 255
-    optic.renderSprite(sprite, positionX - displacement, positionY - displacement, opacity, 180, duration, topLeftCornerAnim, FadeOutAnim)
-    optic.renderSprite(sprite, positionX + displacement, positionY - displacement, opacity, -90, duration, topRightCornerAnim, FadeOutAnim)
-    optic.renderSprite(sprite, positionX - displacement, positionY + displacement, opacity, 90, duration, bottomLeftCornerAnim, FadeOutAnim)
-    optic.renderSprite(sprite, positionX + displacement, positionY + displacement, opacity, 0, duration, bottomRightCornerAnim, FadeOutAnim)
+    optic.render_sprite(sprite, position_x - displacement, position_y - displacement, opacity, 180, duration, top_left_corner_anim, fade_out_anim)
+    optic.render_sprite(sprite, position_x + displacement, position_y - displacement, opacity, -90, duration, top_right_corner_anim, fade_out_anim)
+    optic.render_sprite(sprite, position_x - displacement, position_y + displacement, opacity, 90, duration, bottom_left_corner_anim, fade_out_anim)
+    optic.render_sprite(sprite, position_x + displacement, position_y + displacement, opacity, 0, duration, bottom_right_corner_anim, fade_out_anim)
 end
 
-function OnMultiplayerEvent(eventName, localId, killerId, victimId)
-    if(eventName == "local killed player") then
-        if(localId == killerId) then
-            renderMarker(killmarkerCornerSprite)
-            optic.playSound(hitSound, audioEngine, true)
+function on_multiplayer_event(event_name, local_id, killer_id, victim_id)
+    if(event_name == "local killed player") then
+        if(local_id == killer_id) then
+            render_marker(killmarker_corner_sprite)
 
             -- Block hitmarker
-            killmarker = true
+            kill_marker = true
         end
     end
 end
 
-function OnMultiplayerHitSound(sound)
-    if(not killmarker) then
-        renderMarker(hitmarkerCornerSprite)
+function on_multiplayer_hit_sound(sound)
+    if(not kill_marker) then
+        render_marker(hitmarker_corner_sprite)
     else
-        killmarker = false
+        kill_marker = false
         return false
     end
     return true
 end
 
-function OnLoad()
-    hitmarkerCornerSprite = optic.createSprite("images/hm_blue_corner.png", markerCornerSize, markerCornerSize)
-    killmarkerCornerSprite = optic.createSprite("images/hm_red_corner.png", markerCornerSize, markerCornerSize)
+function on_load()
+    hitmarker_corner_sprite = optic.create_sprite("hm_blue_corner.png", marker_corner_size, marker_corner_size)
+    killmarker_corner_sprite = optic.create_sprite("hm_red_corner.png", marker_corner_size, marker_corner_size)
 
-    topLeftCornerAnim = optic.createAnimation(animationDuration)
-    optic.setAnimationProperty(topLeftCornerAnim, "ease in out", "position x", -animationDisplacement)
-    optic.setAnimationProperty(topLeftCornerAnim, "ease in out", "position y", -animationDisplacement)
+    top_left_corner_anim = optic.create_animation(animation_duration)
+    optic.set_animation_property(top_left_corner_anim, "ease in out", "position x", -animation_displacement)
+    optic.set_animation_property(top_left_corner_anim, "ease in out", "position y", -animation_displacement)
 
-    topRightCornerAnim = optic.createAnimation(animationDuration)
-    optic.setAnimationProperty(topRightCornerAnim, "ease in out", "position x", animationDisplacement)
-    optic.setAnimationProperty(topRightCornerAnim, "ease in out", "position y", -animationDisplacement)
+    top_right_corner_anim = optic.create_animation(animation_duration)
+    optic.set_animation_property(top_right_corner_anim, "ease in out", "position x", animation_displacement)
+    optic.set_animation_property(top_right_corner_anim, "ease in out", "position y", -animation_displacement)
 
-    bottomLeftCornerAnim = optic.createAnimation(animationDuration)
-    optic.setAnimationProperty(bottomLeftCornerAnim, "ease in out", "position x", -animationDisplacement)
-    optic.setAnimationProperty(bottomLeftCornerAnim, "ease in out", "position y", animationDisplacement)
+    bottom_left_corner_anim = optic.create_animation(animation_duration)
+    optic.set_animation_property(bottom_left_corner_anim, "ease in out", "position x", -animation_displacement)
+    optic.set_animation_property(bottom_left_corner_anim, "ease in out", "position y", animation_displacement)
 
-    bottomRightCornerAnim = optic.createAnimation(animationDuration)
-    optic.setAnimationProperty(bottomRightCornerAnim, "ease in out", "position x", animationDisplacement)
-    optic.setAnimationProperty(bottomRightCornerAnim, "ease in out", "position y", animationDisplacement)
+    bottom_right_corner_anim = optic.create_animation(animation_duration)
+    optic.set_animation_property(bottom_right_corner_anim, "ease in out", "position x", animation_displacement)
+    optic.set_animation_property(bottom_right_corner_anim, "ease in out", "position y", animation_displacement)
 
-    FadeOutAnim = optic.createAnimation(duration / 3)
-    optic.setAnimationProperty(FadeOutAnim, "linear", "opacity", -255)
-
-    hitSound = optic.createSound("sounds/hit.wav")
-    audioEngine = optic.createAudioEngine()
+    fade_out_anim = optic.create_animation(duration / 3)
+    optic.set_animation_property(fade_out_anim, "linear", "opacity", -255)
     
     -- Set harmony callbacks
-    harmony.setCallback("multiplayer event", "OnMultiplayerEvent")
-    harmony.setCallback("multiplayer hit sound", "OnMultiplayerHitSound")
+    harmony.set_callback("multiplayer event", "on_multiplayer_event")
+    harmony.set_callback("multiplayer hit sound", "on_multiplayer_hit_sound")
 end
 
 -- Load stuff
-OnLoad()
+on_load()
