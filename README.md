@@ -39,7 +39,8 @@ how these features can be used.
 
 ### Event callbacks
 Like Chimera, Harmony allows you to register callbacks for some events, such when the
-player presses a key, when the player opens or closes a menu, when the player joins a server, when a player dies, etc. (see [API docs](API.md) for more details).
+player presses a key, when the player opens or closes a menu, when the player joins a 
+server, when a player dies, etc. (see [API docs](API.md) for more details).
 
 ### Lua scripting 
 Harmony can be used directly on Chimera scripts, it can be required like any
