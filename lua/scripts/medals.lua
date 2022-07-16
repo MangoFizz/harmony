@@ -9,7 +9,7 @@
 clua_version = 2.056
 
 local blam = require "blam"
-local commandParser = require "command_parser"
+local commandParser = require "harmony.commands"
 local harmony = require "harmony"
 local optic = harmony.optic
 
