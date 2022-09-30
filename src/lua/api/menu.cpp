@@ -210,7 +210,7 @@ namespace Harmony::Lua {
             }
 
             // Get history flag
-            bool dont_push_history = lua_toboolean(state, 1);
+            bool dont_push_history = lua_toboolean(state, 2);
 
             auto *new_widget = open_widget(widget_definition, dont_push_history);
             auto new_widget_id = get_widget_id(new_widget);
