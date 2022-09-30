@@ -18,11 +18,6 @@ namespace Harmony::Lua {
             static auto &harmony = Harmony::get();
             static auto &library = harmony.get_lua_library_handler();
 
-            auto *script = library.get_script(state);
-            if(script->get_type() != "map") {
-                return luaL_error(state, "set_aspect_ratio function unavailable on non-map scripts");
-            }
-
             std::uint16_t x = luaL_checknumber(state, 1);
             std::uint16_t y = luaL_checknumber(state, 2);
 
