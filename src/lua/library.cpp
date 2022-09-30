@@ -58,7 +58,7 @@ namespace Harmony::Lua {
                 // Look for require count
                 if(script->get_require_count() == 1) {
                     if(script->get_type() == "map") {
-                        Menu::enable_widescreen_override(false);
+                        Menu::set_menu_aspect_ratio(4, 3);
                     }
 
                     // Unblock widget input

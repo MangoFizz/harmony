@@ -145,10 +145,7 @@ namespace Harmony::Menu {
             ready = true;
 
             // If enabled, enable it again
-            if(enabled) {
-                enabled = false;
-                enable_widescreen_override(true);
-            }
+            enable_widescreen_override(true);
         }
         catch(Memory::Hook::Exception &e) {
             console_error("harmony: Failed to enable widescreen override: Chimera's widescreen fix is disabled!");

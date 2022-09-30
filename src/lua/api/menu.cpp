@@ -27,7 +27,6 @@ namespace Harmony::Lua {
             std::uint16_t y = luaL_checknumber(state, 2);
 
             Menu::set_menu_aspect_ratio(x, y);
-            Menu::enable_widescreen_override(true);
         }
         else {
             luaL_error(state, "invalid number of arguments in harmony set_widescreen_aspect_ratio function");
