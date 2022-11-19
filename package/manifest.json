@@ -1,0 +1,14 @@
+{
+    "author": "Mango",
+    "files": {},
+    "version": "3.0.1",
+    "manifestVersion": "1.1.0",
+    "dependencies": [
+        {
+            "label": "chimera"
+        }
+    ],
+    "label": "harmony",
+    "name": "Harmony",
+    "description": "External interface features for Halo CE"
+}

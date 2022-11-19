@@ -1,0 +1,8 @@
+version: 1
+commands:
+  package:
+    - cp dist/harmony.dll package/game-mods/harmony.dll
+    - mercury pack package/ dist/
+    - rm -f package/game-mods/harmony.dll
+  release:
+    - mercury build package
