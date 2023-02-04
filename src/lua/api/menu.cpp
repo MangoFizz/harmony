@@ -71,6 +71,7 @@ namespace Harmony::Lua {
                 auto top_bound = widget->top_bound;
                 auto opacity = widget->opacity;
                 auto background_bitmap_index = widget->bitmap_index;
+                auto text = reinterpret_cast<std::uint32_t>(widget->text);
 
                 lua_newtable(state);                
 
@@ -86,6 +87,7 @@ namespace Harmony::Lua {
                 INSERT_ELEMENT(top_bound, lua_pushinteger);
                 INSERT_ELEMENT(opacity, lua_pushnumber);
                 INSERT_ELEMENT(background_bitmap_index, lua_pushinteger);
+                INSERT_ELEMENT(text, lua_pushinteger);
 
                 if(widget->previous_widget) {
                     auto previous_widget = get_widget_id(widget->previous_widget);
