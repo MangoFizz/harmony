@@ -79,7 +79,8 @@ namespace Harmony::Lua {
 
     std::string Script::get_script_data_path() noexcept {
         static auto chimera_folder = HaloData::get_path() / "chimera";
-        static auto scripts_data_directory = chimera_folder / "lua" / "data";
+        static auto chimera_absolute_path = std::filesystem::absolute(chimera_folder);
+        static auto scripts_data_directory = chimera_absolute_path / "lua" / "data";
 
         // Remove script file extension
         auto script_name = this->name.substr(0, this->name.size() - 4);
