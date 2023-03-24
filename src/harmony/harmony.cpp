@@ -2,31 +2,17 @@
 
 #include <iostream>
 #include <balltze/output.hpp>
-#include <balltze/event.hpp>
+#include <balltze/api.hpp>
 
-namespace Harmony {
-    using namespace Balltze::Event;
-
-    static EventListenerHandle<TickEvent> firstTickListener;
-
-    static void first_tick(TickEvent const &context) noexcept {
-        Balltze::console_printf("Harmony initialized");
-        firstTickListener.remove();
-    }
-
-    static void initialize_harmony() noexcept {
-        firstTickListener = TickEvent::subscribe_const(first_tick, EVENT_PRIORITY_HIGHEST);
-    }
+BALLTZE_PLUGIN_API bool plugin_init() noexcept {
+    std::cout << "Harmony initialized" << std::endl;
+    return true;
 }
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
-    switch(fdwReason) {
-        case DLL_PROCESS_ATTACH:
-            Harmony::initialize_harmony();
-            break;
+BALLTZE_PLUGIN_API void plugin_start() noexcept {
+    Balltze::console_printf("Harmony started from Balltze!");
+}
 
-        default:
-            break;
-    }
+WINAPI BOOL DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
     return TRUE;
 }
