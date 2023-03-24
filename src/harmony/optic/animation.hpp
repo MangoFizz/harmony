@@ -8,13 +8,14 @@
 #include <chrono>
 #include <optional>
 #include <balltze/math.hpp>
-#include "sprite.hpp"
+#include <balltze/engine/core.hpp>
+#include "bitmap.hpp"
 
 namespace Harmony::Optic {
     using BezierCurve = Balltze::Math::QuadraticBezier;
 
     struct AnimationProgress {
-        Math::Point2D position;
+        Engine::Point2D position;
         Sprite::Scale scale;
         int opacity;
         float rotation;
@@ -36,9 +37,9 @@ namespace Harmony::Optic {
         ANIMATION_PROPERTY_SCALE_Y
     };
 
-    class Animation {
+    class AnimationSequence {
     private:
-        struct AnimationPropertyData {
+        struct PropertyTransition {
             /** Duration in milliseconds */
             long duration;
             
@@ -47,7 +48,7 @@ namespace Harmony::Optic {
         };
 
         /** Animation curves */
-        std::map<AnimationProperty, AnimationPropertyData> m_properties;
+        std::map<AnimationProperty, std::vector<PropertyTransition>> m_properties_sequences;
 
         /** Animation is playing */
         bool m_playing = false;
@@ -78,7 +79,7 @@ namespace Harmony::Optic {
          * @param curve         The quadratic bezier used to generate the property frames
          * @param duration      Duration of the animation for this property in milliseconds
          */
-        void set_property(AnimationProperty property, BezierCurve curve, long duration) noexcept;
+        void add_property_curve(AnimationProperty property, BezierCurve curve, long duration) noexcept;
 
         /**
          * Play the animation
@@ -128,6 +129,7 @@ namespace Harmony::Optic {
     /**
      * Generic curves for animations
      */
+    BezierCurve static_curve() noexcept;
     BezierCurve flat_curve() noexcept;
     BezierCurve linear_curve() noexcept;
     BezierCurve ease_in_curve() noexcept;
