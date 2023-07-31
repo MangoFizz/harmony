@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
+#include <iostream>
 #include <cstring>
 #include "../messaging/message_box.hpp"
 #include "codefinder.hpp"
@@ -32,7 +33,7 @@ namespace Harmony {
             this->original_data.insert(this->original_data.begin(), this->data, this->data + lenght - offset);
         }
         else {
-            message_box("Could not find %s signature.", name);
+            std::cout << std::endl << "Could not find " << name << " signature." << std::endl;
             std::terminate();
         }
     }
